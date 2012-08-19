@@ -1,4 +1,0 @@
-adminko
-=======
-
-Admin&amp;K°
