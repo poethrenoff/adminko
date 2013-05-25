@@ -3,10 +3,10 @@
 	<head>
 		<title>{$meta_title|escape}</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<script src="/admin/script/jquery.js" type="text/javascript"></script>
-		<script src="/admin/script/interface.js" type="text/javascript"></script>
+		<script src="/admin/js/jquery.js" type="text/javascript"></script>
+		<script src="/admin/js/interface.js" type="text/javascript"></script>
 		<script src="/admin/ckeditor/ckeditor.js" type="text/javascript"></script>
-		<link rel="stylesheet" href="/admin/style/index.css" type="text/css"/>
+		<link rel="stylesheet" href="/admin/css/index.css" type="text/css"/>
 	</head>
 	<body>
 		<table class="main">

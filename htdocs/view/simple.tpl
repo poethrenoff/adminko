@@ -5,7 +5,7 @@
 		<meta name="keywords" content="{$meta_keywords|escape}"/> 
 		<meta name="description" content="{$meta_description|escape}"/> 
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="/style/index.css"/>
+		<link rel="stylesheet" type="text/css" href="/css/index.css"/>
 	</head>
 	<body>
 		<table class="main" border="1">
