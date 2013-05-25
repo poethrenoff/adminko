@@ -1,25 +1,27 @@
 <?php
 class system
 {
-	private static $routes = array();
+	private static $routes = null;
 	
-	private static $route_params = array();
+	private static $params = null;
 	
 	private static $cache_mode = true;
 	
 	private static $lang = null;
 	
-	private static $lang_list = array();
+	private static $lang_list = null;
 	
 	private static $site = null;
 	
 	private static $page = null;
 	
+	private static $key_name = '__SITE__';
+	
 	public static function init()
 	{
-		self::$site = cache::get( CONFIG_FILE );
+		self::$site = cache::get( self::$key_name );
 		if ( self::$site === false )
-			self::$site = build();
+			self::$site = self::build();
 		
 		if ( !self::$site ) exit;
 		
@@ -51,33 +53,33 @@ class system
 	
 	public static function dispatcher()
 	{
-		session_start();
+		@session_start();
 		session::start();
 		
 		self::share_methods();
-		self::$routes = self::routes();
+		$routes = self::get_routes();
 		
 		self::$page = null;
 		$url = '/' . trim( self_url(), '/' );
 		
 		$page_list = array_reindex( self::$site['page'], 'page_path' );
 		
-		foreach ( self::$routes as $route_rule => $route_item )
+		foreach ( $routes as $route_rule => $route_item )
 		{
 			if ( preg_match( $route_item['pattern'], $url, $route_match ) )
 			{
-				$route_params = array();
+				$params = array();
 				
 				foreach ( $route_item['params'] as $route_name => $route_item )
-					if ( is_numeric( $route_item ) )
-						$route_params[$route_name] = trim( $route_match[$route_item], '/' );
+					if ( preg_match( '|^#(\d+)$|', $route_item, $item_match ) )
+						$params[$route_name] = trim( $route_match[$item_match[1]], '/' );
 					else
-						$route_params[$route_name] = trim( $route_item, '/' );
+						$params[$route_name] = trim( $route_item, '/' );
 				
-				if ( isset( $route_params['controller'] ) && isset( $page_list['/' . $route_params['controller']] ) )
+				if ( isset( $params['controller'] ) && isset( $page_list['/' . $params['controller']] ) )
 				{
-					self::$route_params = $route_params;
-					self::$page = $page_list['/' . $route_params['controller']];
+					self::$params = $params;
+					self::$page = $page_list['/' . $params['controller']];
 					
 					break;
 				}
@@ -122,9 +124,11 @@ class system
 				$module_action = $module_main ? action() :
 					( ( isset( $module_params['action'] ) && $module_params['action'] ) ? $module_params['action'] : 'index' );
 				
+				$is_admin = controller() == 'admin';
+				
 				try
 				{
-					if ( controller() == 'admin' )
+					if ( $is_admin )
 						$module_object = admin::factory( object() );
 					else
 						$module_object = module::factory( $module_name );
@@ -140,31 +144,21 @@ class system
 					if ( ob_get_length() !== false )
 						ob_clean();
 					
-					$error_view = new view();
-					$error_view -> assign( 'message', $e -> getMessage() );
+					$error_content = exception_handler( $e, $e -> getCode(), $is_admin );
 					
-					if ( DEBUG_MODE )
-					{
-						$error_view -> assign( 'line', $e -> getLine() );
-						$error_view -> assign( 'file', $e -> getFile() );
-						$error_view -> assign( 'trace', $e -> getTraceAsString() );
-					}
-					
-					$error_content = $error_view -> fetch( 'block/error.tpl' );
-					
-					if ( $e -> getCode() )
-						$layout_view -> assign( $block['area_name'], $error_content );
-					else
-						die( $error_content );
+					$layout_view -> assign( $block['area_name'], $error_content );
 				}
 			}
 		}
 		
-		$layout_view -> display( self::$page['page_layout'] . '.tpl' );
+		$layout_view -> display( self::$page['page_layout'] );
 	}
 	
-	public static function routes()
+	public static function get_routes()
 	{
+		if ( !is_null( self::$routes ) )
+			return self::$routes;
+		
 		include_once APP_DIR . '/config/routes.php';
 		
 		$routes = array_merge( $routes, array(
@@ -186,8 +180,6 @@ class system
 			'@controller/@action' => array(),
 			'@controller/@action/@id' => array() ) );
 		
-		$route_map = array();
-		
 		foreach ( $routes as $route_rule => $route_rule_params )
 		{
 			$route_pattern = $route_rule;
@@ -197,30 +189,31 @@ class system
 			{
 				foreach ( $route_match[0] as $route_index => $route_name )
 				{
+					$route_index_name = '#' . ( $route_index + 1 );
+					
 					if ( $route_name == '@controller' )
 					{
 						$route_pattern = preg_replace( '/@controller/', '([/\w]*)', $route_pattern );
-						$route_pattern_params['controller'] = $route_index + 1;
+						$route_pattern_params['controller'] = $route_index_name;
 					}
 					else if ( $route_name == '@action' )
 					{
 						$route_pattern = preg_replace( '/@action/', '(\w*)', $route_pattern );
-						$route_pattern_params['action'] = $route_index + 1;
+						$route_pattern_params['action'] = $route_index_name;
 					}
 					else if ( $route_name == '@id' )
 					{
 						$route_pattern = preg_replace( '/@id/', '(\d*)', $route_pattern );
-						$route_pattern_params['id'] = $route_index + 1;
+						$route_pattern_params['id'] = $route_index_name;
 					}
 					else
 					{
 						$route_var_name = preg_replace( '/@/', '', $route_name );
+						$route_var_value = isset( $route_rule_params[$route_var_name] ) ?
+							$route_rule_params[$route_var_name] : '[^\/]*';
 						
-						if ( isset( $route_rule_params[$route_var_name] ) )
-						{
-							$route_pattern = preg_replace( '/' . $route_name . '/', '(' . $route_rule_params[$route_var_name] . ')', $route_pattern );
-							$route_pattern_params[$route_var_name] = $route_index + 1;
-						}
+						$route_pattern = preg_replace( '/' . $route_name . '/', '(' . $route_var_value . ')', $route_pattern );
+						$route_pattern_params[$route_var_name] = $route_index_name;
 					}
 				}
 			}
@@ -232,17 +225,194 @@ class system
 			
 			$route_pattern = '|^' . $route_pattern . '$|i';
 			
-			$route_map[$route_rule] = array( 'pattern' => $route_pattern, 'params' => $route_pattern_params );
+			self::$routes[$route_rule] = array( 'pattern' => $route_pattern, 'params' => $route_pattern_params );
 		}
 		
-		return $route_map;
+		return self::$routes;
 	}
 	
-	// Метод устанавливает параметры кеширования и сохраняет их в сессии
+	public static function url_for( $url_array = array(), $url_host = '' )
+	{
+		if ( !is_array( $url_array ) || count( $url_array ) == 0 )
+			return $_SERVER['REQUEST_URI'];
+		
+		if ( !isset( $url_array['action'] ) )
+			$url_array['action'] = !isset( $url_array['controller'] ) ? action() : 'index';
+		if ( !isset( $url_array['controller'] ) )
+			$url_array['controller'] = controller();
+		
+		$routes = self::get_routes();
+		
+		$most_match_rule = ''; $most_match_count = 0;
+		foreach ( $routes as $route_rule => $route_item )
+		{
+			if ( count( array_diff_key( $route_item['params'], $url_array ) ) == 0 )
+			{
+				$is_match = true;
+				foreach ( $route_item['params'] as $route_param_name => $route_param_value )
+					if ( !preg_match( '|^#(\d+)$|', $route_param_value ) )
+						$is_match &= $url_array[$route_param_name] === $route_param_value;
+				
+				if ( $is_match ) {
+					$match_count = count( array_intersect_key( $route_item['params'], $url_array ) );
+					if ( $match_count > $most_match_count ) {
+						$most_match_count = $match_count; $most_match_rule = $route_rule;
+					}
+				}
+			}
+		}
+		
+		$url = $most_match_rule;
+		if ( $url_array['action'] == 'index' )
+			$url = preg_replace( '|/@action$|i', '', $url );
+		
+		foreach ( $routes[$most_match_rule]['params'] as $route_param_name => $route_param_value )
+			$url = preg_replace( '/@' . $route_param_name . '/', $url_array[$route_param_name], $url );
+		
+		$query_string = http_build_query( prepare_query( $url_array, array_keys( $routes[$most_match_rule]['params'] ) ) );
+		
+		$url = $url_host . '/' . trim( $url, '/' ) . ( $query_string ? '?' . $query_string : '' );
+		
+		return $url;
+	}
+	
+	public static function build()
+	{
+		$page_list = db::select_all( 'select * from page, layout where page_layout = layout_id and page_active = 1 order by page_order' );
+		$page_list = array_reindex( tree::get_tree( $page_list, 'page_id', 'page_parent' ), 'page_id' );
+		
+		$area_list = db::select_all( 'select * from layout_area order by area_order' );
+		$area_list = array_group( $area_list, 'area_layout' );
+		
+		$block_list = db::select_all( 'select * from block, module where block_module = module_id' );
+		$block_list = array_reindex( $block_list, 'block_page', 'block_area' );
+		
+		$block_param_list = db::select_all( 'select * from block_param, module_param where param = param_id' );
+		$block_param_list = array_group( $block_param_list, 'block' );
+		
+		$param_value_list = db::select_all( 'select * from param_value' );
+		$param_value_list = array_reindex( $param_value_list, 'value_id' );
+		
+		$site = array();
+		
+		foreach( $page_list as $page )
+		{
+			$site_page = array();
+			
+			$page_path = array( $page['page_name'] ); $page_parent = $page['page_id'];
+			while ( $page_parent = $page_list[$page_parent]['page_parent'] )
+				$page_path[] = $page_list[$page_parent]['page_name'];
+			
+			$page_path = array_reverse( $page_path ); array_shift( $page_path );
+			
+			$site_page['page_id'] = $page['page_id'];
+			$site_page['page_path'] = '/' . join( '/', $page_path );
+			
+			if ( $page['page_folder'] )
+			{
+				$page_redirect = db::select_row( 'select * from page where page_parent = :page_parent and page_active = 1 order by page_order',
+					array( 'page_parent' => $page['page_id'] ) );
+				
+				if ( $page_redirect )
+					$site_page['page_redirect'] = rtrim( $site_page['page_path'] , '/' ) . '/' . $page_redirect['page_name'];
+				else
+					continue;
+			}
+			else
+			{
+				$site_page['page_layout'] = $page['layout_name'];
+				
+				$site_page['meta_title'] = $page['meta_title'];
+				$site_page['meta_keywords'] = $page['meta_keywords'];
+				$site_page['meta_description'] = $page['meta_description'];
+				
+				if ( isset( $area_list[$page['layout_id']] ) )
+				{
+					foreach( $area_list[$page['layout_id']] as $area )
+					{
+						if ( isset( $block_list[$page['page_id']][$area['area_id']] ) )
+						{
+							$block = $block_list[$page['page_id']][$area['area_id']];
+							
+							$page_block = array();
+							
+							$page_block['area_name'] = $area['area_name'];
+							$page_block['area_main'] = $area['area_main'] ? 1 : 0;
+							$page_block['module_name'] = $block['module_name'];
+							
+							if ( isset( $block_param_list[$block['block_id']] ) )
+							{
+								foreach( $block_param_list[$block['block_id']] as $param )
+								{
+									if ( $param['param_type'] == 'select' )
+										$page_block['param'][$param['param_name']] = isset( $param_value_list[$param['value']] ) ?
+											$param_value_list[$param['value']]['value_content'] : '';
+									else
+										$page_block['param'][$param['param_name']] = $param['value'];
+								}
+							}
+							
+							$site_page['block'][] = $page_block;
+						}
+					}
+				}
+			}
+			
+			$site['page'][] = $site_page;
+		}
+		
+		$site['page'][] = array ( 'page_id' => 'admin', 'page_path' => '/admin', 'page_layout' => 'admin', 
+			'meta_title' => '', 'meta_keywords' => '', 'meta_description' => '', 'block' => array(
+				array ( 'area_name' => 'content', 'area_main' => 1, 'module_name' => 'admin', 'param' => array(
+					'action' => 'index' ) ),
+				array ( 'area_name' => 'menu', 'area_main' => 0, 'module_name' => 'admin', 'param' => array(
+					'action'=> 'menu' ) ),
+				array ( 'area_name' => 'auth', 'area_main' => 0, 'module_name' => 'admin', 'param' => array(
+					'action' => 'auth' ) ) ) );
+		
+		if ( isset( metadata::$objects['lang'] ) )
+		{
+			$lang_list = db::select_all( 'select * from lang order by lang_default desc' );
+			
+			foreach ( $lang_list as $lang )
+			{
+				$site_lang = $lang;
+				
+				$dictionary = db::select_all( "
+					select
+						dictionary.word_name, translate.record_value
+					from
+						dictionary, translate
+					where
+						translate.table_record = dictionary.word_id and 
+						translate.table_name = 'dictionary' and
+						translate.field_name = 'word_value' and
+						translate.record_lang = :lang_id", array( 'lang_id' => $lang['lang_id'] ) );
+				
+				foreach ( $dictionary as $word )
+					$site_lang['dictionary'][$word['word_name']] = $word['record_value'];
+				
+				$site['lang'][] = $site_lang;
+			}
+		}
+		
+		if ( isset( metadata::$objects['preference'] ) )
+		{
+			$preference_list = db::select_all( 'select * from preference' );
+			
+			foreach ( $preference_list as $preference )
+				$site['preference'][$preference['preference_name']] = $preference['preference_value'];
+		}
+		
+		cache::set( self::$key_name, $site );
+		
+		return $site;
+	}
+	
 	public static function set_cache_mode()
 	{
 		if ( !isset( $_SESSION['_cache_mode'] ) )
-			$_SESSION['_cache_mode'] = SITE_CACHE;
+			$_SESSION['_cache_mode'] = CACHE_SITE;
 		
 		if ( isset( $_REQUEST['cache_on'] ) ) {
 			$_SESSION['_cache_mode'] = true;
@@ -264,45 +434,40 @@ class system
 	
 	public static function get_param( $param_name, $param_value = null )
 	{
-		if ( isset( System::$route_params[$param_name] ) )
-			return System::$route_params[$param_name];
+		if ( isset( self::$params[$param_name] ) )
+			return self::$params[$param_name];
 		else
 			return $param_value;
 	}
 	
-	public static function get_routes()
-	{
-		return System::$routes;
-	}
-	
 	public static function controller()
 	{
-		return System::get_param( 'controller' );
+		return self::get_param( 'controller' );
 	}
 	
 	public static function action()
 	{
-		return System::get_param( 'action', 'index' );
+		return self::get_param( 'action', 'index' );
 	}
 	
 	public static function id()
 	{
-		return System::get_param( 'id', '' );
+		return self::get_param( 'id', '' );
 	}
 	
 	public static function object()
 	{
-		return System::get_param( 'object' );
+		return self::get_param( 'object' );
 	}
 	
 	public static function is_cache()
 	{
-		return System::$cache_mode;
+		return self::$cache_mode;
 	}
 	
 	public static function lang()
 	{
-		return System::$lang;
+		return self::$lang;
 	}
 	
 	public static function lang_list()
@@ -312,21 +477,21 @@ class system
 	
 	public static function page()
 	{
-		return System::$page;
+		return self::$page;
 	}
 	
 	public static function site()
 	{
-		return System::$site;
+		return self::$site;
 	}
 	
-	// Метод создает общедоступные алиасы для некоторых методов класса
 	public static function share_methods()
 	{
-		$methods = array( 'get_param', 'get_routes', 'controller', 'action', 'id', 'object', 'is_cache', 'lang', 'lang_list', 'page', 'site' );
+		$methods = array( 'get_param', 'url_for', 'build', 'page', 'site', 'is_cache', 
+			'controller', 'action', 'id', 'object', 'lang', 'lang_list' );
 		
 		foreach ( $methods as $method )
-			if ( !is_callable( $method ) && method_exists( 'System', $method ) )
-				eval( 'function ' . $method . '() { $args = func_get_args(); return call_user_func_array( array( "System", "' . $method . '" ), $args ); }' );
+			if ( !is_callable( $method ) && method_exists( 'system', $method ) )
+				eval( 'function ' . $method . '() { $args = func_get_args(); return call_user_func_array( array( "system", "' . $method . '" ), $args ); }' );
 	}
 }

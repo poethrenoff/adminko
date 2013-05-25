@@ -30,9 +30,9 @@ function init_session( $varname, $vardef = '' )
 function init_cookie( $varname, $vardef = '' )
 {
 	if ( isset( $_COOKIE[$varname] ) )
-		return (string) $_COOKIE[$varname];
+		return $_COOKIE[$varname];
 	else
-		return (string) $vardef;
+		return $vardef;
 }
 
 function array_reindex( $array, $key1 = '', $key2 = '', $key3 = '', $key4 = '' )
@@ -155,184 +155,6 @@ function get_preference( $preference_name, $default_value = '' )
 		return $default_value;
 }
 
-function build()
-{
-	$page_list = db::select_all( 'select * from page, layout where page_layout = layout_id and page_active = 1 order by page_order' );
-	$page_list = array_reindex( tree::get_tree( $page_list, 'page_id', 'page_parent' ), 'page_id' );
-	
-	$area_list = db::select_all( 'select * from layout_area order by area_order' );
-	$area_list = array_group( $area_list, 'area_layout' );
-	
-	$block_list = db::select_all( 'select * from block, module where block_module = module_id' );
-	$block_list = array_reindex( $block_list, 'block_page', 'block_area' );
-	
-	$block_param_list = db::select_all( 'select * from block_param, module_param where param = param_id' );
-	$block_param_list = array_group( $block_param_list, 'block' );
-	
-	$param_value_list = db::select_all( 'select * from param_value' );
-	$param_value_list = array_reindex( $param_value_list, 'value_id' );
-	
-	$site = array();
-	
-	foreach( $page_list as $page )
-	{
-		$site_page = array();
-		
-		$page_path = array( $page['page_name'] ); $page_parent = $page['page_id'];
-		while ( $page_parent = $page_list[$page_parent]['page_parent'] )
-			$page_path[] = $page_list[$page_parent]['page_name'];
-		
-		$page_path = array_reverse( $page_path ); array_shift( $page_path );
-		
-		$site_page['page_id'] = $page['page_id'];
-		$site_page['page_path'] = '/' . join( '/', $page_path );
-		
-		if ( $page['page_folder'] )
-		{
-			$page_redirect = db::select_row( 'select * from page where page_parent = :page_parent and page_active = 1 order by page_order',
-				array( 'page_parent' => $page['page_id'] ) );
-			
-			if ( $page_redirect )
-				$site_page['page_redirect'] = rtrim( $site_page['page_path'] , '/' ) . '/' . $page_redirect['page_name'];
-			else
-				continue;
-		}
-		else
-		{
-			$site_page['page_layout'] = $page['layout_name'];
-			
-			$site_page['meta_title'] = $page['meta_title'];
-			$site_page['meta_keywords'] = $page['meta_keywords'];
-			$site_page['meta_description'] = $page['meta_description'];
-			
-			if ( isset( $area_list[$page['layout_id']] ) )
-			{
-				foreach( $area_list[$page['layout_id']] as $area )
-				{
-					if ( isset( $block_list[$page['page_id']][$area['area_id']] ) )
-					{
-						$block = $block_list[$page['page_id']][$area['area_id']];
-						
-						$page_block = array();
-						
-						$page_block['area_name'] = $area['area_name'];
-						$page_block['area_main'] = $area['area_main'] ? 1 : 0;
-						$page_block['module_name'] = $block['module_name'];
-						
-						if ( isset( $block_param_list[$block['block_id']] ) )
-						{
-							foreach( $block_param_list[$block['block_id']] as $param )
-							{
-								if ( $param['param_type'] == 'select' )
-									$page_block['param'][$param['param_name']] = isset( $param_value_list[$param['value']] ) ?
-										$param_value_list[$param['value']]['value_content'] : '';
-								else
-									$page_block['param'][$param['param_name']] = $param['value'];
-							}
-						}
-						
-						$site_page['block'][] = $page_block;
-					}
-				}
-			}
-		}
-		
-		$site['page'][] = $site_page;
-	}
-	
-	$site['page'][] = array ( 'page_id' => 'admin', 'page_path' => '/admin', 'page_layout' => 'admin', 
-		'meta_title' => '', 'meta_keywords' => '', 'meta_description' => '', 'block' => array(
-			array ( 'area_name' => 'content', 'area_main' => 1, 'module_name' => 'admin', 'param' => array(
-				'action' => 'index' ) ),
-			array ( 'area_name' => 'menu', 'area_main' => 0, 'module_name' => 'admin', 'param' => array(
-				'action'=> 'menu' ) ),
-			array ( 'area_name' => 'auth', 'area_main' => 0, 'module_name' => 'admin', 'param' => array(
-				'action' => 'auth' ) ) ) );
-	
-	if ( isset( metadata::$objects['lang'] ) )
-	{
-		$lang_list = db::select_all( 'select * from lang order by lang_default desc' );
-		
-		foreach ( $lang_list as $lang )
-		{
-			$site_lang = $lang;
-			
-			$dictionary = db::select_all( "
-				select
-					dictionary.word_name, translate.record_value
-				from
-					dictionary, translate
-				where
-					translate.table_record = dictionary.word_id and 
-					translate.table_name = 'dictionary' and
-					translate.field_name = 'word_value' and
-					translate.record_lang = :lang_id", array( 'lang_id' => $lang['lang_id'] ) );
-			
-			foreach ( $dictionary as $word )
-				$site_lang['dictionary'][$word['word_name']] = $word['record_value'];
-			
-			$site['lang'][] = $site_lang;
-		}
-	}
-	
-	if ( isset( metadata::$objects['preference'] ) )
-	{
-		$preference_list = db::select_all( 'select * from preference' );
-		
-		foreach ( $preference_list as $preference )
-			$site['preference'][$preference['preference_name']] = $preference['preference_value'];
-	}
-	
-	cache::set( CONFIG_FILE, $site );
-	
-	return $site;
-}
-
-function url_for( $url_array = array(), $url_host = '' )
-{
-	if ( !is_array( $url_array ) || count( $url_array ) == 0 )
-		return $_SERVER['REQUEST_URI'];
-	
-	if ( !isset( $url_array['action'] ) )
-		$url_array['action'] = !isset( $url_array['controller'] ) ? action() : 'index';
-	if ( !isset( $url_array['controller'] ) )
-		$url_array['controller'] = controller();
-	
-	$routes = get_routes();
-	
-	$most_match_rule = ''; $most_match_count = 0;
-	foreach ( $routes as $route_rule => $route_item )
-	{
-		if ( count( array_diff_key( $route_item['params'], $url_array ) ) == 0 )
-		{
-			$is_match = true;
-			foreach ( $route_item['params'] as $route_param_name => $route_param_value )
-				if ( !is_numeric( $route_param_value ) )
-					$is_match &= $url_array[$route_param_name] === $route_param_value;
-			
-			if ( $is_match ) {
-				$match_count = count( array_intersect_key( $route_item['params'], $url_array ) );
-				if ( $match_count > $most_match_count ) {
-					$most_match_count = $match_count; $most_match_rule = $route_rule;
-				}
-			}
-		}
-	}
-	
-	$url = $most_match_rule;
-	if ( $url_array['action'] == 'index' )
-		$url = preg_replace( '|/@action$|i', '', $url );
-	
-	foreach ( $routes[$most_match_rule]['params'] as $route_param_name => $route_param_value )
-		$url = preg_replace( '/@' . $route_param_name . '/', $url_array[$route_param_name], $url );
-	
-	$query_string = http_build_query( prepare_query( $url_array, array_keys( $routes[$most_match_rule]['params'] ) ) );
-	
-	$url = $url_host . '/' . trim( $url, '/' ) . ( $query_string ? '?' . $query_string : '' );
-	
-	return $url;
-}
-
 function redirect_to( $url_array = array() )
 {
 	if ( !is_array( $url_array ) )
@@ -382,25 +204,34 @@ function not_found()
 {
 	header( 'HTTP/1.0 404 Not Found' );
 	
-	readfile( url_for( array( 'controller' => '404' ), 'http://' . $_SERVER['HTTP_HOST'] ) );
+	print block( '404' );
 	
 	exit;
 }
 
-function h( $s )
+function h( $string, $flags = ENT_QUOTES, $charset = 'UTF-8', $double_encode = true )
 {
-	return htmlspecialchars( $s, ENT_QUOTES, 'UTF-8' );
+	if ( is_array( $string ) )
+		foreach ( $string as $key => $value )
+			$string[$key] = h( $value, $flags, $charset, $double_encode );
+	else if ( is_string( $string ) )
+		$string = htmlspecialchars( $string, $flags, $charset, $double_encode );
+	
+	return $string;
 }
 
-function is_empty( $s )
+function is_empty( $var )
 {
-	return trim( $s ) === '';
+	if ( is_array( $var ) || is_object( $var ) )
+		return empty( $var );
+	else
+		return trim( $var ) === '';
 }
 
 function declOfNum( $number, $titles, $view_number = true )
 {
-	$cases = array( 2, 0, 1, 1, 1, 2 );
-	return ( $view_number ? $number . ' ' : '' ) . $titles[( $number % 100 > 4 && $number % 100 < 20 ) ? 2 : $cases[min( $number % 10, 5 )]];
+	$cases = array( 2, 0, 1, 1, 1, 2 ); $value = abs($number);
+	return ( $view_number ? $number . ' ' : '' ) . $titles[( $value % 100 > 4 && $value % 100 < 20 ) ? 2 : $cases[min( $value % 10, 5 )]];
 }
 
 function generate_key( $max = 128 )
@@ -435,6 +266,21 @@ function delete_directory( $dir )
 	return rmdir( $dir );
 }
 
+function block( $template, $params = array() )
+{
+	$view = new view();
+	
+	foreach ( $params as $key => $value )
+		$view -> assign( $key, $value );
+	
+	return $view -> fetch( $template );
+}
+
+function normalize_path( $path )
+{
+	return preg_replace( "/\/+/", "/", str_replace( "\\", "/", trim( $path ) ) );
+}
+
 function strip_tags_attributes( $string, $allowtags = null, $allowattributes = null )
 { 
 	$string = strip_tags( $string, $allowtags ); 
@@ -465,11 +311,44 @@ function global_autoload( $class_name )
 
 spl_autoload_register( 'global_autoload' );
 
-function exception_handler( $exception )
+function exception_handler( $e, $return = false, $admin = false )
 {
-	print "<br/><b>Fatal error</b>: Uncaught exception '" . get_class( $exception ) . "' with message '" . $exception -> getMessage() . "'\n";
+	$error_view = new view();
+	$error_plug = $error_view -> fetch( 'block/error' );
+	
+	$error_view -> assign( 'message', $e -> getMessage() );
+	$error_short = $error_view -> fetch( 'block/error' );
+	
+	$error_view -> assign( 'exception', $e );
+	$error_content = $error_view -> fetch( 'block/error' );
+	
+	$error_log = date( 'd.m.Y H:i:s' ) . ' - ' . $e -> getMessage() . "\n" .
+		$e -> getFile() . ' (' . $e -> getLine(). ')' . "\n" . $e -> getTraceAsString() . "\n\n";
+	print $error_file = LOG_DIR . 'error.log';
+	
+	if ( PRODUCTION )
+	{
+		@file_put_contents( $error_file, $error_log, FILE_APPEND );
+		
+		if ( $admin )
+		{
+			$error_content = $return ? $error_short : $error_plug;
+		}
+		else
+		{
+			sendmail::send( ERROR_EMAIL, ERROR_EMAIL, $_SERVER['HTTP_HOST'], ERROR_SUBLECT, $error_content );
+			
+			$error_content = $return ? '' : $error_plug;
+		}
+	}
+	
+	if ( $return )
+		return $error_content;
+	
+	die( $error_content );
 }
 
-set_exception_handler( 'exception_handler' );
+if ( isset( $_SERVER['HTTP_HOST'] ) )
+	set_exception_handler( 'exception_handler' );
 
 system::init();

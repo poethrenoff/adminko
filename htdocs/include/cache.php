@@ -18,16 +18,21 @@ abstract class cache
 		return new $driver_name( $cache_type );
 	}
 	
+	private static function get_key_name( $key )
+	{
+		return CACHE_DIR . md5( $key );
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public static function get( $key, $expire = CACHE_TIME )
 	{
-		return self::get_driver() -> get( $key, $expire );
+		return self::get_driver() -> get( self::get_key_name( $key ), $expire );
 	}
 	
 	public static function set( $key, $var, $expire = CACHE_TIME )
 	{
-		return self::get_driver() -> set( $key, $var, $expire );
+		return self::get_driver() -> set( self::get_key_name( $key ), $var, $expire );
 	}
 	
 	public static function clear()

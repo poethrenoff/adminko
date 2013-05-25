@@ -19,7 +19,7 @@ class admin_delivery extends admin
 		$cancel_url = url_for( array( 'object' => 'delivery', 'action' => 'clear' ) );
 		$this -> view -> assign( 'cancel_url', $cancel_url );
 		
-		$this -> content = $this -> view -> fetch( 'admin/delivery/delivery.tpl' );
+		$this -> content = $this -> view -> fetch( 'admin/delivery/delivery' );
 		
 		$this -> store_state();
 	}

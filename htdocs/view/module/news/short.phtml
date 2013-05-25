@@ -1,0 +1,5 @@
+<? foreach ( $this -> item_list as $item ) { ?>
+<?= Date::get( $item['news_date'], 'd.m.Y' ) ?> - <a href="<?= url_for( array( 'controller' => 'news', 'action' => 'item', 'id' => $item['news_id'] ) ) ?>"><?= h( $item['news_title'] ) ?></a>
+<?= $item['news_announce'] ?> 
+<? } ?>
+<a href="<?= url_for( array( 'controller' => 'news' ) ) ?>">К списку новостей</a>

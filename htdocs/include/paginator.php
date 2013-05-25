@@ -46,7 +46,7 @@ class paginator
 		return $pages;
 	}
 	
-	public static function fetch( $pages, $tpl = 'block/pages.tpl' )
+	public static function fetch( $pages, $tpl = 'block/pages' )
 	{
 		$view = new view();
 		$view -> assign( $pages );

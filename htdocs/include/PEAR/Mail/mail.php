@@ -39,7 +39,7 @@
  * @author      Chuck Hagenbuch <chuck@horde.org> 
  * @copyright   2010 Chuck Hagenbuch
  * @license     http://opensource.org/licenses/bsd-license.php New BSD License
- * @version     CVS: $Id: mail.php 294747 2010-02-08 08:18:33Z clockwerx $
+ * @version     CVS: $Id: mail.php 3 2010-11-18 13:15:51Z d.konstantinov $
  * @link        http://pear.php.net/package/Mail/
  */
 
@@ -150,9 +150,9 @@ class Mail_mail extends Mail {
         // We only use mail()'s optional fifth parameter if the additional
         // parameters have been provided and we're not running in safe mode.
         if (empty($this->_params) || ini_get('safe_mode')) {
-            $result = mail($recipients, $subject, $body, $text_headers);
+            $result = @mail($recipients, $subject, $body, $text_headers);
         } else {
-            $result = mail($recipients, $subject, $body, $text_headers,
+            $result = @mail($recipients, $subject, $body, $text_headers,
                            $this->_params);
         }
 

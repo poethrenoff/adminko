@@ -86,6 +86,8 @@ abstract class module extends object
 	{
 		if ( !is_cache() ) return false;
 		
+		if ( !empty( $_POST ) ) return false;
+		
 		$cache_key['_host'] = $_SERVER['HTTP_HOST'];
 		$cache_key['_class'] = get_class( $this );
 		$cache_key['_action'] = $this -> action;

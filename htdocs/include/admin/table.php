@@ -107,9 +107,9 @@ class admin_table extends admin
 		$this -> view -> assign( 'counter', $records_count );
 		
 		if ( !$this -> parent_field )
-			$this -> view -> assign( 'pages', paginator::fetch( $pages, 'admin/pages.tpl' ) );
+			$this -> view -> assign( 'pages', paginator::fetch( $pages, 'admin/pages' ) );
 		
-		$this -> content = $this -> view -> fetch( 'admin/table.tpl' );
+		$this -> content = $this -> view -> fetch( 'admin/table' );
 		
 		$this -> store_state();
 	}
@@ -201,7 +201,7 @@ class admin_table extends admin
 			'bind' => $bind_name, 'id' => $primary_record[$this -> primary_field] ) );
 		$this -> view -> assign( 'form_url', $form_url );
 		
-		$this -> content = $this -> view -> fetch( 'admin/form.tpl' );
+		$this -> content = $this -> view -> fetch( 'admin/form' );
 		$this -> output['meta_title'] .= ' :: ' . $title;
 	}
 	
@@ -312,9 +312,9 @@ class admin_table extends admin
 		$this -> view -> assign( 'form_url', $form_url );
 		
 		if ( !$secondary_object -> parent_field )
-			$this -> view -> assign( 'pages', paginator::fetch( $pages, 'admin/pages.tpl' ) );
+			$this -> view -> assign( 'pages', paginator::fetch( $pages, 'admin/pages' ) );
 		
-		$this -> content = $this -> view -> fetch( 'admin/table.tpl' );
+		$this -> content = $this -> view -> fetch( 'admin/table' );
 		$this -> output['meta_title'] .= ' :: ' . $title;
 		
 		$this -> store_state( 'prev_relation_url' );
@@ -1035,7 +1035,7 @@ class admin_table extends admin
 		$hidden_fields = prepare_query( $_GET, array_merge( array_keys( $search_fields ), array( 'page' ) ) );
 		$view -> assign( 'hidden', $hidden_fields );
 		
-		return $view -> fetch( 'admin/filter.tpl' );
+		return $view -> fetch( 'admin/filter' );
 	}
 	
 	protected function get_group_conds( $record, $field_name )
@@ -1231,7 +1231,7 @@ class admin_table extends admin
 		
 		$this -> view -> assign( 'back_url', url_for( $prev_url ) );
 		
-		$this -> content = $this -> view -> fetch( 'admin/form.tpl' );
+		$this -> content = $this -> view -> fetch( 'admin/form' );
 		$this -> output['meta_title'] .= ( $record_title ? ' :: ' . $record_title : '' ) . ' :: ' . $action_title;
 	}
 	
@@ -1243,9 +1243,18 @@ class admin_table extends admin
 	protected function upload_file( $field_name, $field_desc )
 	{
 		if ( isset( $_FILES[$field_name . '_file']['name'] ) && $_FILES[$field_name . '_file']['name'] )
-			return upload::upload_file( $_FILES[$field_name . '_file'], $field_desc['upload_dir'] );
-		else
-			return init_string( $field_name );
+		{
+			$allowed_types = ( $field_desc['type'] == 'image' ) ? 'gif|jpg|jpe|jpeg|png' : '';
+			
+			$upload = Upload::fetch( $field_name . '_file', array( 'upload_path' => $field_desc['upload_dir'], 'allowed_types' => $allowed_types ) );
+			
+			if ( $upload -> is_error() )
+				throw new Exception( 'Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload -> get_error() . '.' );
+			
+			return $upload -> get_file_link();
+		}
+		
+		return init_string( $field_name );
 	}
 	
 	protected function is_action_allow( $action, $throw = false )

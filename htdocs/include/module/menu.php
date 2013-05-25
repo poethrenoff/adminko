@@ -30,7 +30,7 @@ class module_menu extends module
 		
 		$this -> view -> assign( 'menu_tree', $menu_tree );
 		
-		$this -> content = $this -> view -> fetch( 'module/menu/' . $menu_template . '.tpl' );
+		$this -> content = $this -> view -> fetch( 'module/menu/' . $menu_template );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////

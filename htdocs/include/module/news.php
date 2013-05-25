@@ -11,16 +11,10 @@ class module_news extends module
 		
 		$item_list = $this -> get_list( $pages['by_page'], $pages['offset'] );
 		
-		foreach( $item_list as $item_index => $item )
-		{
-			$item_list[$item_index]['news_date'] = date::get( $item['news_date'], 'd.m.Y' );
-			$item_list[$item_index]['news_url'] = url_for( array( 'controller' => 'news', 'action' => 'item', 'id' => $item['news_id'] ) );
-		}
-		
 		$this -> view -> assign( 'item_list', $item_list );
 		$this -> view -> assign( 'pages', paginator::fetch( $pages ) );
 		
-		$this -> content = $this -> view -> fetch( 'module/news/list.tpl' );
+		$this -> content = $this -> view -> fetch( 'module/news/list' );
 	}
 	
 	// Вывод краткого списка новостей
@@ -30,15 +24,9 @@ class module_news extends module
 		
 		$item_list = $this -> get_list( $count );
 		
-		foreach( $item_list as $item_index => $item )
-		{
-			$item_list[$item_index]['news_date'] = date::get( $item['news_date'], 'd.m.Y' );
-			$item_list[$item_index]['news_url'] = url_for( array( 'controller' => 'news', 'action' => 'item', 'id' => $item['news_id'] ) );
-		}
-		
 		$this -> view -> assign( 'item_list', $item_list );
 		
-		$this -> content = $this -> view -> fetch( 'module/news/short.tpl' );
+		$this -> content = $this -> view -> fetch( 'module/news/short' );
 	}
 	
 	// Вывод конкретной новости
@@ -46,13 +34,10 @@ class module_news extends module
 	{
 		$item = $this -> get_item( id() );
 		
-		$item['news_date'] = date::get( $item['news_date'], 'd.m.Y' );
-		
 		$this -> view -> assign( $item );
-		$this -> view -> assign( 'news_url', url_for( array( 'controller' => 'news' ) ) );
 		
 		$this -> output['meta_title'] = $item['news_title'];
-		$this -> content = $this -> view -> fetch( 'module/news/item.tpl' );
+		$this -> content = $this -> view -> fetch( 'module/news/item' );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////

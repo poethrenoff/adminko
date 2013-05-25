@@ -1,19 +1,8 @@
 <?php
 class cache_file
 {
-	private $cache_ext = '.cache';
-	
-	private function get_file_name( $key )
+	public function get( $file_name, $expire )
 	{
-		return CACHE_DIR . $key . $this -> cache_ext;
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public function get( $key, $expire )
-	{
-		$file_name = $this -> get_file_name( $key );
-		
 		if ( !file_exists( $file_name ) )
 			return false;
 		
@@ -25,10 +14,8 @@ class cache_file
 		return @unserialize( $var );
 	}
 	
-	public function set( $key, $var, $expire )
+	public function set( $file_name, $var, $expire )
 	{
-		$file_name = $this -> get_file_name( $key );
-		
 		@file_put_contents( $file_name, serialize( $var ) );
 		
 		return file_exists( $file_name );
@@ -41,7 +28,7 @@ class cache_file
 		foreach( $file_list as $file_name )
 		{
 			$file_path = CACHE_DIR . '/' . $file_name;
-			if ( is_file( $file_path ) && preg_match( '/' . preg_quote( $this -> cache_ext ) . '$/', $file_name ) )
+			if ( is_file( $file_path ) )
 				@unlink( $file_path );
 		}
 		

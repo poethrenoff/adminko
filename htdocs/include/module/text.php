@@ -7,7 +7,7 @@ class module_text extends module
 		
 		$this -> view -> assign( array( 'text_content' => self::get_text_by_id( $text_id ) ) );
 		
-		$this -> content = $this -> view -> fetch( 'module/text/item.tpl' );
+		$this -> content = $this -> view -> fetch( 'module/text/item' );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
