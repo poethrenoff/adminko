@@ -1,5 +1,4 @@
 1. Обновить CKEDITOR (done)
-1. Избавится от smarty
-2. Обновления из aisite
+1. Избавиться от Smarty (done)
+2. Обновления из aisite (done)
 3. Класс для работы с формами
-4. Каптча на основе http://code.google.com/p/cool-php-captcha/
