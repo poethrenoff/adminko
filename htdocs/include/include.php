@@ -324,7 +324,7 @@ function exception_handler( $e, $return = false, $admin = false )
 	
 	$error_log = date( 'd.m.Y H:i:s' ) . ' - ' . $e -> getMessage() . "\n" .
 		$e -> getFile() . ' (' . $e -> getLine(). ')' . "\n" . $e -> getTraceAsString() . "\n\n";
-	print $error_file = LOG_DIR . 'error.log';
+	$error_file = LOG_DIR . 'error.log';
 	
 	if ( PRODUCTION )
 	{

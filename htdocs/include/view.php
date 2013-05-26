@@ -4,7 +4,11 @@
  */
 class view
 {
-    public $template_dir = VIEW_DIR;
+    // Каталог с шаблонами
+    protected $template_dir = VIEW_DIR;
+    
+    // Объект, переданный в шаблон
+    protected $object = null;
     
     /**
      * Передача переменной в шаблон
@@ -14,11 +18,30 @@ class view
      */
     public function assign($name, $data = null)
     {
-        if (is_array($name))
-            foreach ($name as $key => $val)
+        // Если переменая - объект
+        if (is_object($name)) {
+            $this->object = $name;
+        // Если переменая - массив
+        } elseif (is_array($name)) {
+            foreach ($name as $key => $val) {
                 $this->$key = $val;
-        else if ($name)
+            }
+        // Если переменая - строка
+        } elseif (is_string($name)) {
             $this->$name = $data;
+        } else {
+            throw new Exception('Недопустимый тип переменной', true);
+        }
+    }
+
+    /**
+     * Получение контента
+     *
+     * @param  $template string
+     * @return string
+     */
+    public function __call($method, $vars) {
+        return call_user_func_array(array($this->object, $method), $vars);
     }
     
     /**
