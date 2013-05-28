@@ -1,0 +1,17 @@
+## MySQL ##
+
+mysql -u adminko -p adminko < mysql.sql
+mysqldump -u adminko -p adminko > mysql.sql
+
+
+## PostgreSQL ##
+
+psql -U adminko < pgsql.sql
+pg_dump.exe -c -O -x --inserts -n public -U adminko > pgsql.sql
+
+
+## SQLite ##
+
+rm adminko.db
+sqlite3 adminko.db < sqlite.sql
+sqlite3 adminko.db .dump > sqlite.sql

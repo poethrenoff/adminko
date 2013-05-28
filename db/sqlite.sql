@@ -1,6 +1,5 @@
+PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
-
-DROP TABLE IF EXISTS admin;
 CREATE TABLE admin (
   admin_id integer PRIMARY KEY autoincrement,
   admin_title varchar NOT NULL default '',
@@ -10,15 +9,11 @@ CREATE TABLE admin (
   admin_active integer NOT NULL default '0'
 );
 INSERT INTO "admin" VALUES(1,'Главный администратор','admin','21232f297a57a5a743894a0e4a801fc3','admin@example.ru',1);
-
-DROP TABLE IF EXISTS admin_role;
 CREATE TABLE admin_role (
   admin_id integer NOT NULL default '0',
   role_id integer NOT NULL default '0'
 );
 INSERT INTO "admin_role" VALUES(1,1);
-
-DROP TABLE IF EXISTS block;
 CREATE TABLE block (
   block_id integer PRIMARY KEY autoincrement,
   block_page integer NOT NULL default '0',
@@ -32,8 +27,6 @@ INSERT INTO "block" VALUES(3,1,2,'Краткий список новостей',
 INSERT INTO "block" VALUES(4,3,2,'Полный список новостей',2);
 INSERT INTO "block" VALUES(5,3,3,'Главное меню',5);
 INSERT INTO "block" VALUES(6,2,1,'Сообщение об ошибке',3);
-
-DROP TABLE IF EXISTS block_param;
 CREATE TABLE block_param (
   block integer NOT NULL default '0',
   param integer NOT NULL default '0',
@@ -49,29 +42,21 @@ INSERT INTO "block_param" VALUES(6,1,'2');
 INSERT INTO "block_param" VALUES(1,1,'1');
 INSERT INTO "block_param" VALUES(2,4,'1');
 INSERT INTO "block_param" VALUES(2,5,'3');
-
-DROP TABLE IF EXISTS delivery_body;
 CREATE TABLE delivery_body (
   body_id integer PRIMARY KEY autoincrement,
   body_headers text,
   body_text text
 );
-
-DROP TABLE IF EXISTS delivery_person;
 CREATE TABLE delivery_person (
   person_id integer PRIMARY KEY autoincrement,
   person_email varchar NOT NULL default '',
   person_admin integer NOT NULL default '0'
 );
-
-DROP TABLE IF EXISTS delivery_queue;
 CREATE TABLE delivery_queue (
   queue_id integer PRIMARY KEY autoincrement,
   queue_body integer NOT NULL default '0',
   queue_person integer NOT NULL default '0'
 );
-
-DROP TABLE IF EXISTS delivery_storage;
 CREATE TABLE delivery_storage (
   body_id integer PRIMARY KEY autoincrement,
   body_subject varchar NOT NULL default '',
@@ -79,15 +64,11 @@ CREATE TABLE delivery_storage (
   body_name varchar NOT NULL default '',
   body_text text
 );
-
-DROP TABLE IF EXISTS dictionary;
 CREATE TABLE dictionary (
   word_id integer PRIMARY KEY autoincrement,
   word_name varchar NOT NULL default '',
   word_value varchar NOT NULL default ''
 );
-
-DROP TABLE IF EXISTS lang;
 CREATE TABLE lang (
   lang_id integer PRIMARY KEY autoincrement,
   lang_title varchar NOT NULL default '',
@@ -97,8 +78,6 @@ CREATE TABLE lang (
 );
 INSERT INTO "lang" VALUES(1,'Русский','Рус','ru',1);
 INSERT INTO "lang" VALUES(2,'Английский','Eng','en',0);
-
-DROP TABLE IF EXISTS layout;
 CREATE TABLE layout (
   layout_id integer PRIMARY KEY autoincrement,
   layout_title varchar NOT NULL default '',
@@ -107,8 +86,6 @@ CREATE TABLE layout (
 INSERT INTO "layout" VALUES(1,'Шаблон главной страницы','index');
 INSERT INTO "layout" VALUES(2,'Шаблон внутренних страниц','default');
 INSERT INTO "layout" VALUES(3,'Шаблон для страницы ошибок','simple');
-
-DROP TABLE IF EXISTS layout_area;
 CREATE TABLE layout_area (
   area_id integer PRIMARY KEY autoincrement,
   area_layout integer NOT NULL default '0',
@@ -123,8 +100,6 @@ INSERT INTO "layout_area" VALUES(3,3,'Контентная область','cont
 INSERT INTO "layout_area" VALUES(4,1,'Главное меню','menu',0,2);
 INSERT INTO "layout_area" VALUES(5,2,'Главное меню','menu',0,2);
 INSERT INTO "layout_area" VALUES(6,1,'Новостной блок','news',0,3);
-
-DROP TABLE IF EXISTS menu;
 CREATE TABLE menu (
   menu_id integer PRIMARY KEY autoincrement,
   menu_parent integer NOT NULL default '0',
@@ -138,8 +113,6 @@ INSERT INTO "menu" VALUES(1,0,'Главное меню',0,'',1,1);
 INSERT INTO "menu" VALUES(2,1,'Главная',1,'',1,1);
 INSERT INTO "menu" VALUES(3,1,'Новости',3,'',2,1);
 INSERT INTO "menu" VALUES(4,1,'Ссылка',0,'http://adminko.testea.ru/',3,1);
-
-DROP TABLE IF EXISTS module;
 CREATE TABLE module (
   module_id integer PRIMARY KEY autoincrement,
   module_title varchar NOT NULL default '',
@@ -148,8 +121,6 @@ CREATE TABLE module (
 INSERT INTO "module" VALUES(1,'Текст','text');
 INSERT INTO "module" VALUES(2,'Новости','news');
 INSERT INTO "module" VALUES(3,'Меню','menu');
-
-DROP TABLE IF EXISTS module_param;
 CREATE TABLE module_param (
   param_id integer PRIMARY KEY autoincrement,
   param_module integer NOT NULL default '0',
@@ -166,8 +137,6 @@ INSERT INTO "module_param" VALUES(2,2,'Вариант использования
 INSERT INTO "module_param" VALUES(3,2,'Количество новостей на странице','int','count','','10',1,2);
 INSERT INTO "module_param" VALUES(4,3,'Меню в блоке','table','id','menu','',1,1);
 INSERT INTO "module_param" VALUES(5,3,'Шаблон меню','select','template','','',1,2);
-
-DROP TABLE IF EXISTS news;
 CREATE TABLE news (
   news_id integer PRIMARY KEY autoincrement,
   news_title varchar NOT NULL default '',
@@ -202,8 +171,6 @@ INSERT INTO "news" VALUES(3,'Валентный электрон как полн
 <p>
 	Фудзияма, несмотря на внешние воздействия, ментально начинает анимус, повышая конкуренцию. Индуцированное соответствие постоянно. Вещь в себе, как следует из вышесказанного, противозаконно разъедает метод последовательных приближений, что лишний раз подтверждает правоту З. Фрейда. Магнитное наклонение, очевидно, нивелирует пирогенный комплекс агрессивности, о чем и писал А. Маслоу в своей работе &quot;Мотивация и личность&quot;.</p>
 ','20091003111300');
-
-DROP TABLE IF EXISTS object;
 CREATE TABLE object (
   object_id integer PRIMARY KEY autoincrement,
   object_parent integer NOT NULL default '0',
@@ -235,8 +202,6 @@ INSERT INTO "object" VALUES(20,1,'Меню','menu',3,1);
 INSERT INTO "object" VALUES(21,4,'Области шаблонов','layout_area',4,1);
 INSERT INTO "object" VALUES(22,11,'Роли','role',6,1);
 INSERT INTO "object" VALUES(23,17,'Лист рассылки','delivery_person',3,1);
-
-DROP TABLE IF EXISTS page;
 CREATE TABLE page (
   page_id integer PRIMARY KEY autoincrement,
   page_parent integer NOT NULL default '0',
@@ -253,8 +218,6 @@ CREATE TABLE page (
 INSERT INTO "page" VALUES(1,0,1,'Главная страница','',0,'Заголовок главной страницы','Ключевые слова главной страницы','Описание главной страницы',1,1);
 INSERT INTO "page" VALUES(2,1,3,'Ошибка 404','404',0,'Страница не найдена','Страница не найдена','Страница не найдена',2,1);
 INSERT INTO "page" VALUES(3,1,2,'Новости','news',0,'Заголовок внутренней страницы','Ключевые слова внутренней страницы','Описание внутренней страницы',1,1);
-
-DROP TABLE IF EXISTS param_value;
 CREATE TABLE param_value (
   value_id integer PRIMARY KEY autoincrement,
   value_param integer NOT NULL default '0',
@@ -265,47 +228,37 @@ CREATE TABLE param_value (
 INSERT INTO "param_value" VALUES(1,2,'Полный список','index',0);
 INSERT INTO "param_value" VALUES(2,2,'Краткий список','preview',1);
 INSERT INTO "param_value" VALUES(3,5,'Главное меню','main',1);
-
-DROP TABLE IF EXISTS preference;
 CREATE TABLE preference (
   preference_id integer PRIMARY KEY autoincrement,
   preference_title varchar NOT NULL default '',
   preference_name varchar NOT NULL default '',
   preference_value varchar NOT NULL default ''
 );
-
-DROP TABLE IF EXISTS role;
 CREATE TABLE role (
   role_id integer PRIMARY KEY autoincrement,
   role_title varchar NOT NULL default '',
   role_default integer NOT NULL default '0'
 );
 INSERT INTO "role" VALUES(1,'Главный администратор',1);
-
-DROP TABLE IF EXISTS role_object;
 CREATE TABLE role_object (
   role_id integer NOT NULL default '0',
   object_id integer NOT NULL default '0'
 );
-
-DROP TABLE IF EXISTS text;
 CREATE TABLE text (
   text_id integer PRIMARY KEY autoincrement,
   text_tag varchar NOT NULL default '',
   text_title varchar NOT NULL default '',
   text_content text
 );
-INSERT INTO text VALUES (1, 'index', 'Главная страница', '<h3>Добро пожаловать!</h3>
+INSERT INTO "text" VALUES(1,'index','Главная страница','<h3>Добро пожаловать!</h3>
 <p>Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице.&nbsp;</p>
 <p>Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице.</p>
 <p>Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице.</p>');
-INSERT INTO text VALUES (2, '404', 'Ошибка 404', '<h1 style="text-align:center">&nbsp;</h1>
+INSERT INTO "text" VALUES(2,'404','Ошибка 404','<h1 style="text-align:center">&nbsp;</h1>
 <h1 style="text-align:center"><span style="font-size:48px">404</span></h1>
 <p style="text-align:center">Страница не найдена</p>');
-INSERT INTO text VALUES (3, 'header', 'Шапка сайта', '<p>Шапка сайта</p>');
-INSERT INTO text VALUES (4, 'footer', 'Подвал сайта', '<p>Подвал сайта</p>');
-
-DROP TABLE IF EXISTS translate;
+INSERT INTO "text" VALUES(3,'header','Шапка сайта','<p>Шапка сайта</p>');
+INSERT INTO "text" VALUES(4,'footer','Подвал сайта','<p>Подвал сайта</p>');
 CREATE TABLE translate (
   table_name varchar NOT NULL default '',
   field_name varchar NOT NULL default '',
@@ -313,5 +266,19 @@ CREATE TABLE translate (
   record_lang integer NOT NULL default '0',
   record_value text
 );
-
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('admin',1);
+INSERT INTO "sqlite_sequence" VALUES('block',6);
+INSERT INTO "sqlite_sequence" VALUES('lang',2);
+INSERT INTO "sqlite_sequence" VALUES('layout',3);
+INSERT INTO "sqlite_sequence" VALUES('layout_area',6);
+INSERT INTO "sqlite_sequence" VALUES('menu',4);
+INSERT INTO "sqlite_sequence" VALUES('module',3);
+INSERT INTO "sqlite_sequence" VALUES('module_param',5);
+INSERT INTO "sqlite_sequence" VALUES('news',3);
+INSERT INTO "sqlite_sequence" VALUES('object',23);
+INSERT INTO "sqlite_sequence" VALUES('page',3);
+INSERT INTO "sqlite_sequence" VALUES('param_value',3);
+INSERT INTO "sqlite_sequence" VALUES('role',1);
+INSERT INTO "sqlite_sequence" VALUES('text',4);
 COMMIT;

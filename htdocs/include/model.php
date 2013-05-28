@@ -4,9 +4,12 @@ class model
     // Название таблицы
     protected $object = '';
 
-    // Название таблицы
+    // Поле с идентификатором первичного ключа
     protected $primary_field = '';
-    
+
+    // Поле с идентификатором родительской записи
+    protected $parent_field = '';
+
     // Поля таблицы
     protected $fields = array();
 
@@ -37,6 +40,9 @@ class model
         foreach ($object_desc['fields'] as $field_name => $field_desc) {
             if ($field_desc['type'] == 'pk') {
                 $this->primary_field = $field_name;
+            }
+            if ($field_desc['type'] == 'parent') {
+                $this->parent_field = $field_name;
             }
         }
         if (!$this->primary_field) {
@@ -81,7 +87,7 @@ class model
             if (is_null($record)) {
                 $record = db::select_row("select * from {$this->object} where {$this->primary_field} = :{$this->primary_field}",
                     array($this->primary_field => $primary_field)
-                );
+               );
                 if (!$record){
                     throw new Exception("Ошибка. Запись {$this->object}({$primary_field}) не найдена.");
                 }
@@ -139,7 +145,7 @@ class model
         $order_clause = $this->get_order_clause($order);
         $limit_clause = $this->get_limit_clause($limit, $offset);
         
-        $records = db::select_all("select * from {$this->object} {$filter_clause} {$order_clause} {$limit_clause}");
+        $records = db::select_all("select * from {$this->object} {$filter_clause} {$order_clause} {$limit_clause}", $filter_binds);
         
         $objects = array();
         foreach ($records as $record) {
@@ -154,7 +160,7 @@ class model
         foreach($this->fields_desc as $field_name => $field_desc) {
             if (!(isset($field_desc['no_add']) && $field_desc['no_add'] || isset($field_desc['no_edit']) && $field_desc['no_edit']) &&
                 $field_desc['type'] != 'pk' && $field_desc['type'] != 'order'
-          ) {
+         ) {
                 $record[$field_name] = $this->fields[$field_name];
                 
                 // @todo Валидация
@@ -175,6 +181,15 @@ class model
         return $this;
     }
 
+    // Удаление объекта из БД
+    public function delete() {
+        if($this->is_new){
+            throw new Exception("Ошибка. Запись не можеть быть удалена из БД, так как не имеет идентификатора.");
+        }
+        db::delete($this->object, array($this->primary_field => $this->get_id()));
+        self::purge($this->object, $this->primary_field);
+    }
+
     // Получение идентификатора объекта
     public function get_id() {
         if($this->is_new){
@@ -183,10 +198,48 @@ class model
         return $this->fields[$this->primary_field];
     }
 
+    // Построение дерева записей
+    public function get_tree(&$records, $begin = 0, $except = array())
+    {
+        $this->except = $except;
+        $this->records_by_parent = array();
+        $parent_method = 'get_' . $this->parent_field;
+        foreach ($records as $record) {
+            $this->records_by_parent[$record->$parent_method()][] = $record;
+        }
+        
+        $this->records_as_tree = array();
+        $this->build_tree($begin);
+        
+        return $this->records_as_tree;
+    }
+
+    // Рекурсивный метод постройки уровня дерева
+    private function build_tree($parent_field_id, $depth = 0)
+    {
+        if (isset($this->records_by_parent[$parent_field_id])) {
+            $primary_method = 'get_' . $this->primary_field;
+            foreach ($this->records_by_parent[$parent_field_id] as $record) {
+                $primary_field_id = $record->$primary_method();
+                if (!in_array($primary_field_id, $this->except)) {
+                    $record->_depth = $depth;
+                    $record->_has_children = isset($this->records_by_parent[$primary_field_id]);
+                    if ($record->_has_children)
+                        $record->_children_count = count($this->records_by_parent[$primary_field_id]);
+                    
+                    $this->records_as_tree[] = $record;
+                    $this->build_tree($primary_field_id, $depth + 1);
+                }
+            }
+        }
+    }
+
     // Очистка кеша объектов
-    public static function purge($object = null) {
-        if ($object) {
-            self::$object_cache[$object] = array();
+    public static function purge($object = null, $primary_field = null) {
+        if (!is_null($object) && !is_null($primary_field)) {
+            unset(self::$object_cache[$object][$primary_field]);
+        } elseif (!is_null($object)) {
+            unset(self::$object_cache[$object]);
         } else {
             self::$object_cache = array();
         }
