@@ -3,7 +3,7 @@
  * Настроки проекта
  */
 ini_set('display_errors', true);
-ini_set('error_reporting', E_ALL);
+ini_set('error_reporting', E_ALL & ~E_STRICT);
 
 setlocale(LC_ALL, 'ru_RU.UTF8');
 ini_set('date.timezone', 'Europe/Moscow');
@@ -14,7 +14,7 @@ define('DB_TYPE', 'mysql'); // mysql, pgsql, sqlite
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'adminko');
 define('DB_USER', 'root');
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', '12345');
 
 define('APP_DIR', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 
