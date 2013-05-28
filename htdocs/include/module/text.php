@@ -12,4 +12,10 @@ class module_text extends module
         $this->view->assign($item);
         $this->content = $this->view->fetch('module/text/item');
     }
+    
+    // Получение текста по тегу
+    public static function get_by_tag($text_tag)
+    {
+        return model::factory('text')->get_by_tag($text_tag)->get_text_content();
+    }
 }
