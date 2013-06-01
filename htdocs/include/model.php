@@ -158,18 +158,17 @@ class model
     public function save() {
         $record = array();
         foreach($this->fields_desc as $field_name => $field_desc) {
-            if (!(isset($field_desc['no_add']) && $field_desc['no_add'] || isset($field_desc['no_edit']) && $field_desc['no_edit']) &&
-                $field_desc['type'] != 'pk' && $field_desc['type'] != 'order'
-         ) {
-                $record[$field_name] = $this->fields[$field_name];
-                
-                // @todo Валидация
-                
-                // Порядковое поле должно заполнятся само
-                // А значит нужна проверка и учет группировки
-                // А еще многоязычные записи...
-                
-                // Наверное, будет проще отделить метаданные модели от метаданных админки...
+           if (!(isset($field_desc[$this->is_new ? 'no_add' : 'no_edit']) &&
+                    $field_desc[$this->is_new ? 'no_add' : 'no_edit'] ||
+                $this->is_new && $field_desc['type'] == 'pk'))
+            {
+                $get_method = 'get_' . $field_name;
+                $record[$field_name] = $this->$get_method();
+                $field = field::factory($field_desc['type']);
+                $errors_string = isset($field_desc['errors']) && $field_desc['errors'] ? $field_desc['errors'] : null;
+                if (!$field->check($record[$field_name], $errors_string)) {
+                    throw new Exception('Ошибочное значение поля "' . $field_desc['title'] . '".', true);
+                }
             }
         }
         

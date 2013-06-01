@@ -1,14 +1,9 @@
 <?php
-class field_boolean extends field
+class field_boolean extends field_string
 {
     public function get($content)
     {
         return $content ? 'да' : 'нет';
-    }
-    
-    public function form($content)
-    {
-        return field_string::form($content);
     }
     
     public function set($content)

@@ -15,4 +15,10 @@ class field_datetime extends field
     {
         return date::set($content, 'long');
     }
+    
+    public function check($content, $errors_string = '')
+    {
+        return valid::factory('datetime')->internal_check($content) &&
+            parent::check($content, $errors_string);
+    }
 }

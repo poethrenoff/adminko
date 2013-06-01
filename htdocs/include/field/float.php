@@ -1,18 +1,14 @@
 <?php
-class field_float extends field
+class field_float extends field_string
 {
-    public function get($content)
-    {
-        return self::get_string($content);
-    }
-    
-    public function form($content)
-    {
-        return self::form_string($content);
-    }
-    
     public function set($content)
     {
         return $content !== '' ? str_replace(',', '.', $content) : null;
+    }
+    
+    public function check($content, $errors_string = '')
+    {
+        return valid::factory('float')->check($content) &&
+            parent::check($content, $errors_string);
     }
 }

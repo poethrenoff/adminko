@@ -1,6 +1,9 @@
 <?php
 abstract class field
 {
+    // Кеш объектов
+    private static $object_cache = array();
+    
     public static $errors = array(
         'require' => 1, 'int' => 2, 'float' => 4, 'date' => 8, 'datetime' => 16, 'email' => 32, 'alpha' => 64
    );
@@ -53,11 +56,26 @@ abstract class field
     
     abstract public function set($content);
     
+    public function check($content, $errors_string = '')
+    {
+        if (!empty($errors_string)) {
+            foreach (explode('|', $errors_string) as $error_name) {
+                if (!valid::factory($error_name)->check($content)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     // Создание объекта поля
     public static final function factory($type)
     {
-        $class_name = 'field_' . $type;
-        return new $class_name();
+        if (!isset(self::$object_cache[$type])) {
+            $class_name = 'field_' . $type;
+            self::$object_cache[$type] = new $class_name();
+        }
+        return self::$object_cache[$type];
     }
     
     public static final function get_field($content, $type)

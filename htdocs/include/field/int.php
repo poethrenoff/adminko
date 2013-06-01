@@ -1,18 +1,14 @@
 <?php
-class field_int extends field
+class field_int extends field_string
 {
-    public function get($content)
-    {
-        return field_string::get($content);
-    }
-    
-    public function form($content)
-    {
-        return field_string::form($content);
-    }
-    
     public function set($content)
     {
         return $content !== '' ? strval(intval($content)) : null;
+    }
+    
+    public function check($content, $errors_string = '')
+    {
+        return valid::factory('int')->check($content) &&
+            parent::check($content, $errors_string);
     }
 }

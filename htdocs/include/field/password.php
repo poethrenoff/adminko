@@ -15,4 +15,10 @@ class field_password extends field
     {
         return md5($content);
     }
+    
+    public function check($content, $errors_string = '')
+    {
+        return valid::factory('alpha')->check($content) &&
+            parent::check($content, $errors_string);
+    }
 }
