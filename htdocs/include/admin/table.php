@@ -291,7 +291,7 @@ class admin_table extends admin
         if (!$secondary_object->parent_field)
         {
             $secondary_object->filter_fields[] = '_checked';
-            $secondary_object->fields['_checked'] = array('title' => 'Показать', 'type' => 'checked', 'filter' => 1);
+            $secondary_object->fields['_checked'] = array('title' => 'Показать', 'type' => 'boolean', 'filter' => 1);
             
             $this->view->assign('filter', $secondary_object->get_filter());
         }
@@ -1245,7 +1245,7 @@ class admin_table extends admin
         {
             $allowed_types = ($field_desc['type'] == 'image') ? 'gif|jpg|jpe|jpeg|png' : '';
             
-            $upload = Upload::fetch($field_name . '_file', array('upload_path' => $field_desc['upload_dir'], 'allowed_types' => $allowed_types));
+            $upload = upload::fetch($field_name . '_file', array('upload_path' => $field_desc['upload_dir'], 'allowed_types' => $allowed_types));
             
             if ($upload->is_error())
                 throw new Exception('Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload->get_error() . '.');

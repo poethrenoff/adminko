@@ -39,7 +39,7 @@ class upload
 	public $image_size_str = '';
 	public $remove_spaces = true;
 	
-	protected $upload_path = UPLOAD_DIR;
+	protected $upload_path = '';
 	
 	protected $error_msg = '';
 	protected $error_lang = 'ru';
@@ -306,6 +306,18 @@ class upload
 	}
 	
 	// --------------------------------------------------------------------
+	
+	/**
+	 * Set Upload Path
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	void
+	 */	
+	function set_upload_path($path)
+	{
+		$this -> upload_path = normalize_path( UPLOAD_DIR ) . rtrim( $path, '/' ) . '/';
+	}
 	
 	/**
 	 * Set the file name

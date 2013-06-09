@@ -279,7 +279,7 @@ class system
 	public static function build()
 	{
 		$page_list = db::select_all( 'select * from page, layout where page_layout = layout_id and page_active = 1 order by page_order' );
-		$page_list = array_reindex( admin::factory( 'page' )->get_tree($page_list), 'page_id');
+		$page_list = array_reindex( $page_list, 'page_id');
 		
 		$area_list = db::select_all( 'select * from layout_area order by area_order' );
 		$area_list = array_group( $area_list, 'area_layout' );
