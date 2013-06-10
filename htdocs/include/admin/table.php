@@ -397,8 +397,7 @@ class admin_table extends admin
                     
                     $insert_fields[$field_name] = $bind_record[$field_name];
                     if (isset($field_desc['translate']) && $field_desc['translate'])
-                        $translate_values[$field_name] = $this->get_translate_values(
-                                $bind_desc['table'], $field_name, init_string($this->primary_field));
+                        $translate_values[$field_name] = $this->get_translate_values($bind_desc['table'], $field_name, id());
                 }
                 $insert_fields[$bind_desc['field']] = $primary_field;
                 
