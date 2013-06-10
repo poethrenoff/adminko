@@ -7,7 +7,7 @@ mysqldump -u adminko -p adminko > mysql.sql
 ## PostgreSQL ##
 
 psql -U adminko < pgsql.sql
-pg_dump.exe -c -O -x --inserts -n public -U adminko > pgsql.sql
+pg_dump -c -O -x --inserts -n public -U adminko > pgsql.sql
 
 
 ## SQLite ##
