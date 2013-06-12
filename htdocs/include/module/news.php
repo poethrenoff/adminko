@@ -49,22 +49,6 @@ class module_news extends module
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    // Получение списка новостей
-    protected function get_list($limit = null, $offset = null)
-    {
-        $limit_cond = '';
-        if (isset($limit))
-        {
-            $limit_cond .= 'limit ' . $limit;
-            if (isset($offset))
-                $limit_cond .= ' offset ' . $offset;
-        }
-        
-        return db::select_all('select * from news order by news_date desc ' . $limit_cond);
-    }
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    
     // Дополнительные параметры хэша модуля
     protected function ext_cache_key()
     {

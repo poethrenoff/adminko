@@ -7,9 +7,6 @@ class model
     // Поле с идентификатором первичного ключа
     protected $primary_field = '';
 
-    // Поле с идентификатором родительской записи
-    protected $parent_field = '';
-
     // Поля таблицы
     protected $fields = array();
 
@@ -40,9 +37,6 @@ class model
         foreach ($object_desc['fields'] as $field_name => $field_desc) {
             if ($field_desc['type'] == 'pk') {
                 $this->primary_field = $field_name;
-            }
-            if ($field_desc['type'] == 'parent') {
-                $this->parent_field = $field_name;
             }
         }
         if (!$this->primary_field) {
@@ -196,43 +190,7 @@ class model
         }
         return $this->fields[$this->primary_field];
     }
-
-    // Построение дерева записей
-    public function get_tree(&$records, $begin = 0, $except = array())
-    {
-        $this->except = $except;
-        $this->records_by_parent = array();
-        $parent_method = 'get_' . $this->parent_field;
-        foreach ($records as $record) {
-            $this->records_by_parent[$record->$parent_method()][] = $record;
-        }
-        
-        $this->records_as_tree = array();
-        $this->build_tree($begin);
-        
-        return $this->records_as_tree;
-    }
-
-    // Рекурсивный метод постройки уровня дерева
-    private function build_tree($parent_field_id, $depth = 0)
-    {
-        if (isset($this->records_by_parent[$parent_field_id])) {
-            $primary_method = 'get_' . $this->primary_field;
-            foreach ($this->records_by_parent[$parent_field_id] as $record) {
-                $primary_field_id = $record->$primary_method();
-                if (!in_array($primary_field_id, $this->except)) {
-                    $record->_depth = $depth;
-                    $record->_has_children = isset($this->records_by_parent[$primary_field_id]);
-                    if ($record->_has_children)
-                        $record->_children_count = count($this->records_by_parent[$primary_field_id]);
-                    
-                    $this->records_as_tree[] = $record;
-                    $this->build_tree($primary_field_id, $depth + 1);
-                }
-            }
-        }
-    }
-
+    
     // Очистка кеша объектов
     public static function purge($object = null, $primary_field = null) {
         if (!is_null($object) && !is_null($primary_field)) {

@@ -1,5 +1,3 @@
-<? foreach ( $this -> menu_tree as $menu_item ) { ?>
-<div style="margin-left: <?= 20 * $menu_item->_depth ?>px">
-	<a<? if ( $menu_item->_selected ) { ?> style="font-weight: bold"<? } ?> href="<?= $menu_item->get_menu_url() ?>"><?= h( $menu_item->get_menu_title() ) ?></a>
-</div>
+<? foreach ($this->get_children() as $menu_item) { ?>
+	<a<? if ( $menu_item->is_selected ) { ?> style="font-weight: bold"<? } ?> href="<?= $menu_item->get_menu_url() ?>"><?= h( $menu_item->get_menu_title() ) ?></a><br/>
 <? } ?>
