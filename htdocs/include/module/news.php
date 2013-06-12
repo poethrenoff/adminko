@@ -11,7 +11,7 @@ class module_news extends module
         
         $pages = paginator::construct($total, array('by_page' => $count));
         
-        $item_list = $model_news->get_list(array(), array(), $pages['by_page'], $pages['offset']);
+        $item_list = $model_news->get_list(array(), array('news_date' => 'desc'), $pages['by_page'], $pages['offset']);
         
         $this->view->assign('item_list', $item_list);
         $this->view->assign('pages', paginator::fetch($pages));
