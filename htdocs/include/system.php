@@ -135,6 +135,9 @@ class system
 					
 					$module_object -> init( $module_action, $module_params, $module_main );
 					
+					if ( $module_main && self::is_ajax() )
+						die( $module_object -> get_content() );
+					
 					$layout_view -> assign( $block['area_name'], $module_object -> get_content() );
 					if ( $module_main )
 						$layout_view -> assign( $module_object -> get_output() );
@@ -483,6 +486,11 @@ class system
 	public static function site()
 	{
 		return self::$site;
+	}
+	
+	public static function is_ajax()
+	{
+		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 	}
 	
 	public static function share_methods()

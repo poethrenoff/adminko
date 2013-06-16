@@ -66,7 +66,11 @@ class model
     // Создание объекта модели
     public static final function factory($object)
     {
-        $class_name = 'model_' . $object;
+        if (isset(metadata::$objects[$object]['model'])) {
+            $class_name = 'model_' . metadata::$objects[$object]['model'];
+        } else {
+            $class_name = 'model_' . $object;
+        }
         
         if (!class_exists($class_name)) {
             $class_name = 'model';
@@ -93,6 +97,15 @@ class model
         $this->fields = self::$object_cache[$this->object][$primary_field];
         $this->is_new = false;
         return $this;
+    }
+
+    // Получние списка объектов
+    public function get_batch(&$records = array()) {
+        $objects = array();
+        foreach ($records as $record) {
+            $objects[$record[$this->primary_field]] = model::factory($this->object)->get($record[$this->primary_field], $record);
+        }
+        return $objects;
     }
 
     // Получение условия фильтрации записей
@@ -141,11 +154,7 @@ class model
         
         $records = db::select_all("select * from {$this->object} {$filter_clause} {$order_clause} {$limit_clause}", $filter_binds);
         
-        $objects = array();
-        foreach ($records as $record) {
-            $objects[] = model::factory($this->object)->get($record[$this->primary_field], $record);
-        }
-        return $objects;
+        return $this->get_batch($records);
     }
 
     // Сохранение объекта в БД
