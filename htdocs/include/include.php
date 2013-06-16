@@ -303,7 +303,7 @@ function strip_tags_attributes( $string, $allowtags = null, $allowattributes = n
 
 function global_autoload( $class_name )
 {
-	$class_path = join( DIRECTORY_SEPARATOR, array_map( 'strtolower', explode( '_', $class_name ) ) );
+	$class_path = join( DIRECTORY_SEPARATOR, explode( '_', $class_name ) );
 	
 	if ( file_exists( $class_file = CLASS_DIR . $class_path . '.php' ) )
 		include_once( $class_file );
