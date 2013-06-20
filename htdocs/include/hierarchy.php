@@ -26,6 +26,18 @@ class hierarchy extends model
             throw new Exception('Ошибка в описании таблицы "' . $object . '". Отсутствует поле родительской записи.', true);
         }
     }
+
+    // Получение идентификатора родительской записи
+    public function get_parent_id()
+    {
+        return $this->fields[$this->parent_field];
+    }
+    
+    // Получение поля с идентификатором родительской записи
+    public function get_parent_field()
+    {
+        return $this->parent_field;
+    }
     
     // Получение объекта-родителя
     public function get_parent()
@@ -52,23 +64,29 @@ class hierarchy extends model
     }
     
     // Построение дерева записей
-    public function get_tree(&$records, $begin = 0, $except = array())
+    public function get_tree(&$records, $root_field = 0, $except = array())
     {
-        $begin_parent = null;
+        $root_parent = null;
+        
         $parent_method = 'get_' . $this->parent_field;
         $primary_method = 'get_' . $this->primary_field;
+        
+        if (!$root_field) {
+            $records[] = model::factory($this->object);
+        }
+        
         foreach ($records as $parent_record) {
             foreach ($records as $child_record) {
-                if ($child_record->$parent_method() == $parent_record->$primary_method() &&
-                        !in_array($child_record->$primary_method(), $except)) {
+                if ($child_record->$parent_method() == (int)$parent_record->$primary_method() &&
+                        !in_array((int)$child_record->$primary_method(), $except)) {
                     $child_record->parent = $parent_record;
                     $parent_record->children[] = $child_record;
                 }
             }
-            if ($parent_record->$primary_method() == $begin) {
-                $begin_parent = $parent_record;
+            if ((int)$parent_record->$primary_method() == $root_field) {
+                $root_parent = $parent_record;
             }
         }
-        return $begin_parent;
+        return $root_parent;
     }
 }
