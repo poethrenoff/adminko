@@ -833,7 +833,7 @@ class upload
 	 */	
 	function mimes_types($mime)
 	{
-		return ( !isset(Mime::$types[$mime]) ) ? FALSE : Mime::$types[$mime];
+		return ( !isset(mime::$types[$mime]) ) ? FALSE : mime::$types[$mime];
 	}
 
 	// --------------------------------------------------------------------
