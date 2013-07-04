@@ -3,4 +3,4 @@
 	
 	session_start();
 	
-	captcha::display();
+	captcha::create();

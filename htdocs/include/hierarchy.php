@@ -51,7 +51,7 @@ class hierarchy extends model
         return $this->children;
     }
     
-    // Колчество дочерних объектов
+    // Количество дочерних объектов
     public function children_count()
     {
         return count($this->children);
@@ -72,7 +72,7 @@ class hierarchy extends model
         $primary_method = 'get_' . $this->primary_field;
         
         if (!$root_field) {
-            $records[] = model::factory($this->object);
+            $records[] = model::factory($this->object); $except[] = 0;
         }
         
         foreach ($records as $parent_record) {

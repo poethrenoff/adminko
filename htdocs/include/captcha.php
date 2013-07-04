@@ -2,7 +2,7 @@
 /**
  * SimpleCaptcha class
  */
-class Captcha {
+class captcha {
 
     /** Width of the image */
     public $width  = 180;
