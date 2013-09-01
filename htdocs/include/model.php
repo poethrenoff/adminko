@@ -99,7 +99,7 @@ class model
         return $this;
     }
 
-    // Получние списка объектов
+    // Получение списка объектов
     public function get_batch(&$records = array()) {
         $objects = array();
         foreach ($records as $record) {
@@ -129,7 +129,7 @@ class model
     }
     
     // Получение условия ограничения количества записей
-    protected function get_limit_clause($limit = 0, $offset = 0) {
+    protected function get_limit_clause($limit = null, $offset = null) {
         $limit_clause = '';
         if (isset($limit)) {
             $limit_clause .= 'limit ' . $limit;
@@ -143,7 +143,7 @@ class model
     // Получение количества объектов
     public function get_count($where = array()) {
         list($filter_clause, $filter_binds) = $this->get_filter_condition($where);
-        return db::select_cell("select count(*) from {$this->object}" . $filter_clause, $filter_binds);
+        return db::select_cell("select count(*) from {$this->object} {$filter_clause}", $filter_binds);
     }
 
     // Получение списка объектов
@@ -199,7 +199,12 @@ class model
         }
         return $this->fields[$this->primary_field];
     }
-    
+
+    // Получение поля с идентификатором первичного ключа
+    public function get_primary_field() {
+        return $this->primary_field;
+    }
+
     // Очистка кеша объектов
     public static function purge($object = null, $primary_field = null) {
         if (!is_null($object) && !is_null($primary_field)) {
