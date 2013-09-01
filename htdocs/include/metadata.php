@@ -161,7 +161,7 @@ class metadata
          */
         'module_param' => array(
             'title' => 'Параметры модулей',
-            'class' => 'param',
+            'class' => 'moduleParam',
             'fields' => array(
                 'param_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'param_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => 'require'),
@@ -190,7 +190,7 @@ class metadata
          */
         'param_value' => array(
             'title' => 'Значения параметров модулей',
-            'class' => 'value',
+            'class' => 'paramValue',
             'fields' => array(
                 'value_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'value_param' => array('title' => 'Параметр', 'type' => 'table', 'table' => 'module_param', 'errors' => 'require'),

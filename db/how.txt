@@ -1,5 +1,8 @@
 ## MySQL ##
 
+create database adminko;
+grant all privileges on adminko.* to 'adminko'@'localhost' identified by 'adminko' with grant option;
+
 mysql -u adminko -p adminko < mysql.sql
 mysqldump -u adminko -p adminko > mysql.sql
 

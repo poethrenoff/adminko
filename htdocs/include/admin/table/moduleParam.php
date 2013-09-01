@@ -1,5 +1,5 @@
 <?php
-class admin_table_param extends admin_table_builder
+class admin_table_moduleParam extends admin_table_builder
 {
 	protected function action_add_save( $redirect = true )
 	{
