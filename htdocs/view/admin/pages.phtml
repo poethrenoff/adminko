@@ -1,7 +1,7 @@
 <? if( $this -> count > $this -> by_page ) { ?>
 <? 		foreach( $this -> pages as $page ) { ?>
 <? 			if( $page['link'] ) { ?>
-<a href="<?= h( $page['link'] ) ?>"><? if ( $page['number'] ) { ?><?= $page['number'] ?><? } else { ?>&hellip;<? } ?></a>
+<a href="<?= $this->escape( $page['link'] ) ?>"><? if ( $page['number'] ) { ?><?= $page['number'] ?><? } else { ?>&hellip;<? } ?></a>
 <? 			} else { ?>
 <b><?= $page['number'] ?></b>
 <? 			} ?>

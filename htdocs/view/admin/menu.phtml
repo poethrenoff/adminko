@@ -4,7 +4,7 @@
 <?for($i=0;$i<$item['_depth'];$i++):?><div class="tree_offset"><?endfor;?> 
 <?endif;?>
 <?if($item['object_name']):?>
-	<a href="<?=h($item['object_url'])?>"<?if(@$item['_selected']):?> class="selected"<?endif;?>><?=$item['object_title']?></a><br/>
+	<a href="<?=$item['object_url']?>"<?if(@$item['_selected']):?> class="selected"<?endif;?>><?=$this->escape($item['object_title'])?></a><br/>
 <?else:?>
 	<b><?=$item['object_title']?></b><br/>
 <?endif;?>

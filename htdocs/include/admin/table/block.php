@@ -76,7 +76,7 @@ class admin_table_block extends admin_table_builder
 					
 				$value_records = array();
 				foreach ( $values as $value )
-					$value_records[] = array( 'value' => (string) $value['value_id'], 'title' => h( $value['value_title'] ) );
+					$value_records[] = array( 'value' => (string) $value['value_id'], 'title' => field::form_field($value['value_title'], 'string') );
 				
 				$form_fields['param[' . $param_value['param_id'] . ']']['values'] = $value_records;
 			}

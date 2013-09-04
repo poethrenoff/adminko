@@ -40,7 +40,8 @@ class view
      * @param  $template string
      * @return string
      */
-    public function __call($method, $vars) {
+    public function __call($method, $vars)
+    {
         return call_user_func_array(array($this->object, $method), $vars);
     }
     
@@ -84,12 +85,29 @@ class view
     }
     
     /**
+     * Алиас для htmlspecialchars + возможность обработки массивов
+     *
+     * @param  mixed $var
+     */
+    function escape($var)
+    {
+        if (is_array($var)) {
+            foreach ($var as $key => $value) {
+                $var[$key] = $this->escape($value);
+            }
+        } else {
+            $var = htmlspecialchars($var, ENT_QUOTES, 'UTF-8');
+        }
+        return $var;
+    }
+    
+    /**
      * Проверка присутствия данных в запросе
      *
      * Примеры вызова:
-     *      $this -> in_request('var', 1);
-     *      $this -> in_request('var[step]', 2);
-     *      $this -> in_request('var[step][point]');
+     *      $this->in_request('var', 1);
+     *      $this->in_request('var[step]', 2);
+     *      $this->in_request('var[step][point]');
      *
      * @param  $name string
      * @param  $data string
@@ -97,7 +115,7 @@ class view
      */
     public function in_request($name, $data = null)
     {
-        $isset = !is_null($value = $this -> from_request($name));
+        $isset = !is_null($value = $this->from_request($name));
         
         return (is_null($data) || !$isset) ? $isset : ($value == $data);
     }
@@ -106,9 +124,9 @@ class view
      * Извлечение данных из запроса
      *
      * Примеры вызова:
-     *      $this -> from_request('var');
-     *      $this -> from_request('var[step]');
-     *      $this -> from_request('var[step][point]');
+     *      $this->from_request('var');
+     *      $this->from_request('var[step]');
+     *      $this->from_request('var[step][point]');
      *
      * @param  $name string
      * @param  $data string

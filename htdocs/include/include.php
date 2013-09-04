@@ -209,17 +209,6 @@ function not_found()
 	exit;
 }
 
-function h( $string, $flags = ENT_QUOTES, $charset = 'UTF-8', $double_encode = true )
-{
-	if ( is_array( $string ) )
-		foreach ( $string as $key => $value )
-			$string[$key] = h( $value, $flags, $charset, $double_encode );
-	else if ( is_string( $string ) )
-		$string = htmlspecialchars( $string, $flags, $charset, $double_encode );
-	
-	return $string;
-}
-
 function is_empty( $var )
 {
 	if ( is_array( $var ) || is_object( $var ) )
