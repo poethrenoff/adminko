@@ -87,7 +87,7 @@ class model
                     array($this->primary_field => $primary_field)
                );
                 if (!$record){
-                    throw new Exception("Ошибка. Запись {$this->object}({$primary_field}) не найдена.");
+                    throw new Exception("Ошибка. Запись {$this->object}({$primary_field}) не найдена.", true);
                 }
             }
             foreach ($this->fields_desc as $field_name => $field_desc) {
@@ -186,7 +186,7 @@ class model
     // Удаление объекта из БД
     public function delete() {
         if($this->is_new){
-            throw new Exception("Ошибка. Запись не можеть быть удалена из БД, так как не имеет идентификатора.");
+            throw new Exception("Ошибка. Запись не можеть быть удалена из БД, так как не имеет идентификатора.", true);
         }
         db::delete($this->object, array($this->primary_field => $this->get_id()));
         self::purge($this->object, $this->primary_field);
@@ -195,7 +195,7 @@ class model
     // Получение идентификатора объекта
     public function get_id() {
         if($this->is_new){
-            throw new Exception("Ошибка. Запись не была сохранена в БД, поэтому не имеет идентификатора.");
+            throw new Exception("Ошибка. Запись не была сохранена в БД, поэтому не имеет идентификатора.", true);
         }
         return $this->fields[$this->primary_field];
     }

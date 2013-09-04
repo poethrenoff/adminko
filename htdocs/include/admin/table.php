@@ -1247,7 +1247,7 @@ class admin_table extends admin
             $upload = upload::fetch($field_name . '_file', array('upload_path' => $field_desc['upload_dir'], 'allowed_types' => $allowed_types));
             
             if ($upload->is_error())
-                throw new Exception('Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload->get_error() . '.');
+                throw new Exception('Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload->get_error() . '.', true);
             
             return $upload->get_file_link();
         }
