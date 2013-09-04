@@ -33,13 +33,13 @@ class admin_delivery extends admin
 		$type = init_string( 'type' );
 		
 		if ( $subject === '' )
-			throw new Exception( 'Ошибка. Не заполнено поле "Тема рассылки".', true );
+			throw new AlarmException( 'Ошибка. Не заполнено поле "Тема рассылки".' );
 		if ( $email === '' )
-			throw new Exception( 'Ошибка. Не заполнено поле "От кого".', true );
+			throw new AlarmException( 'Ошибка. Не заполнено поле "От кого".' );
 		if ( $message === '' )
-			throw new Exception( 'Ошибка. Не заполнено поле "Текст рассылки".', true );
+			throw new AlarmException( 'Ошибка. Не заполнено поле "Текст рассылки".' );
 		if ( $type === '' )
-			throw new Exception( 'Ошибка. Не заполнено поле "Тип рассылки".', true );
+			throw new AlarmException( 'Ошибка. Не заполнено поле "Тип рассылки".' );
 		
 		db::delete( 'delivery_storage' );
 		db::insert( 'delivery_storage', array( 'body_subject' => $subject, 'body_email' => $email,

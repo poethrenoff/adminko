@@ -111,6 +111,8 @@ class system
 			'meta_keywords' => self::$page['meta_keywords'],
 			'meta_description' => self::$page['meta_description'] ) );
 		
+		$is_admin = controller() == 'admin';
+		
 		if ( isset( self::$page['block'] ) )
 		{
 			foreach ( self::$page['block'] as $block )
@@ -123,8 +125,6 @@ class system
 				$module_main = (boolean) $block['area_main'];
 				$module_action = $module_main ? action() :
 					( ( isset( $module_params['action'] ) && $module_params['action'] ) ? $module_params['action'] : 'index' );
-				
-				$is_admin = controller() == 'admin';
 				
 				try
 				{
@@ -142,14 +142,15 @@ class system
 					if ( $module_main )
 						$layout_view -> assign( $module_object -> get_output() );
 				}
-				catch ( Exception $e )
+				catch ( AlarmException $e )
 				{
-					if ( ob_get_length() !== false )
-						ob_clean();
-					
-					$error_content = exception_handler( $e, $e -> getCode(), $is_admin );
+					$error_content = exception_handler( $e, true, $is_admin );
 					
 					$layout_view -> assign( $block['area_name'], $error_content );
+				}
+				catch ( Exception $e )
+				{
+					exception_handler( $e, false, $is_admin );
 				}
 			}
 		}

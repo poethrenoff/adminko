@@ -38,7 +38,7 @@ class module_news extends module
     {
         try {
             $item = model::factory('news')->get(id());
-        } catch (Exception $e) {
+        } catch (AlarmException $e) {
             not_found();
         }
         

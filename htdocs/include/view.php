@@ -30,7 +30,7 @@ class view
         } elseif (is_string($name)) {
             $this->$name = $data;
         } else {
-            throw new Exception('Недопустимый тип переменной', true);
+            throw new AlarmException('Недопустимый тип переменной');
         }
     }
 
@@ -55,7 +55,7 @@ class view
         $template_file = $this->template_dir . '/' . $template . '.phtml';
         
         if (!file_exists($template_file))
-            throw new Exception('Файл "' . normalize_path($template_file) . '" не найден', true);
+            throw new AlarmException('Файл "' . normalize_path($template_file) . '" не найден');
         
         $old_error_level = error_reporting();
         error_reporting(error_reporting() & ~(E_NOTICE|E_WARNING));

@@ -22,10 +22,10 @@ class admin_fm extends admin
         
         if( !file_exists( $real_upload_path ) )
             if ( !( @mkdir( $real_upload_path , 0777, true ) ) )
-                throw new Exception( 'Ошибка. Невозможно создать каталог "' . $real_upload_path . '".', true );
+                throw new AlarmException( 'Ошибка. Невозможно создать каталог "' . $real_upload_path . '".' );
         
         if( !is_readable( $real_upload_path ) )
-            throw new Exception( 'Ошибка. Невозможно прочитать каталог "' . $real_upload_path . '".', true );
+            throw new AlarmException( 'Ошибка. Невозможно прочитать каталог "' . $real_upload_path . '".' );
         
         $sort_field = init_string( 'sort_field' );
         $sort_order = init_string( 'sort_order' );
@@ -107,15 +107,15 @@ class admin_fm extends admin
         $real_file_path = $this -> get_upload_path() . $file;
         
         if( $real_file_path != realpath( $real_file_path ) )
-            throw new Exception( 'Ошибка. Недопустимое имя файла "' . $real_file_path . '".', true );
+            throw new AlarmException( 'Ошибка. Недопустимое имя файла "' . $real_file_path . '".' );
         
         if( !file_exists( $real_file_path ) || !is_file( $real_file_path ) )
-            throw new Exception( 'Ошибка. Файл "' . $real_file_path . '" не существует.', true );
+            throw new AlarmException( 'Ошибка. Файл "' . $real_file_path . '" не существует.' );
         
         @unlink( $real_file_path );
     
         if ( file_exists( $real_file_path ) )
-            throw new Exception( 'Ошибка. Невозможно удалить файл "' . $real_file_path . '".', true );
+            throw new AlarmException( 'Ошибка. Невозможно удалить файл "' . $real_file_path . '".' );
     
         $this -> redirect();
     }
@@ -144,10 +144,10 @@ class admin_fm extends admin
             $upload = upload::fetch( $field_name . '_file' );
             
             if ( $upload -> is_error() )
-                throw new Exception( 'Ошибка. ' . $upload -> get_error() . '.', true );
+                throw new AlarmException( 'Ошибка. ' . $upload -> get_error() . '.' );
         }
         else
-            throw new Exception( 'Ошибка. Отсутствует файл для закачки.', true );
+            throw new AlarmException( 'Ошибка. Отсутствует файл для закачки.' );
         
         $this -> redirect();
     }

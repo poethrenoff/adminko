@@ -110,7 +110,7 @@ abstract class field
             foreach(self::$errors as $error_name => $error_code)
                 if ($field_desc['errors_code'] & $error_code)
                     if (!valid::factory($error_name)->check($content))
-                        throw new Exception('Ошибочное значение поля "' . $field_desc['title'] . '".', true);
+                        throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
             
             $content = self::factory($field_desc['type'])->set($content);
         }

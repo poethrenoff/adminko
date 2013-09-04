@@ -23,7 +23,7 @@ class hierarchy extends model
             }
         }
         if (!$this->parent_field) {
-            throw new Exception('Ошибка в описании таблицы "' . $object . '". Отсутствует поле родительской записи.', true);
+            throw new AlarmException('Ошибка в описании таблицы "' . $object . '". Отсутствует поле родительской записи.');
         }
     }
 

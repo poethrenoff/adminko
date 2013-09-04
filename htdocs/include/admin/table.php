@@ -143,7 +143,7 @@ class admin_table extends admin
         
         $bind_name = init_string('bind');
         if (!isset($this->binds[$bind_name]))
-            throw new Exception('Ошибка. Связь "' . $bind_name . '" не описана в метаданных.', true);
+            throw new AlarmException('Ошибка. Связь "' . $bind_name . '" не описана в метаданных.');
         
         $bind = $this->binds[$bind_name];
         
@@ -185,7 +185,7 @@ class admin_table extends admin
         }
         
         if (count($form_fields) == 0)
-            throw new Exception('Ошибка. Нет полей, доступных для изменения.', true);
+            throw new AlarmException('Ошибка. Нет полей, доступных для изменения.');
         
         $title = field::get_field($primary_record[$this->main_field], $this->fields[$this->main_field]['type']);
         
@@ -211,7 +211,7 @@ class admin_table extends admin
         
         $relation_name = init_string('relation');
         if (!isset($this->relations[$relation_name]))
-            throw new Exception('Ошибка. Связь "' . $relation_name . '" не описана в метаданных.', true);
+            throw new AlarmException('Ошибка. Связь "' . $relation_name . '" не описана в метаданных.');
         
         $relation = $this->relations[$relation_name];
         
@@ -553,7 +553,7 @@ class admin_table extends admin
             $records_count = db::select_row($query, array('primary_field' => $primary_field));
             
             if ($records_count['_count'])
-                throw new Exception('Ошибка. Невозможно удалить запись, так как у нее есть дочерние записи.', true);
+                throw new AlarmException('Ошибка. Невозможно удалить запись, так как у нее есть дочерние записи.');
         }
         
         if (isset($this->binds) && is_array($this->binds))
@@ -599,8 +599,8 @@ class admin_table extends admin
                     $records_count = db::select_row($query, array('primary_field' => $primary_field));
                     
                     if ($records_count['_count'])
-                        throw new Exception('Ошибка. Невозможно удалить запись, так как у нее есть зависимые записи в таблице "' .
-                            metadata::$objects[$link_desc['table']]['title'] . '".', true);
+                        throw new AlarmException('Ошибка. Невозможно удалить запись, так как у нее есть зависимые записи в таблице "' .
+                            metadata::$objects[$link_desc['table']]['title'] . '".');
                 }
             }
         }
@@ -625,7 +625,7 @@ class admin_table extends admin
         
         $bind_name = init_string('bind');
         if (!isset($this->binds[$bind_name]))
-            throw new Exception('Ошибка. Связь "' . $bind_name . '" не описана в метаданных.', true);
+            throw new AlarmException('Ошибка. Связь "' . $bind_name . '" не описана в метаданных.');
         
         $bind = $this->binds[$bind_name];
         
@@ -679,7 +679,7 @@ class admin_table extends admin
         
         $relation_name = init_string('relation');
         if (!isset($this->relations[$relation_name]))
-            throw new Exception('Ошибка. Связь "' . $relation_name . '" не описана в метаданных.', true);
+            throw new AlarmException('Ошибка. Связь "' . $relation_name . '" не описана в метаданных.');
         
         $relation = $this->relations[$relation_name];
         
@@ -1078,7 +1078,7 @@ class admin_table extends admin
             $records_count = db::select_row($query, $group_binds);
             
             if ($records_count['_count'])
-                throw new Exception('Ошибка. Запись не удовлетворяет условию группировки.', true);
+                throw new AlarmException('Ошибка. Запись не удовлетворяет условию группировки.');
         }
     }
     
@@ -1132,7 +1132,7 @@ class admin_table extends admin
         $record = db::select_row($query, array('primary_field' => $primary_field));
         
         if (!$record)
-            throw new Exception('Ошибка. Запись не найдена.', true);
+            throw new AlarmException('Ошибка. Запись не найдена.');
         
         foreach ($this->fields as $field_name => $field_desc)
             if (isset($field_desc['translate']) && $field_desc['translate'])
@@ -1192,7 +1192,7 @@ class admin_table extends admin
         }
         
         if (count($form_fields) == 0)
-            throw new Exception('Ошибка. Нет полей, доступных для изменения.', true);
+            throw new AlarmException('Ошибка. Нет полей, доступных для изменения.');
         
         $record_title = ($action != 'add') ? field::get_field(
             $record[$this->main_field], $this->fields[$this->main_field]['type']) : '';
@@ -1247,7 +1247,7 @@ class admin_table extends admin
             $upload = upload::fetch($field_name . '_file', array('upload_path' => $field_desc['upload_dir'], 'allowed_types' => $allowed_types));
             
             if ($upload->is_error())
-                throw new Exception('Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload->get_error() . '.', true);
+                throw new AlarmException('Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload->get_error() . '.');
             
             return $upload->get_file_link();
         }
@@ -1261,7 +1261,7 @@ class admin_table extends admin
             !$this->object_desc['no_' . $action];
         
         if (!$action_allow && $throw)
-            throw new Exception('Ошибка. Данная операция с таблицей "' . $this->object_desc['title'] . '" запрещена.', true);
+            throw new AlarmException('Ошибка. Данная операция с таблицей "' . $this->object_desc['title'] . '" запрещена.');
         
         return $action_allow;
     }

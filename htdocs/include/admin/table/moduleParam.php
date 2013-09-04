@@ -51,7 +51,7 @@ class admin_table_moduleParam extends admin_table_builder
 			$this -> fields['param_default']['type'] = 'int';
 		
 		if ( init_string( 'param_type' ) == 'table' && !isset( metadata::$objects[init_string( 'param_table' )] ) )
-			throw new Exception( 'Ошибочное значение поля "' . $this -> fields['param_table']['title'] . '".', true );
+			throw new AlarmException( 'Ошибочное значение поля "' . $this -> fields['param_table']['title'] . '".' );
 	}
 	
 	protected function get_card_scripts( $action = 'edit', $record = null )

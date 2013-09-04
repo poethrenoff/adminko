@@ -328,7 +328,11 @@ function exception_handler( $e, $return = false, $admin = false )
 	
 	if ( PRODUCTION )
 	{
-		@file_put_contents( $error_file, $error_log, FILE_APPEND );
+		if (!$admin || !$return)
+		{
+			@file_put_contents( $error_file, $error_log, FILE_APPEND );
+			@sendmail::send( ERROR_EMAIL, ERROR_EMAIL, $_SERVER['HTTP_HOST'], ERROR_SUBLECT, $error_content );
+		}
 		
 		if ( $admin )
 		{
@@ -336,11 +340,12 @@ function exception_handler( $e, $return = false, $admin = false )
 		}
 		else
 		{
-			sendmail::send( ERROR_EMAIL, ERROR_EMAIL, $_SERVER['HTTP_HOST'], ERROR_SUBLECT, $error_content );
-			
 			$error_content = $return ? '' : $error_plug;
 		}
 	}
+	
+	if ( ob_get_length() !== false )
+		ob_clean();
 	
 	if ( $return )
 		return $error_content;
@@ -350,5 +355,9 @@ function exception_handler( $e, $return = false, $admin = false )
 
 if ( isset( $_SERVER['HTTP_HOST'] ) )
 	set_exception_handler( 'exception_handler' );
+
+class AlarmException extends Exception {
+	// Уведомительное исключение, не прерывающее выполнение программы
+}
 
 system::init();

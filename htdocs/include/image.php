@@ -61,14 +61,14 @@ class image {
          * Задано ли исходное изображение?
          */
         if ($this->source_image == '') {
-            throw new Exception('Не задано исходное изображение');
+            throw new AlarmException('Не задано исходное изображение');
         }
         
         /*
          * Установлена ли библиотека GD?
          */
         if (!function_exists('getimagesize')) {
-            throw new Exception('Не установлена библиотека GD');
+            throw new AlarmException('Не установлена библиотека GD');
         }
         
         /*
@@ -77,7 +77,7 @@ class image {
         $image_info = @getimagesize($this->source_image);
         
         if ($image_info === false) {
-            throw new Exception('Исходный файл не является изображением');
+            throw new AlarmException('Исходный файл не является изображением');
         }
         
         list($this->orig_width, $this->orig_height, $this->image_type, $this->size_str) = $image_info;
@@ -109,11 +109,11 @@ class image {
             case 3:
                 $image_resource = @imagecreatefrompng($this->source_image); break;
             default:
-                throw new Exception('Не поддерживаемый тип изображения');
+                throw new AlarmException('Не поддерживаемый тип изображения');
         }
         
         if ($image_resource === false) { 
-            throw new Exception('Не удалось открыть изображение');
+            throw new AlarmException('Не удалось открыть изображение');
         }
         
         return $image_resource;
@@ -134,11 +134,11 @@ class image {
             case 3:
                 $image_result = @imagepng($destination_resource, $this->dest_image, 9); break;
             default:
-                throw new Exception('Не поддерживаемый тип изображения');
+                throw new AlarmException('Не поддерживаемый тип изображения');
         }
         
         if ($image_result === false) {
-            throw new Exception('Не удалось сохранить изображение');
+            throw new AlarmException('Не удалось сохранить изображение');
         }
         
         return $image_result;

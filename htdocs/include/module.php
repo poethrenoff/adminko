@@ -39,7 +39,7 @@ abstract class module extends object
 		if ( !method_exists( $this, $action_name ) )
 		{
 			if ( !$is_main )
-				throw new Exception( 'Ошибка. Метод "' . $action_name . '" не найден.', true );
+				throw new AlarmException( 'Ошибка. Метод "' . $action_name . '" не найден.' );
 			else
 				not_found();
 			
