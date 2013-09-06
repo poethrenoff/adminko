@@ -35,10 +35,11 @@ class view
     }
 
     /**
-     * Получение контента
+     * Вызов метода внутреннего объекта
      *
-     * @param  $template string
-     * @return string
+     * @param  $method string
+     * @param  $vars   array
+     * @return mixed
      */
     public function __call($method, $vars)
     {

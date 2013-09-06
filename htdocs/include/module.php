@@ -48,23 +48,19 @@ abstract class module extends object
 		
 		$cache_key = $this -> get_cache_key();
 		
-		if ( $cache_key )
+		if ( !$cache_key || ( $cache_values = cache::get( $cache_key ) ) === false )
 		{
-			$cache_values = cache::get( $cache_key );
+			$this -> $action_name();
 			
-			if ( $cache_values === false )
+			if ($cache_key)
 			{
-				$this -> $action_name();
-				
 				cache::set( $cache_key, array( $this -> content, $this -> output ) );
-			}
-			else
-			{
-				list( $this -> content, $this -> output ) = $cache_values;
 			}
 		}
 		else
-			$this -> $action_name();
+		{
+			list( $this -> content, $this -> output ) = $cache_values;
+		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////

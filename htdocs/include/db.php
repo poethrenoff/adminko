@@ -11,6 +11,28 @@ abstract class db
 		return self::$db_driver;
 	}
 	
+	protected static function get_result( $method, $query, $fields = array(), $expiration = 0 )
+	{
+		$cache_key = $expiration > 0 ? static::get_cache_key( $query, $fields ) : false;
+		
+		if ( !$cache_key || ( $result = cache::get( $cache_key, $expiration ) ) === false )
+		{
+			$result = static::get_driver() -> $method( $query, $fields );
+			
+			if ( $cache_key )
+			{
+				cache::set( $cache_key, $result, $expiration );
+			}
+		}
+		
+		return $result;
+	}
+	
+	protected static function get_cache_key($query, $fields = array())
+	{
+		return md5(serialize(array($query, $fields)));
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public static function query( $query, $fields = array() )
@@ -18,19 +40,19 @@ abstract class db
 		return static::get_driver() -> query( $query, $fields );
 	}
 	
-	public static function select_cell( $query, $fields = array() )
+	public static function select_cell( $query, $fields = array(), $expiration = 0 )
 	{
-		return static::get_driver() -> select_cell( $query, $fields );
+		return static::get_result( 'select_cell', $query, $fields, $expiration );
 	}
 	
-	public static function select_row( $query, $fields = array() )
+	public static function select_row( $query, $fields = array(), $expiration = 0 )
 	{
-		return static::get_driver() -> select_row( $query, $fields );
+		return static::get_result( 'select_row', $query, $fields, $expiration );
 	}
 	
-	public static function select_all( $query, $fields = array() )
+	public static function select_all( $query, $fields = array(), $expiration = 0 )
 	{
-		return static::get_driver() -> select_all( $query, $fields );
+		return static::get_result( 'select_all', $query, $fields, $expiration );
 	}
 	
 	public static function insert( $table, $fields = array() )
