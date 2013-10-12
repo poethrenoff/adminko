@@ -85,7 +85,7 @@ class model
             if (is_null($record)) {
                 $record = db::select_row("select * from {$this->object} where {$this->primary_field} = :{$this->primary_field}",
                     array($this->primary_field => $primary_field)
-               );
+                );
                 if (!$record){
                     throw new AlarmException("Ошибка. Запись {$this->object}({$primary_field}) не найдена.");
                 }

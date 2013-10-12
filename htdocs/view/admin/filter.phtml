@@ -39,7 +39,7 @@
 				<td colspan="2">
 					<input type="submit" value="Искать" class="button"/>
 <?foreach($this -> hidden as $name=>$value):?>
-					<input type="hidden" name="<?=h($name)?>" value="<?=h($value)?>"/>
+					<input type="hidden" name="<?=$this->escape($name)?>" value="<?=$this->escape($value)?>"/>
 <?endforeach;?>
 				</td>
 			</tr>
