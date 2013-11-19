@@ -158,7 +158,7 @@ class admin_fm extends admin
         
         if ( isset( $_FILES['upload']['name'] ) && $_FILES['upload']['name'] )
         {
-            $upload = upload::fetch( 'upload' );
+            $upload = upload::fetch( 'upload', array( 'upload_path' => '' ) );
             
             if ( $upload -> is_error() )
                 die( '<script type="text/javascript">alert( "Ошибка! ' . $upload -> get_error() . '." ); window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "", "");</script>' );
