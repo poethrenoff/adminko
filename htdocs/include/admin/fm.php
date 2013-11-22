@@ -141,7 +141,7 @@ class admin_fm extends admin
         
         if ( isset( $_FILES[$field_name . '_file']['name'] ) && $_FILES[$field_name . '_file']['name'] )
         {
-            $upload = upload::fetch( $field_name . '_file' );
+            $upload = upload::fetch( $field_name . '_file', array( 'upload_path' => '' ) );
             
             if ( $upload -> is_error() )
                 throw new AlarmException( 'Ошибка. ' . $upload -> get_error() . '.' );
