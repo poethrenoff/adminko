@@ -97,6 +97,9 @@ class admin_table_block extends admin_table_builder
 		$form_url = url_for( array( 'object' => $this -> object, 'action' => 'param_save', 'id' => $record[$this -> primary_field] ) );
 		$this -> view -> assign( 'form_url', $form_url );
 		
+		$prev_url = $this->restore_state();
+		$this->view->assign('back_url', url_for($prev_url));
+		
 		$this -> content = $this -> view -> fetch( '/admin/form' );
 		$this -> output['meta_title'] .= ' :: ' . $record_title . ' :: ' . $action_title;
 	}
