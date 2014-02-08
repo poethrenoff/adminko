@@ -34,7 +34,8 @@ class model
         $this->object = $object;
         $this->fields_desc = $object_desc['fields'];
         
-        foreach ($object_desc['fields'] as $field_name => $field_desc) {
+        foreach ($this->fields_desc as $field_name => $field_desc) {
+            $this->fields[$field_name] = field::factory($this->fields_desc[$field_name]['type']);
             if ($field_desc['type'] == 'pk') {
                 $this->primary_field = $field_name;
             }
@@ -53,12 +54,14 @@ class model
             throw new AlarmException("Ошибка. Поле {$this->object}->{$matches[2]} не описано в метаданных.");
         }
         
-        $field_name = $matches[2]; $field_desc = $this->fields_desc[$field_name];
+        $field = $this->fields[$matches[2]];
         switch ($matches[1]) {
             case 'get':
-                return isset($this->fields[$field_name]) ? $this->fields[$field_name] : null;
+                return $field->get();
             case 'set':
-                $this->fields[$field_name] = $vars[0];
+                if (!empty($vars)) {
+                    $field->set($vars[0]);
+                }
                 return $this;
         }
     }
@@ -91,7 +94,8 @@ class model
                 }
             }
             foreach ($this->fields_desc as $field_name => $field_desc) {
-                self::$object_cache[$this->object][$primary_field][$field_name] = $record[$field_name];
+                self::$object_cache[$this->object][$primary_field][$field_name] =
+                    field::factory($this->fields_desc[$field_name]['type'])->set($record[$field_name]);
             }
         }
         $this->fields = self::$object_cache[$this->object][$primary_field];
@@ -165,13 +169,13 @@ class model
                     $field_desc[$this->is_new ? 'no_add' : 'no_edit'] ||
                 $this->is_new && $field_desc['type'] == 'pk'))
             {
-                $get_method = 'get_' . $field_name;
-                $record[$field_name] = $this->$get_method();
-                $field = field::factory($field_desc['type']);
-                $errors_string = isset($field_desc['errors']) && $field_desc['errors'] ? $field_desc['errors'] : null;
-                if (!$field->check($record[$field_name], $errors_string)) {
+                $errors = isset($field_desc['errors']) && is_array($field_desc['errors']) ? $field_desc['errors'] : array();
+                if (!$this->fields[$field_name]->check($errors)) {
                     throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
                 }
+                
+                $get_method = 'get_' . $field_name;
+                $record[$field_name] = $this->$get_method();
             }
         }
         
@@ -197,7 +201,7 @@ class model
         if($this->is_new){
             throw new AlarmException("Ошибка. Запись не была сохранена в БД, поэтому не имеет идентификатора.");
         }
-        return $this->fields[$this->primary_field];
+        return $this->fields[$this->primary_field]->get();
     }
 
     // Получение поля с идентификатором первичного ключа

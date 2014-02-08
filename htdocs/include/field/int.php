@@ -1,14 +1,21 @@
 <?php
-class field_int extends field_string
+class field_int extends field
 {
-    public function set($content)
-    {
-        return $content !== '' ? strval(intval($content)) : null;
+    public function parse($content) {
+        $result = valid::factory('int')->parse_check($content);
+        if ($result) {
+            $this->set($content);
+        }
+        return $result;
     }
     
-    public function check($content, $errors_string = '')
-    {
-        return valid::factory('int')->check($content) &&
-            parent::check($content, $errors_string);
+    public function set($content) {
+        $this->value = $content !== '' ? $content : null;
+        return $this;
+    }
+    
+    public function check($errors = array()) {
+        return valid::factory('int')->check($this->get()) &&
+            parent::check($errors);
     }
 }

@@ -1,13 +1,18 @@
 <?php
-class field_boolean extends field_string
+class field_boolean extends field
 {
-    public function get($content)
-    {
-        return $content ? 'да' : 'нет';
+    protected $value = 0;
+    
+    public function get() {
+        return (boolean) $this->value;
     }
     
-    public function set($content)
-    {
-        return strval($content ? 1 : 0);
+    public function view() {
+        return $this->get() ? 'да' : 'нет';
+    }
+    
+    public function check($errors = array()) {
+        return parent::check($errors) &&
+            (in_array('require', $errors) ? $this->get() > 0 : true);
     }
 }

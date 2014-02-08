@@ -1,24 +1,19 @@
 <?php
-class field_password extends field
+class field_password extends field_string
 {
-    public function get($content)
-    {
-        return str_repeat('*', rand(5, 8));
+    public function parse($content) {
+        $result = valid::factory('alpha')->parse_check($content);
+        if ($result) {
+            $this->set(md5($content));
+        }
+        return $result;
     }
     
-    public function form($content)
-    {
+    public function form() {
         return '';
     }
     
-    public function set($content)
-    {
-        return md5($content);
-    }
-    
-    public function check($content, $errors_string = '')
-    {
-        return valid::factory('alpha')->check($content) &&
-            parent::check($content, $errors_string);
+    public function view() {
+        return str_repeat('*', rand(5, 8));
     }
 }

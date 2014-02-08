@@ -1,5 +1,5 @@
 <?php
-class field_image extends field_file
+class field_image extends field_string
 {
     ///
 }

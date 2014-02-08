@@ -1,18 +1,14 @@
 <?php
 class field_string extends field
 {
-    public function get($content)
-    {
-        return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+    // Значение поля
+    protected $value = '';
+    
+    public function form() {
+        return htmlspecialchars($this->get(), ENT_QUOTES, 'UTF-8');
     }
     
-    public function form($content)
-    {
-        return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
-    }
-    
-    public function set($content)
-    {
-        return $content;
+    public function view() {
+        return htmlspecialchars($this->get(), ENT_QUOTES, 'UTF-8');
     }
 }

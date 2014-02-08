@@ -1,8 +1,5 @@
 <?php
-class field_parent extends field_int
+class field_parent extends field_table
 {
-    public function set($content)
-    {
-        return strval(intval($content));
-    }
+    ///
 }

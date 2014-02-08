@@ -1,14 +1,10 @@
 <?php
 class field_order extends field_int
 {
-    public function set($content)
-    {
-        return strval(intval($content));
-    }
+    protected $value = 0;
     
-    public function check($content, $errors_string = '')
-    {
-        return valid::factory('require')->check($content) &&
-            parent::check($content, $errors_string);
+    public function check($errors = array()) {
+        return valid::factory('require')->check($this->get()) &&
+            parent::check($errors);
     }
 }

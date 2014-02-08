@@ -1,8 +1,10 @@
 <?php
 class field_table extends field_int
 {
-    public function set($content)
-    {
-        return strval(intval($content));
+    protected $value = 0;
+    
+    public function check($errors = array()) {
+        return valid::factory('require')->check($this->get()) && parent::check($errors) &&
+            (in_array('require', $errors) ? ($this->get() > 0) : ($this->get() >= 0));
     }
 }
