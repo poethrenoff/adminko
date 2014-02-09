@@ -1,11 +1,8 @@
 <?php
-abstract class field
+class field
 {
     // Значение поля
     protected $value = null;
-    
-    // Кеш объектов
-    private static $object_cache = array();
     
     ///////////////////////////////////////////////////////////////////////////
     
@@ -49,10 +46,7 @@ abstract class field
     // Создание объекта поля
     public static final function factory($type)
     {
-        if (!isset(self::$object_cache[$type])) {
-            $class_name = 'field_' . $type;
-            self::$object_cache[$type] = new $class_name();
-        }
-        return self::$object_cache[$type];
+        $class_name = 'field_' . $type;
+        return new $class_name();
     }
 }

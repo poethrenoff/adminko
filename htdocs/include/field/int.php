@@ -10,7 +10,7 @@ class field_int extends field
     }
     
     public function set($content) {
-        $this->value = $content !== '' ? $content : null;
+        $this->value = (string) $content !== '' ? $content : null;
         return $this;
     }
     

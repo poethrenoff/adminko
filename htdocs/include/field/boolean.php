@@ -1,10 +1,11 @@
 <?php
 class field_boolean extends field
 {
-    protected $value = 0;
+    protected $value = false;
     
-    public function get() {
-        return (boolean) $this->value;
+    public function set($content) {
+        $this->value = (boolean) $content;
+        return $this;
     }
     
     public function view() {
@@ -13,6 +14,6 @@ class field_boolean extends field
     
     public function check($errors = array()) {
         return parent::check($errors) &&
-            (in_array('require', $errors) ? $this->get() > 0 : true);
+            (in_array('require', $errors) ? $this->get() : true);
     }
 }

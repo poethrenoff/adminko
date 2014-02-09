@@ -1,8 +1,12 @@
 <?php
 class field_string extends field
 {
-    // Значение поля
     protected $value = '';
+    
+    public function set($content) {
+        $this->value = (string) $content !== '' ? (string) $content : '';
+        return $this;
+    }
     
     public function form() {
         return htmlspecialchars($this->get(), ENT_QUOTES, 'UTF-8');
