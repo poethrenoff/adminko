@@ -62,7 +62,7 @@ class admin_table_page extends admin_table_builder
 	protected function check_page_parent()
 	{
 		if ( init_string( 'page_parent' ) )
-			$this -> fields['page_name']['errors_code'] |= field::$errors['require'];
+			$this -> fields['page_name']['errors'][] = 'require';
 		else if ( init_string( 'page_name' ) !== '' )
 			throw new AlarmException( 'Ошибочное значение поля "' . $this -> fields['page_name']['title'] . '".' );
 	}

@@ -1,14 +1,6 @@
 <?php
 class field_int extends field
 {
-    public function parse($content) {
-        $result = valid::factory('int')->parse_check($content);
-        if ($result) {
-            $this->set($content);
-        }
-        return $result;
-    }
-    
     public function set($content) {
         $this->value = (string) $content !== '' ? $content : null;
         return $this;

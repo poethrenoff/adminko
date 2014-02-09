@@ -9,9 +9,9 @@ class metadata
             'title' => 'Тексты',
             'fields' => array(
                 'text_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'text_tag' => array('title' => 'Метка', 'type' => 'string', 'show' => 1, 'sort' => 'asc', 'errors' => 'require|alpha', 'group' => array()),
-                'text_title' => array('title' => 'Заголовок', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
-                'text_content' => array('title' => 'Текст', 'type' => 'text', 'editor' => 1, 'errors' => 'require'),
+                'text_tag' => array('title' => 'Метка', 'type' => 'string', 'show' => 1, 'sort' => 'asc', 'errors' => array('require', 'alpha'), 'group' => array()),
+                'text_title' => array('title' => 'Заголовок', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
+                'text_content' => array('title' => 'Текст', 'type' => 'text', 'editor' => 1, 'errors' => array('require')),
             ),
         ),
         
@@ -22,10 +22,10 @@ class metadata
             'title' => 'Новости',
             'fields' => array(
                 'news_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'news_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
-                'news_announce' => array('title' => 'Анонс', 'type' => 'text', 'editor' => 1, 'errors' => 'require'),
-                'news_content' => array('title' => 'Текст', 'type' => 'text', 'editor' => 1, 'errors' => 'require'),
-                'news_date' => array('title' => 'Дата публикации', 'type' => 'datetime', 'show' => 1, 'sort' => 'desc', 'errors' => 'require'),
+                'news_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
+                'news_announce' => array('title' => 'Анонс', 'type' => 'text', 'editor' => 1, 'errors' => array('require')),
+                'news_content' => array('title' => 'Текст', 'type' => 'text', 'editor' => 1, 'errors' => array('require')),
+                'news_date' => array('title' => 'Дата публикации', 'type' => 'datetime', 'show' => 1, 'sort' => 'desc', 'errors' => array('require')),
             ),
         ),
         
@@ -37,7 +37,7 @@ class metadata
             'fields' => array(
                 'menu_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'menu_parent' => array('title' => 'Родительский элемент', 'type' => 'parent'),
-                'menu_title' => array('title' => 'Заголовок', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
+                'menu_title' => array('title' => 'Заголовок', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
                 'menu_page' => array('title' => 'Раздел', 'type' => 'table', 'table' => 'page', 'show' => 1),
                 'menu_url' => array('title' => 'URL', 'type' => 'string', 'show' => 1),
                 'menu_order' => array('title' => 'Порядок', 'type' => 'order', 'group' => array('menu_parent')),
@@ -55,8 +55,8 @@ class metadata
             'class' => 'builder',
             'fields' => array(
                 'preference_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'preference_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
-                'preference_name' => array('title' => 'Имя', 'type' => 'string', 'show' => 1, 'filter' => 1, 'errors' => 'require|alpha', 'group' => array()),
+                'preference_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
+                'preference_name' => array('title' => 'Имя', 'type' => 'string', 'show' => 1, 'filter' => 1, 'errors' => array('require', 'alpha'), 'group' => array()),
                 'preference_value' => array('title' => 'Значение', 'type' => 'string', 'show' => 1),
             ),
         ),
@@ -70,9 +70,9 @@ class metadata
             'fields' => array(
                 'page_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'page_parent' => array('title' => 'Родительский раздел', 'type' => 'parent'),
-                'page_layout' => array('title' => 'Шаблон', 'type' => 'table', 'table' => 'layout', 'errors' => 'require'),
-                'page_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
-                'page_name' => array('title' => 'Каталог', 'type' => 'string', 'show' => 1, 'errors' => 'alpha', 'group' => array('page_parent')),
+                'page_layout' => array('title' => 'Шаблон', 'type' => 'table', 'table' => 'layout', 'errors' => array('require')),
+                'page_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
+                'page_name' => array('title' => 'Каталог', 'type' => 'string', 'show' => 1, 'errors' => array('alpha'), 'group' => array('page_parent')),
                 'page_folder' => array('title' => 'Папка', 'type' => 'boolean'),
                 'meta_title' => array('title' => 'Заголовок', 'type' => 'text'),
                 'meta_keywords' => array('title' => 'Ключевые слова', 'type' => 'text'),
@@ -93,10 +93,10 @@ class metadata
             'class' => 'block',
             'fields' => array(
                 'block_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'block_page' => array('title' => 'Раздел', 'type' => 'table', 'table' => 'page', 'errors' => 'require'),
-                'block_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => 'require'),
-                'block_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
-                'block_area' => array('title' => 'Область шаблона', 'type' => 'table', 'table' => 'layout_area', 'errors' => 'require'),
+                'block_page' => array('title' => 'Раздел', 'type' => 'table', 'table' => 'page', 'errors' => array('require')),
+                'block_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => array('require')),
+                'block_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
+                'block_area' => array('title' => 'Область шаблона', 'type' => 'table', 'table' => 'layout_area', 'errors' => array('require')),
              ),
             'links' => array(
                 'block_param' => array('table' => 'block_param', 'field' => 'block', 'ondelete' => 'cascade'),
@@ -111,8 +111,8 @@ class metadata
             'class' => 'layout',
             'fields' => array(
                 'layout_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'layout_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
-                'layout_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'errors' => 'require|alpha'),
+                'layout_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
+                'layout_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'errors' => array('require', 'alpha')),
              ),
             'links' => array(
                 'page' => array('table' => 'page', 'field' => 'page_layout', 'hidden' => 1),
@@ -128,9 +128,9 @@ class metadata
             'class' => 'builder',
             'fields' => array(
                 'area_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'area_layout' => array('title' => 'Шаблон', 'type' => 'table', 'table' => 'layout', 'errors' => 'require'),
-                'area_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
-                'area_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'errors' => 'require|alpha'),
+                'area_layout' => array('title' => 'Шаблон', 'type' => 'table', 'table' => 'layout', 'errors' => array('require')),
+                'area_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
+                'area_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'errors' => array('require', 'alpha')),
                 'area_main' => array('title' => 'Главная область', 'type' => 'default', 'show' => 1, 'group' => array('area_layout')),
                 'area_order' => array('title' => 'Порядок', 'type' => 'order', 'group' => array('area_layout')),
              ),
@@ -147,8 +147,8 @@ class metadata
             'class' => 'module',
             'fields' => array(
                 'module_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'module_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
-                'module_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'group' => array(), 'errors' => 'require|alpha'),
+                'module_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
+                'module_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'group' => array(), 'errors' => array('require', 'alpha')),
              ),
             'links' => array(
                 'block' => array('table' => 'block', 'field' => 'block_module'),
@@ -164,16 +164,16 @@ class metadata
             'class' => 'moduleParam',
             'fields' => array(
                 'param_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'param_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => 'require'),
-                'param_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
+                'param_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => array('require')),
+                'param_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
                 'param_type' => array('title' => 'Тип параметра', 'type' => 'select', 'filter' => 1, 'values' => array(
                         array('value' => 'string', 'title' => 'Строка'),
                         array('value' => 'int', 'title' => 'Число'),
                         array('value' => 'text', 'title' => 'Текст'),
                         array('value' => 'select', 'title' => 'Список'),
                         array('value' => 'table', 'title' => 'Таблица'),
-                        array('value' => 'boolean', 'title' => 'Флаг')), 'show' => 1, 'errors' => 'require'),
-                'param_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'group' => array('param_module'), 'errors' => 'require|alpha'),
+                        array('value' => 'boolean', 'title' => 'Флаг')), 'show' => 1, 'errors' => array('require')),
+                'param_name' => array('title' => 'Системное имя', 'type' => 'string', 'show' => 1, 'group' => array('param_module'), 'errors' => array('require', 'alpha')),
                 'param_table' => array('title' => 'Имя таблицы', 'type' => 'select', 'values' => '__OBJECT__', 'show' => 1),
                 'param_default' => array('title' => 'Значение по умолчанию', 'type' => 'string'),
                 'param_require' => array('title' => 'Обязательное', 'type' => 'boolean'),
@@ -193,9 +193,9 @@ class metadata
             'class' => 'paramValue',
             'fields' => array(
                 'value_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'value_param' => array('title' => 'Параметр', 'type' => 'table', 'table' => 'module_param', 'errors' => 'require'),
-                'value_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => 'require'),
-                'value_content' => array('title' => 'Значение', 'type' => 'string', 'show' => 1, 'group' => array('value_param'), 'errors' => 'require'),
+                'value_param' => array('title' => 'Параметр', 'type' => 'table', 'table' => 'module_param', 'errors' => array('require')),
+                'value_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
+                'value_content' => array('title' => 'Значение', 'type' => 'string', 'show' => 1, 'group' => array('value_param'), 'errors' => array('require')),
                 'value_default' => array('title' => 'По умолчанию', 'type' => 'default', 'show' => 1, 'group' => array('value_param')),
              ),
         ),
@@ -221,10 +221,10 @@ class metadata
             'title' => 'Администраторы',
             'fields' => array(
                 'admin_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'admin_title' => array('title' => 'Имя', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
-                'admin_login' => array('title' => 'Логин', 'type' => 'string', 'show' => 1, 'errors' => 'require|alpha', 'group' => array()),
+                'admin_title' => array('title' => 'Имя', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
+                'admin_login' => array('title' => 'Логин', 'type' => 'string', 'show' => 1, 'errors' => array('require', 'alpha'), 'group' => array()),
                 'admin_password' => array('title' => 'Пароль', 'type' => 'password'),
-                'admin_email' => array('title' => 'Email', 'type' => 'string', 'errors' => 'email'),
+                'admin_email' => array('title' => 'Email', 'type' => 'string', 'errors' => array('email')),
                 'admin_active' => array('title' => 'Активный', 'type' => 'active'),
              ),
             'relations' => array(
@@ -237,8 +237,8 @@ class metadata
             'title' => 'Роли администраторов',
             'internal' => true,
             'fields' => array(
-                'admin_id' => array('title' => 'Администратор', 'type' => 'table', 'table' => 'admin', 'errors' => 'require'),
-                'role_id' => array('title' => 'Роль', 'type' => 'table', 'table' => 'role', 'errors' => 'require'),
+                'admin_id' => array('title' => 'Администратор', 'type' => 'table', 'table' => 'admin', 'errors' => array('require')),
+                'role_id' => array('title' => 'Роль', 'type' => 'table', 'table' => 'role', 'errors' => array('require')),
              ),
         ),
         
@@ -246,7 +246,7 @@ class metadata
             'title' => 'Роли',
             'fields' => array(
                 'role_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'role_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
+                'role_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
                 'role_default' => array('title' => 'Главный администратор', 'type' => 'default', 'show' => 1),
              ),
             'relations' => array(
@@ -259,8 +259,8 @@ class metadata
             'title' => 'Права на системные разделы',
             'internal' => true,
             'fields' => array(
-                'role_id' => array('title' => 'Роль', 'type' => 'table', 'table' => 'role', 'errors' => 'require'),
-                'object_id' => array('title' => 'Системный раздел', 'type' => 'table', 'table' => 'object', 'errors' => 'require'),
+                'role_id' => array('title' => 'Роль', 'type' => 'table', 'table' => 'role', 'errors' => array('require')),
+                'object_id' => array('title' => 'Системный раздел', 'type' => 'table', 'table' => 'object', 'errors' => array('require')),
              ),
         ),
         
@@ -269,7 +269,7 @@ class metadata
             'fields' => array(
                 'object_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'object_parent' => array('title' => 'Родительский раздел', 'type' => 'parent'),
-                'object_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
+                'object_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
                 'object_name' => array('title' => 'Объект', 'type' => 'select', 'values' => '__OBJECT__'),
                 'object_order' => array('title' => 'Порядок', 'type' => 'order', 'group' => array('object_parent')),
                 'object_active' => array('title' => 'Видимость', 'type' => 'active'),
@@ -284,9 +284,9 @@ class metadata
             'class' => 'builder',
             'fields' => array(
                 'lang_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'lang_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require', 'sort' => 'asc'),
-                'lang_short' => array('title' => 'Краткое название', 'type' => 'string', 'show' => 1, 'errors' => 'require'),
-                'lang_name' => array('title' => 'Каталог', 'type' => 'string', 'show' => 1, 'errors' => 'require|alpha'),
+                'lang_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require'), 'sort' => 'asc'),
+                'lang_short' => array('title' => 'Краткое название', 'type' => 'string', 'show' => 1, 'errors' => array('require')),
+                'lang_name' => array('title' => 'Каталог', 'type' => 'string', 'show' => 1, 'errors' => array('require', 'alpha')),
                 'lang_default' => array('title' => 'По умолчанию', 'type' => 'default'),
              ),
         ),
@@ -308,8 +308,8 @@ class metadata
             'class' => 'builder',
             'fields' => array(
                 'word_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'word_name' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'sort' => 'asc', 'group' => array(), 'filter' => 1, 'errors' => 'require|alpha'),
-                'word_value' => array('title' => 'Значение', 'type' => 'string', 'translate' => 1, 'main' => 1, 'show' => 1, 'errors' => 'require'),
+                'word_name' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'sort' => 'asc', 'group' => array(), 'filter' => 1, 'errors' => array('require', 'alpha')),
+                'word_value' => array('title' => 'Значение', 'type' => 'string', 'translate' => 1, 'main' => 1, 'show' => 1, 'errors' => array('require')),
              ),
         ),
         
@@ -320,7 +320,7 @@ class metadata
             'title' => 'Лист рассылки',
             'fields' => array(
                 'person_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'person_email' => array('title' => 'Email', 'type' => 'string', 'show' => 1, 'main' => 1, 'sort' => 'asc', 'errors' => 'require|email'),
+                'person_email' => array('title' => 'Email', 'type' => 'string', 'show' => 1, 'main' => 1, 'sort' => 'asc', 'errors' => array('require', 'email')),
                 'person_admin' => array('title' => 'Администратор', 'type' => 'boolean', 'show' => 1),
             ),
         ),
@@ -340,8 +340,8 @@ class metadata
             'internal' => 'true',
             'fields' => array(
                 'queue_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'queue_body' => array('title' => 'Письмо', 'type' => 'table', 'table' => 'delivery_body', 'errors' => 'require'),
-                'queue_person' => array('title' => 'Получатель', 'type' => 'table', 'table' => 'delivery_person', 'errors' => 'require'),
+                'queue_body' => array('title' => 'Письмо', 'type' => 'table', 'table' => 'delivery_body', 'errors' => array('require')),
+                'queue_person' => array('title' => 'Получатель', 'type' => 'table', 'table' => 'delivery_person', 'errors' => array('require')),
             ),
         ),
         
@@ -357,37 +357,13 @@ class metadata
              ),
         ),
 /**
-        // Пример описания таблиц, связанных один-к-одному
-        
-        'primary_table' => array(
-            'title' => 'Первичная таблица',
-            'fields' => array(
-                'primary_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'primary_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require')
-             ),
-            'binds' => array(
-                'secondary' => array('table' => 'secondary_table', 'field' => 'secondary_primary'),
-             ),
-        ),
-        
-        'secondary_table' => array(
-            'title' => 'Вторичная таблица',
-            'internal' => true,
-            'fields' => array(
-                'secondary_primary' => array('title' => 'Первичная таблица', 'type' => 'table', 'table' => 'primary_table'),
-                'secondary_title' => array('title' => 'Название', 'type' => 'string', 'errors' => 'require'),
-             ),
-        ),
-/**/
-
-/**
         // Пример описания таблиц, связанных многие-ко-многим
         
         'primary_table' => array(
             'title' => 'Первичная таблица',
             'fields' => array(
                 'primary_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'primary_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
+                'primary_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
              ),
             'relations' => array(
                 'primary_secondary_relation' => array('secondary_table' => 'secondary_table', 'relation_table' => 'relation_table',
@@ -399,7 +375,7 @@ class metadata
             'title' => 'Вторичная таблица',
             'fields' => array(
                 'secondary_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'secondary_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => 'require'),
+                'secondary_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
              ),
         ),
         
@@ -407,8 +383,8 @@ class metadata
             'title' => 'Связующая таблица',
             'internal' => true,
             'fields' => array(
-                'primary_field' => array('title' => 'Первичная таблица', 'type' => 'table', 'table' => 'primary_table', 'errors' => 'require'),
-                'secondary_field' => array('title' => 'Вторичная таблица', 'type' => 'table', 'table' => 'secondary_table', 'errors' => 'require')
+                'primary_field' => array('title' => 'Первичная таблица', 'type' => 'table', 'table' => 'primary_table', 'errors' => array('require')),
+                'secondary_field' => array('title' => 'Вторичная таблица', 'type' => 'table', 'table' => 'secondary_table', 'errors' => array('require'))
              ),
         ),
 /**/
@@ -426,34 +402,6 @@ class metadata
         'delivery' => array(
             'title' => 'Почтовая рассылка',
             'class' => 'delivery',
-        ),
-        
-        /**
-         * Тестовая таблица
-         */
-        'test' => array(
-            'title' => 'Тестовая таблица',
-            'fields' => array(
-                'test_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'test_string' => array('title' => 'Строка', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
-                'test_text' => array('title' => 'Текст', 'type' => 'text'),
-                'test_int' => array('title' => 'Целое', 'type' => 'int', 'errors' => array('require')),
-                'test_float' => array('title' => 'Действительное', 'type' => 'float', 'errors' => array('require')),
-                'test_order' => array( 'title' => 'Порядок', 'type' => 'order'),
-                'test_parent' => array( 'title' => 'Родитель', 'type' => 'parent'),
-                'test_table' => array( 'title' => 'Таблица', 'type' => 'table', 'table' => 'news', 'errors' => array('require')),
-                'test_image' => array('title' => 'Изображение', 'type' => 'image', 'upload_dir' => 'image', 'errors' => array('require')),
-                'test_file' => array('title' => 'Файл', 'type' => 'file', 'upload_dir' => 'file'),
-                'test_boolean' => array( 'title' => 'Флаг', 'type' => 'boolean', 'errors' => array('require')),
-                'test_active' => array( 'title' => 'Видимость', 'type' => 'active'),
-                'test_default' => array( 'title' => 'По умолчанию', 'type' => 'default'),
-                'test_select' => array('title' => 'Список', 'type' => 'select', 'values' => array(
-                        array('value' => '1', 'title' => 'Значение 1'),
-                        array('value' => '2', 'title' => 'Значение 2')), 'errors' => array('require')),
-                'test_date' => array('title' => 'Дата', 'type' => 'date'),
-                'test_datetime' => array('title' => 'Дата/Время', 'type' => 'datetime'),
-                'test_password' => array( 'title' => 'Пароль', 'type' => 'password'),
-            ),
         ),
    );
 }

@@ -18,9 +18,9 @@
 			</td>
 			<td class="field">
 <?if( $field['type'] === 'boolean' || $field['type'] === 'active' || $field['type'] === 'default'):?>
-				<input type="checkbox" name="<?=$name?>" value="1" class="check" errors="<?=$field['errors']?>"<?if($field['value'] === "1"):?> checked="checked"<?endif;?>/>
+				<input type="checkbox" name="<?=$name?>" value="1" class="check" errors="<?=join('|', $field['errors'])?>"<?if($field['value']):?> checked="checked"<?endif;?>/>
 <?elseif($field['type'] === 'select' || $field['type'] === 'table' || $field['type'] === 'parent'):?>
-				<select name="<?=$name?>" class="list" errors="<?=$field['errors']?>">
+				<select name="<?=$name?>" class="list" errors="<?=join('|', $field['errors'])?>">
 					<option value=""/>
 <?foreach($field['values'] as $option):?>
 					<option value="<?=$option['value']?>"<?if($option['value'] === $field['value']):?> selected="selected"<?endif;?>><?for($i=0;$i<$option['_depth'];$i++):?>&nbsp;&nbsp;&nbsp;<?endfor;?><?=$option['title']?></option>
@@ -30,7 +30,7 @@
 				<table class="date">
 					<tr>
 						<td>
-							<input type="text" name="<?=$name?>" value="<?=$field['value']?>" class="date" errors="<?=$field['errors']?>"/>
+							<input type="text" name="<?=$name?>" value="<?=$field['value']?>" class="date" errors="<?=join('|', $field['errors'])?>"/>
 						</td>
 						<td>
 							<a href="" onclick="Calendar.show( document.forms.card['<?=$name?>'], this, '<?if( $field['type'] === 'date'):?>short<?else:?>long<?endif;?>' ); return false">
@@ -53,7 +53,7 @@
 					</tr>
 					<tr>
 						<td>
-							<input type="text" name="<?=$name?>" value="<?=$field['value']?>" class="link"/>
+							<input type="text" name="<?=$name?>" value="<?=$field['value']?>" class="link" errors="<?=join('|', $field['errors'])?>"/>
 						</td>
 					</tr>
 				</table>
@@ -61,21 +61,21 @@
 <?if($field['translate']):?>
 <?foreach($this -> lang_list as $lang):?>
 				<div class="lang"><?=$lang['lang_name']?></div>
-				<textarea name="<?=$name?>[<?=$lang['lang_id']?>]" cols="" rows=""<?if(@$field['editor']):?> class="ckeditor"<?endif;?> errors="<?=$field['errors']?>"><?=$field['value'][$lang['lang_id']]?></textarea>
+				<textarea name="<?=$name?>[<?=$lang['lang_id']?>]" cols="" rows=""<?if(@$field['editor']):?> class="ckeditor"<?endif;?> errors="<?=join('|', $field['errors'])?>"><?=$field['value'][$lang['lang_id']]?></textarea>
 				<div class="padding"></div>
 <?endforeach;?>
 <?else:?>
-				<textarea name="<?=$name?>" cols="" rows=""<?if(@$field['editor']):?> class="ckeditor"<?endif;?> errors="<?=$field['errors']?>"><?=$field['value']?></textarea>
+				<textarea name="<?=$name?>" cols="" rows=""<?if(@$field['editor']):?> class="ckeditor"<?endif;?> errors="<?=join('|', $field['errors'])?>"><?=$field['value']?></textarea>
 <?endif;?>
 <?else:?>
 <?if($field['translate']):?>
 <?foreach($this -> lang_list as $lang):?>
 				<div class="lang"><?=$lang['lang_name']?></div>
-				<input type="text" name="<?=$name?>[<?=$lang['lang_id']?>]" value="<?=$field['value'][$lang['lang_id']]?>" class="text" errors="<?=$field['errors']?>"/>
+				<input type="text" name="<?=$name?>[<?=$lang['lang_id']?>]" value="<?=$field['value'][$lang['lang_id']]?>" class="text" errors="<?=join('|', $field['errors'])?>"/>
 				<div class="padding"></div>
 <?endforeach;?>
 <?else:?>
-				<input type="text" name="<?=$name?>" value="<?=$field['value']?>" class="text" errors="<?=$field['errors']?>"/>
+				<input type="text" name="<?=$name?>" value="<?=$field['value']?>" class="text" errors="<?=join('|', $field['errors'])?>"/>
 <?endif;?>
 <?endif;?>
 			</td>

@@ -117,6 +117,9 @@ var CheckForm =
 	{
 		if ( oItem.type == 'checkbox' )
 			return oItem.checked;
+		else if ( this.oForm[oItem.name + '_file'] && this.oForm[oItem.name + '_file'].type == 'file' )
+			return oItem.value.replace( /(^\s*)|(\s*$)/g, '' ) != '' ||
+				this.oForm[oItem.name + '_file'].value.replace( /(^\s*)|(\s*$)/g, '' ) != '';
 		else
 			return oItem.value.replace( /(^\s*)|(\s*$)/g, '' ) != '';
 	},

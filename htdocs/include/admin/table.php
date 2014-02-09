@@ -11,7 +11,6 @@ class admin_table extends admin
     protected $show_fields = array();
     protected $filter_fields = array();
     
-    protected $binds = array();
     protected $links = array();
     protected $relations = array();
     
@@ -48,8 +47,6 @@ class admin_table extends admin
         if (isset($this->object_desc['filter_fields']))
             $this->filter_fields = $this->object_desc['filter_fields'];
         
-        if (isset($this->object_desc['binds']))
-            $this->binds = $this->object_desc['binds'];
         if (isset($this->object_desc['links']))
             $this->links = $this->object_desc['links'];
         if (isset($this->object_desc['relations']))
@@ -85,10 +82,9 @@ class admin_table extends admin
         foreach ($records as $record_id => $record)
         {
             foreach ($this->show_fields as $show_field)
-                $records[$record_id][$show_field] = field::get_field(
-                    $records[$record_id][$show_field], $this->fields[$show_field]['type']);
+                $records[$record_id][$show_field] = field::factory($this->fields[$show_field]['type'])
+                    ->set($records[$record_id][$show_field])->view();
             
-            $records[$record_id] += $this->get_record_binds($record);
             $records[$record_id] += $this->get_record_links($record);
             $records[$record_id] += $this->get_record_relations($record);
             
@@ -133,76 +129,6 @@ class admin_table extends admin
         $this->is_action_allow('edit', true);
         
         $this->record_card('edit');
-    }
-    
-    protected function action_bind()
-    {
-        $this->is_action_allow('edit', true);
-        
-        $primary_record = $this->get_record();
-        
-        $bind_name = init_string('bind');
-        if (!isset($this->binds[$bind_name]))
-            throw new AlarmException('Ошибка. Связь "' . $bind_name . '" не описана в метаданных.');
-        
-        $bind = $this->binds[$bind_name];
-        
-        $bind_query = 'select * from ' . $bind['table'] . ' where ' . $bind['field'] . ' = :bind_field';
-        $bind_record = db::select_row($bind_query, array('bind_field' => $primary_record[$this->primary_field]));
-        
-        $bind_fields = metadata::$objects[$bind['table']]['fields'];
-        
-        if ($bind_record)
-            foreach ($bind_fields as $field_name => $field_desc)
-                if (isset($field_desc['translate']) && $field_desc['translate'])
-                    $bind_record[$field_name] = $this->get_translate_values($bind['table'], $field_name, $primary_record[$this->primary_field]);
-        
-        $form_fields = array();
-        
-        foreach ($bind_fields as $field_name => $field_desc)
-        {
-            if ($field_name == $bind['field'] ||
-                    !$bind_record && isset($field_desc['no_add']) && $field_desc['no_add'] ||
-                    $bind_record && isset($field_desc['no_edit']) && $field_desc['no_edit'])
-                continue;
-            
-            $form_fields[$field_name] = $field_desc;
-            
-            if ($bind_record)
-                $form_fields[$field_name]['value'] = field::form_field(
-                    $bind_record[$field_name], $field_desc['type']);
-            else if (($field_desc['type'] == 'string' || $field_desc['type'] == 'text' ||
-                    $field_desc['type'] == 'int' || $field_desc['type'] == 'float') && isset($field_desc['default']))
-                $form_fields[$field_name]['value'] = field::form_field(
-                    $field_desc['default'], $field_desc['type']);
-            
-            if ($field_desc['type'] == 'select')
-                $form_fields[$field_name]['values'] = $field_desc['values'];
-            if ($field_desc['type'] == 'table')
-                $form_fields[$field_name]['values'] = $this->get_table_records($field_desc['table']);
-            
-            $form_fields[$field_name]['require'] = $form_fields[$field_name]['errors_code'] & field::$errors['require'];
-        }
-        
-        if (count($form_fields) == 0)
-            throw new AlarmException('Ошибка. Нет полей, доступных для изменения.');
-        
-        $title = field::get_field($primary_record[$this->main_field], $this->fields[$this->main_field]['type']);
-        
-        $this->view->assign('lang_list', $this->lang_list);
-        $this->view->assign('record_title', $this->object_desc['title'] . ' :: ' . $title);
-        $this->view->assign('fields', $form_fields);
-        
-        $this->view->assign('scripts', $this->get_card_scripts('bind', $bind_record));
-        
-        $this->view->assign('back_url', url_for($this->restore_state()));
-        
-        $form_url = url_for(array('object' => $this->object, 'action' => 'bind_save',
-            'bind' => $bind_name, 'id' => $primary_record[$this->primary_field]));
-        $this->view->assign('form_url', $form_url);
-        
-        $this->content = $this->view->fetch('admin/form');
-        $this->output['meta_title'] .= ' :: ' . $title;
     }
     
     protected function action_relation()
@@ -281,8 +207,9 @@ class admin_table extends admin
         
         foreach ($records as $record_id => $record)
         {
-            $records[$record_id][$secondary_object->main_field] = field::get_field(
-                $records[$record_id][$secondary_object->main_field], $secondary_object->fields[$secondary_object->main_field]['type']);
+            $records[$record_id][$secondary_object->main_field] =
+                field::factory($secondary_object->fields[$secondary_object->main_field]['type'])
+                    ->set($records[$record_id][$secondary_object->main_field])->view();
             
             $records[$record_id]['_checkbox'] = array('id' => $record[$secondary_object->primary_field],
                 'checked' => in_array($record[$secondary_object->primary_field], $checked_list));
@@ -296,7 +223,8 @@ class admin_table extends admin
             $this->view->assign('filter', $secondary_object->get_filter());
         }
         
-        $title = field::get_field($primary_record[$this->main_field], $this->fields[$this->main_field]['type']);
+        $title = field::factory($this->fields[$this->main_field]['type'])
+            ->set($primary_record[$this->main_field])->view();
         
         $this->view->assign('title', $this->object_desc['title'] . ' :: ' . $title);
         $this->view->assign('records', $records);
@@ -332,19 +260,33 @@ class admin_table extends admin
             if (isset($field_desc['no_add']) && $field_desc['no_add'])
                 continue;
             
-            if ($field_desc['type'] == 'image' || $field_desc['type'] == 'file')
-                $insert_fields[$field_name] = field::set_field(
-                    $this->upload_file($field_name, $field_desc), $field_desc);
-            else if ($field_desc['type'] != 'pk' && $field_desc['type'] != 'order' &&
+            if ($field_desc['type'] != 'pk' && $field_desc['type'] != 'order' &&
                     !($field_desc['type'] == 'password' && init_string($field_name) === ''))
             {
                 if (isset($field_desc['translate']) && $field_desc['translate'])
                 {
-                    $translate_values[$field_name] = field::set_field(init_array($field_name), $field_desc);
+                    foreach (init_array($field_name) as $record_lang => $record_value) {
+                        $field = field::factory($field_desc['type'])->set($record_value);
+                        if (!($field->check($field_desc['errors']))) {
+                            throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
+                        }
+                        $translate_values[$field_name][$record_lang] = $field->get();
+                    }
                     $insert_fields[$field_name] = current($translate_values[$field_name]);
                 }
                 else
-                    $insert_fields[$field_name] = field::set_field(init_string($field_name), $field_desc);
+                {
+                    $field = field::factory($field_desc['type']);
+                    $value = ($field_desc['type'] == 'image' || $field_desc['type'] == 'file') ?
+                        $this->upload_file($field_name, $field_desc) : init_string($field_name);
+                    if (!($field->parse($value))) {
+                        throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
+                    }
+                    if (!($field->check($field_desc['errors']))) {
+                        throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
+                    }
+                    $insert_fields[$field_name] = $field->get();
+                }
             }
         }
         
@@ -352,8 +294,9 @@ class admin_table extends admin
         {
             list($group_conds, $group_binds) =
                 $this->get_group_conds($insert_fields, $this->order_field);
-            $insert_fields[$this->order_field] = field::set_field(
-                $this->get_edge_order(true, $group_conds, $group_binds), $this->fields[$this->order_field]);
+            $field = field::factory($this->fields[$this->order_field]['type'])
+                ->set($this->get_edge_order(true, $group_conds, $group_binds));
+            $insert_fields[$this->order_field] = $field->get();
         }
         
         $this->check_group_unique($insert_fields);
@@ -376,37 +319,6 @@ class admin_table extends admin
     {
         $primary_field = $this->action_add_save(false);
         
-        if (isset($this->binds) && is_array($this->binds))
-        {
-            foreach ($this->binds as $bind_name => $bind_desc)
-            {
-                $bind_query = 'select * from ' . $bind_desc['table'] . ' where ' . $bind_desc['field'] . ' = :bind_field';
-                $bind_record = db::select_row($bind_query, array('bind_field' => id()));
-                
-                $bind_fields = metadata::$objects[$bind_desc['table']]['fields'];
-                
-                if (!$bind_record)
-                    continue;
-                
-                $insert_fields = array(); $translate_values = array();
-                foreach ($bind_fields as $field_name => $field_desc)
-                {
-                    if ($field_name == $bind_desc['field'] ||
-                            isset($field_desc['no_add']) && $field_desc['no_add'])
-                        continue;
-                    
-                    $insert_fields[$field_name] = $bind_record[$field_name];
-                    if (isset($field_desc['translate']) && $field_desc['translate'])
-                        $translate_values[$field_name] = $this->get_translate_values($bind_desc['table'], $field_name, id());
-                }
-                $insert_fields[$bind_desc['field']] = $primary_field;
-                
-                db::insert($bind_desc['table'], $insert_fields);
-                
-                $this->change_translate_record($bind_desc['table'], $primary_field, $translate_values);
-            }
-        }
-        
         if ($redirect)
             $this->redirect();
         
@@ -426,19 +338,33 @@ class admin_table extends admin
             if (isset($field_desc['no_edit']) && $field_desc['no_edit'])
                 continue;
             
-            if ($field_desc['type'] == 'image' || $field_desc['type'] == 'file')
-                $update_fields[$field_name] = field::set_field(
-                    $this->upload_file($field_name, $field_desc), $field_desc);
-            else if ($field_desc['type'] != 'pk' && $field_desc['type'] != 'order' &&
+            if ($field_desc['type'] != 'pk' && $field_desc['type'] != 'order' &&
                     !($field_desc['type'] == 'password' && init_string($field_name) === ''))
             {
                 if (isset($field_desc['translate']) && $field_desc['translate'])
                 {
-                    $translate_values[$field_name] = field::set_field(init_array($field_name), $field_desc);
+                    foreach (init_array($field_name) as $record_lang => $record_value) {
+                        $field = field::factory($field_desc['type'])->set($record_value);
+                        if (!($field->check($field_desc['errors']))) {
+                            throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
+                        }
+                        $translate_values[$field_name][$record_lang] = $field->get();
+                    }
                     $update_fields[$field_name] = current($translate_values[$field_name]);
                 }
                 else
-                    $update_fields[$field_name] = field::set_field(init_string($field_name), $field_desc);
+                {
+                    $field = field::factory($field_desc['type']);
+                    $value = ($field_desc['type'] == 'image' || $field_desc['type'] == 'file') ?
+                        $this->upload_file($field_name, $field_desc) : init_string($field_name);
+                    if (!($field->parse($value))) {
+                        throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
+                    }
+                    if (!($field->check($field_desc['errors']))) {
+                        throw new AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
+                    }
+                    $update_fields[$field_name] = $field->get();
+                }
             }
         }
         
@@ -453,9 +379,11 @@ class admin_table extends admin
             foreach ($group_binds as $field_name => $field_value)
                 $group_permanent &= $record[$field_name] == $field_value;
             
-            if (!$group_permanent)
-                $update_fields[$this->order_field] = field::set_field(
-                    $this->get_edge_order(true, $group_conds, $group_binds), $this->fields[$this->order_field]);
+            if (!$group_permanent) {
+                $field = field::factory($this->fields[$this->order_field]['type'])
+                    ->set($this->get_edge_order(true, $group_conds, $group_binds));
+                $update_fields[$this->order_field] = $field->get();
+            }
         }
         
         $this->check_group_unique($update_fields, $primary_field);
@@ -488,20 +416,22 @@ class admin_table extends admin
             
             if ($sibling_record = $this->get_sibling_record($direction, $order_conds, $order_binds, $record))
             {
-                db::update($this->object, array($this->order_field =>
-                    field::set_field($sibling_record[$this->order_field], $this->fields[$this->order_field])),
-                        array($this->primary_field => $primary_field));
-                db::update($this->object, array($this->order_field =>
-                    field::set_field($record[$this->order_field], $this->fields[$this->order_field])),
-                        array($this->primary_field => $sibling_record[$this->primary_field]));
+                $field = field::factory($this->fields[$this->order_field]['type'])
+                    ->set($sibling_record[$this->order_field]);
+                db::update($this->object, array($this->order_field => $field->get()),
+                    array($this->primary_field => $primary_field));
+                
+                $field = field::factory($this->fields[$this->order_field]['type'])
+                    ->set($record[$this->order_field]);
+                db::update($this->object, array($this->order_field => $field->get()),
+                    array($this->primary_field => $sibling_record[$this->primary_field]));
             }
             else
             {
-                $edge_order = $this->get_edge_order(!$direction, $order_conds, $order_binds);
-                
-                db::update($this->object, array($this->order_field =>
-                    field::set_field($edge_order, $this->fields[$this->order_field])),
-                        array($this->primary_field => $record[$this->primary_field]));
+                $field = field::factory($this->fields[$this->order_field]['type'])
+                    ->set($this->get_edge_order(!$direction, $order_conds, $order_binds));
+                db::update($this->object, array($this->order_field => $field->get()),
+                    array($this->primary_field => $record[$this->primary_field]));
             }
         }
         
@@ -556,16 +486,6 @@ class admin_table extends admin
                 throw new AlarmException('Ошибка. Невозможно удалить запись, так как у нее есть дочерние записи.');
         }
         
-        if (isset($this->binds) && is_array($this->binds))
-        {
-            foreach ($this->binds as $bind_name => $bind_desc)
-            {
-                $this->delete_translate_record($bind_desc['table'], $primary_field);
-                
-                db::delete($bind_desc['table'], array($bind_desc['field'] => $primary_field));
-            }
-        }
-        
         if (isset($this->links) && is_array($this->links))
         {
             foreach ($this->links as $link_name => $link_desc)
@@ -612,62 +532,6 @@ class admin_table extends admin
         $this->delete_translate_record($this->object, $primary_field);
         
         db::delete($this->object, array($this->primary_field => $primary_field));
-        
-        if ($redirect)
-            $this->redirect();
-    }
-    
-    protected function action_bind_save($redirect = true)
-    {
-        $this->is_action_allow('edit', true);
-        
-        $primary_record = $this->get_record();
-        
-        $bind_name = init_string('bind');
-        if (!isset($this->binds[$bind_name]))
-            throw new AlarmException('Ошибка. Связь "' . $bind_name . '" не описана в метаданных.');
-        
-        $bind = $this->binds[$bind_name];
-        
-        $bind_query = 'select * from ' . $bind['table'] . ' where ' . $bind['field'] . ' = :bind_field';
-        $bind_record = db::select_row($bind_query, array('bind_field' => $primary_record[$this->primary_field]));
-        
-        $bind_fields = metadata::$objects[$bind['table']]['fields'];
-        
-        $insert_fields = $bind_record; $translate_values = array();
-        if ($bind_record)
-            foreach ($bind_fields as $field_name => $field_desc)
-                if (isset($field_desc['translate']) && $field_desc['translate'])
-                    $translate_values[$field_name] = $this->get_translate_values($bind['table'], $field_name, $primary_record[$this->primary_field]);
-        
-        foreach ($bind_fields as $field_name => $field_desc)
-        {
-            if ($field_name == $bind['field'] ||
-                    !$bind_record && isset($field_desc['no_add']) && $field_desc['no_add'] ||
-                    $bind_record && isset($field_desc['no_edit']) && $field_desc['no_edit'])
-                continue;
-            
-            if ($field_desc['type'] == 'image' || $field_desc['type'] == 'file')
-                $insert_fields[$field_name] = field::set_field(
-                    $this->upload_file($field_name, $field_desc), $field_desc);
-            else if (!($field_desc['type'] == 'password' && init_string($field_name) === ''))
-            {
-                if (isset($field_desc['translate']) && $field_desc['translate'])
-                {
-                    $translate_values[$field_name] = field::set_field(init_array($field_name), $field_desc);
-                    $insert_fields[$field_name] = current($translate_values[$field_name]);
-                }
-                else
-                    $insert_fields[$field_name] = field::set_field(init_string($field_name), $field_desc);
-            }
-        }
-        $insert_fields[$bind['field']] = $primary_record[$this->primary_field];
-        
-        db::delete($bind['table'], array($bind['field'] => $primary_record[$this->primary_field]));
-        
-        db::insert($bind['table'], $insert_fields);
-        
-        $this->change_translate_record($bind['table'], $primary_record[$this->primary_field], $translate_values);
         
         if ($redirect)
             $this->redirect();
@@ -827,8 +691,8 @@ class admin_table extends admin
         foreach ($table_records as $table_record)
             $result_records[] = array(
                 'value' => (string) $table_record[$table_object->primary_field],
-                'title' => field::get_field($table_record[$table_object->main_field],
-                    $table_object->fields[$table_object->main_field]['type']),
+                'title' => field::factory($table_object->fields[$table_object->main_field]['type'])
+                    ->set($table_record[$table_object->main_field])->view(),
                 '_depth' => isset($table_record['_depth']) ? $table_record['_depth'] : '');
         
         return $result_records;
@@ -874,11 +738,6 @@ class admin_table extends admin
         
         $records_header[$this->primary_field]['title'] = 'ID';
         
-        foreach ($this->binds as $bind_name => $bind_desc)
-            if (!isset($bind_desc['hidden']) || !$bind_desc['hidden'])
-                $records_header[$bind_name] = array('title' => isset($bind_desc['title']) ? $bind_desc['title'] :
-                    (isset(metadata::$objects[$bind_desc['table']]['title']) ?
-                        metadata::$objects[$bind_desc['table']]['title'] : ''), 'type' => '_link');
         foreach ($this->links as $link_name => $link_desc)
             if (!isset($link_desc['hidden']) || !$link_desc['hidden'])
                 $records_header[$link_name] = array('title' => isset($link_desc['title']) ? $link_desc['title'] :
@@ -942,21 +801,6 @@ class admin_table extends admin
         return $actions;
     }
     
-    protected function get_record_binds($record)
-    {
-        if (!count($this->binds))
-            return array();
-        
-        $binds = array();
-        
-        foreach ($this->binds as $bind_name => $bind_desc)
-            $binds[$bind_name] = array('title' => 'Перейти',
-                'url' => url_for(array('object' => $this->object, 'action' => 'bind', 'bind' => $bind_name,
-                    'id' => $record[$this->primary_field])));
-        
-        return $binds;
-    }
-    
     protected function get_record_links($record)
     {
         if (!count($this->links))
@@ -1016,8 +860,8 @@ class admin_table extends admin
                 continue;
             
             $search_fields[$field_name] = $this->fields[$field_name];
-            $search_fields[$field_name]['value'] = field::form_field(
-                init_string($field_name), $this->fields[$field_name]['type']);
+            $search_fields[$field_name]['value'] = field::factory($this->fields[$field_name]['type'])
+                ->set(init_string($field_name))->form();
             
             if ($this->fields[$field_name]['type'] == 'select')
                 $search_fields[$field_name]['values'] = $this->fields[$field_name]['values'];
@@ -1159,23 +1003,31 @@ class admin_table extends admin
             
             $form_fields[$field_name] = $field_desc;
             
-            if ($action == 'edit' || $action == 'copy')
-                $form_fields[$field_name]['value'] = field::form_field(
-                    $record[$field_name], $field_desc['type']);
+            if ($action == 'edit' || $action == 'copy') {
+                if (isset($field_desc['translate']) && $field_desc['translate'])
+                    foreach ($record[$field_name] as $record_lang => $record_value)
+                        $form_fields[$field_name]['value'][$record_lang] =
+                            field::factory($field_desc['type'])->set($record_value)->form();
+                else
+                    $form_fields[$field_name]['value'] =
+                        field::factory($field_desc['type'])->set($record[$field_name])->form();
+            }
             
             if ($action == 'add')
             {
                 if (($field_desc['type'] == 'parent') && ($parent_field = id()))
-                    $form_fields[$field_name]['value'] = field::form_field($parent_field, $field_desc['type']);
+                    $form_fields[$field_name]['value'] = field::factory($field_desc['type'])
+                        ->set($parent_field)->form();
                 
                 if (($field_desc['type'] == 'table' || $field_desc['type'] == 'select') &&
                         isset($prev_url[$field_name]) && $prev_url[$field_name])
-                    $form_fields[$field_name]['value'] = field::form_field($prev_url[$field_name], $field_desc['type']);
+                    $form_fields[$field_name]['value'] = field::factory($field_desc['type'])
+                        ->set($prev_url[$field_name])->form();
                 
                 if (($field_desc['type'] == 'string' || $field_desc['type'] == 'text' ||
                         $field_desc['type'] == 'int' || $field_desc['type'] == 'float') && isset($field_desc['default']))
-                    $form_fields[$field_name]['value'] = field::form_field(
-                        $field_desc['default'], $field_desc['type']);
+                    $form_fields[$field_name]['value'] = field::factory($field_desc['type'])
+                        ->set($field_desc['default'])->form();
             }
             
             if ($field_desc['type'] == 'select')
@@ -1188,17 +1040,27 @@ class admin_table extends admin
                 $form_fields[$field_name]['values'] = $this->get_table_records($this->object, $except);
             }
             
-            $form_fields[$field_name]['require'] = $form_fields[$field_name]['errors_code'] & field::$errors['require'];
+            if ($field_desc['type'] == 'parent' || $field_desc['type'] == 'table')
+                $form_fields[$field_name]['errors'] = array_merge($form_fields[$field_name]['errors'], array('int'));
+            if ($field_desc['type'] == 'date')
+                $form_fields[$field_name]['errors'] = array_merge($form_fields[$field_name]['errors'], array('date'));
+            if ($field_desc['type'] == 'datetime')
+                $form_fields[$field_name]['errors'] = array_merge($form_fields[$field_name]['errors'], array('datetime'));
+            if ($field_desc['type'] == 'int')
+                $form_fields[$field_name]['errors'] = array_merge($form_fields[$field_name]['errors'], array('int'));
+            if ($field_desc['type'] == 'float')
+                $form_fields[$field_name]['errors'] = array_merge($form_fields[$field_name]['errors'], array('float'));
+            if ($field_desc['type'] == 'password')
+                $form_fields[$field_name]['errors'] = array_merge($form_fields[$field_name]['errors'], array('alpha'));
+            
+            $form_fields[$field_name]['require'] = in_array('require', $form_fields[$field_name]['errors']);
         }
         
         if (count($form_fields) == 0)
             throw new AlarmException('Ошибка. Нет полей, доступных для изменения.');
         
-        $record_title = ($action != 'add') ? field::get_field(
-            $record[$this->main_field], $this->fields[$this->main_field]['type']) : '';
-        if (($action != 'add') && isset($this->fields[$this->main_field]['translate']) &&
-                $this->fields[$this->main_field]['translate'])
-            $record_title = current($record_title);
+        $record_title = ($action != 'add') ? field::factory($this->fields[$this->main_field]['type'])
+            ->set($record[$this->main_field])->view() : '';
         
         switch ($action)
         {
@@ -1210,8 +1072,8 @@ class admin_table extends admin
         if ($action == 'copy' && $this->fields[$this->main_field]['type'] == 'string')
         {
             if (isset($this->fields[$this->main_field]['translate']) && $this->fields[$this->main_field]['translate'])
-                foreach ($form_fields[$this->main_field]['value'] as $field_name => $field_value)
-                    $form_fields[$this->main_field]['value'][$field_name] = $field_value . ' (копия)';
+                foreach ($form_fields[$this->main_field]['value'] as $record_lang => $record_value)
+                    $form_fields[$this->main_field]['value'][$record_lang] = $record_value . ' (копия)';
             else
                 $form_fields[$this->main_field]['value'] = $form_fields[$this->main_field]['value'] . ' (копия)';
         }

@@ -206,34 +206,10 @@ abstract class admin extends object
 	
 	private static final function prepare_metadata()
 	{
-		$bind_table_list = array();
-		
 		foreach ( metadata::$objects as $object_name => $object_desc )
 		{
 			if ( !( isset( $object_desc['fields'] ) && $object_desc['fields'] ) )
 				continue;
-			
-			if ( isset( $object_desc['internal'] ) && $object_desc['internal'] )
-				if ( isset( $object_desc['binds'] ) || isset( $object_desc['links'] ) || isset( $object_desc['relations'] ) )
-					throw new Exception( 'Ошибка в описании таблицы "' . $object_name . '". Скрытая таблица не может ссылаться на другие таблицы.' );
-			
-			if ( isset( $object_desc['binds'] ) && is_array( $object_desc['binds'] ) )
-				foreach ( $object_desc['binds'] as $bind_name => $bind_desc )
-				{
-					if ( !isset( $bind_desc['table'] ) || !$bind_desc['table'] ||
-							!isset( metadata::$objects[$bind_desc['table']] ) || !metadata::$objects[$bind_desc['table']] )
-						throw new Exception( 'Ошибка в описании связи таблиц "' . $object_name . '.' . $bind_name . '". Ошибка при задании целевой таблицы.' );
-					if ( !isset( $bind_desc['field'] ) || !$bind_desc['field'] ||
-							!isset( metadata::$objects[$bind_desc['table']]['fields'][$bind_desc['field']]['type'] ) ||
-								metadata::$objects[$bind_desc['table']]['fields'][$bind_desc['field']]['type'] !== 'table' ||
-							!isset( metadata::$objects[$bind_desc['table']]['fields'][$bind_desc['field']]['table'] ) ||
-								metadata::$objects[$bind_desc['table']]['fields'][$bind_desc['field']]['table'] != $object_name )
-						throw new Exception( 'Ошибка в описании связи таблиц "' . $object_name . '.' . $bind_name . '". Ошибка при задании целевого поля.' );
-					
-					if ( in_array( $bind_desc['table'], $bind_table_list ) )
-						throw new Exception( 'Ошибка в описании связи таблиц "' . $object_name . '.' . $bind_name . '". На таблицу "' . $bind_desc['table'] . '" уже есть ссылки.' );
-					$bind_table_list[] = $bind_desc['table'];
-				}
 			
 			if ( isset( $object_desc['links'] ) && is_array( $object_desc['links'] ) )
 				foreach ( $object_desc['links'] as $link_name => $link_desc )
@@ -317,12 +293,8 @@ abstract class admin extends object
 									!is_array( $field_desc['values'] ) && $field_desc['values'] == '__OBJECT__' ) ) )
 							throw new Exception( 'Ошибка в описании поля "' . $object_name . '.' . $field_name . '". Ошибка при задании списка значений поля типа "select".' );
 						
-						$errors_code = isset( $field_desc['errors'] ) && $field_desc['errors'] ?
-							field::get_errors_code( $field_desc['errors'] ) : 0;
-						$errors_code = field::apply_default_errors( $errors_code, $field_desc['type'] );
-						
-						metadata::$objects[$object_name]['fields'][$field_name]['errors_code'] = $errors_code;
-						metadata::$objects[$object_name]['fields'][$field_name]['errors'] = field::get_errors_value( $errors_code );
+						$errors = isset( $field_desc['errors'] ) && is_array($field_desc['errors']) ? $field_desc['errors'] : array();
+						metadata::$objects[$object_name]['fields'][$field_name]['errors'] = $errors;
 					}
 				
 				continue;
@@ -401,12 +373,8 @@ abstract class admin extends object
 						!( isset( $field_desc['upload_dir'] ) && $field_desc['upload_dir'] ) )
 					throw new Exception( 'Ошибка в описании поля "' . $object_name . '.' . $field_name . '". Не задан каталог для закачки файлов.' );
 				
-				$errors_code = isset( $field_desc['errors'] ) && $field_desc['errors'] ?
-					field::get_errors_code( $field_desc['errors'] ) : 0;
-				$errors_code = field::apply_default_errors( $errors_code, $field_desc['type'] );
-				
-				metadata::$objects[$object_name]['fields'][$field_name]['errors_code'] = $errors_code;
-				metadata::$objects[$object_name]['fields'][$field_name]['errors'] = field::get_errors_value( $errors_code );
+				$errors = isset( $field_desc['errors'] ) && is_array($field_desc['errors']) ? $field_desc['errors'] : array();
+				metadata::$objects[$object_name]['fields'][$field_name]['errors'] = $errors;
 				
 				if ( $field_desc['type'] == 'table' )
 				{
@@ -420,7 +388,7 @@ abstract class admin extends object
 					if ( !$link_show )
 						metadata::$objects[$field_desc['table']]['links'][$object_name] =
 							array( 'table' => $object_name, 'field' => $field_name, 'hidden' => 1 ) +
-								( !( $errors_code & field::$errors['require'] ) ? array( 'ondelete' => 'set_null' ): array() );
+								( !in_array('require', $errors) ? array( 'ondelete' => 'set_null' ): array() );
 				}
 				
 				if ( isset( $field_desc['translate'] ) && $field_desc['translate'] &&

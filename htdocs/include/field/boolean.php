@@ -1,11 +1,17 @@
 <?php
 class field_boolean extends field
 {
-    protected $value = false;
-    
     public function set($content) {
-        $this->value = (boolean) $content;
+        $this->value = (string) $content !== '' ? (boolean) $content : null;
         return $this;
+    }
+    
+    public function get() {
+        return (boolean) $this->value;
+    }
+    
+    public function form() {
+        return is_null($this->value) ? null : $this->get();
     }
     
     public function view() {

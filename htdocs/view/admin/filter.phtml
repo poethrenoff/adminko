@@ -10,14 +10,14 @@
 <?if($field['type'] == 'boolean' || $field['type'] == 'active'):?>
 					<select name="<?=$name?>" class="check">
 						<option value=""/>
-						<option value="1"<?if($field['value'] === "1"):?> selected="selected"<?endif;?>>да</option>
-						<option value="0"<?if($field['value'] === "0"):?> selected="selected"<?endif;?>>нет</option>
+						<option value="1"<?if($field['value'] === true):?> selected="selected"<?endif;?>>да</option>
+						<option value="0"<?if($field['value'] === false):?> selected="selected"<?endif;?>>нет</option>
 					</select>
 <?elseif($field['type'] == 'checked'):?>
 					<select name="<?=$name?>" class="list">
 						<option value=""/>
-						<option value="1"<?if($field['value'] === "1"):?> selected="selected"<?endif;?>>отмеченные</option>
-						<option value="0"<?if($field['value'] === "0"):?> selected="selected"<?endif;?>>неотмеченные</option>
+						<option value="1"<?if($field['value'] === true):?> selected="selected"<?endif;?>>отмеченные</option>
+						<option value="0"<?if($field['value'] === false):?> selected="selected"<?endif;?>>неотмеченные</option>
 					</select>
 <?elseif($field['type'] == 'select' || ( $field['type'] == 'table' && $field['search'] != 'text' )):?>
 					<select name="<?=$name?>" class="list">

@@ -4,7 +4,7 @@ class field_datetime extends field_string
     public function parse($content) {
         $result = valid::factory('datetime')->parse_check($content);
         if ($result) {
-            $this->set(date::set($content, 'short'));
+            $this->set(date::set($content, 'long'));
         }
         return $result;
     }
