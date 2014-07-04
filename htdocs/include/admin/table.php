@@ -1,4 +1,6 @@
 <?php
+use Adminko\Db\Db;
+
 class admin_table extends admin
 {
     protected $primary_field = '';
@@ -56,7 +58,7 @@ class admin_table extends admin
         $this->sort_order = $this->object_desc['sort_order'];
         
         if (isset(metadata::$objects['lang']))
-            $this->lang_list = db::select_all('select * from lang order by lang_default desc');
+            $this->lang_list = Db::selectAll('select * from lang order by lang_default desc');
     }
     
     //////////////////////////////////////////////////////////////////////////
@@ -199,7 +201,7 @@ class admin_table extends admin
         
         $checked_query = 'select ' . $relation['secondary_field'] . ' from ' . $relation['relation_table'] . ' where ' . $relation['primary_field'] . ' = :' . $relation['primary_field'] .
             (count($secondary_list) ? ' and ' . $relation['secondary_field'] . ' in (' . join(', ', $secondary_list) . ')' : '');
-        $checked_records = db::select_all($checked_query, array($relation['primary_field'] => $primary_record[$this->primary_field]));
+        $checked_records = Db::selectAll($checked_query, array($relation['primary_field'] => $primary_record[$this->primary_field]));
         
         $checked_list = array();
         foreach ($checked_records as $record_id => $record)
@@ -303,9 +305,9 @@ class admin_table extends admin
         
         $this->clear_default_fields($insert_fields);
         
-        db::insert($this->object, $insert_fields);
+        Db::insert($this->object, $insert_fields);
         
-        $primary_field = db::last_insert_id();
+        $primary_field = Db::lastInsertId();
         
         $this->change_translate_record($this->object, $primary_field, $translate_values);
         
@@ -390,7 +392,7 @@ class admin_table extends admin
         
         $this->clear_default_fields($update_fields);
         
-        db::update($this->object, $update_fields, array($this->primary_field => $primary_field));
+        Db::update($this->object, $update_fields, array($this->primary_field => $primary_field));
         
         $this->change_translate_record($this->object, $primary_field, $translate_values);
         
@@ -418,19 +420,19 @@ class admin_table extends admin
             {
                 $field = field::factory($this->fields[$this->order_field]['type'])
                     ->set($sibling_record[$this->order_field]);
-                db::update($this->object, array($this->order_field => $field->get()),
+                Db::update($this->object, array($this->order_field => $field->get()),
                     array($this->primary_field => $primary_field));
                 
                 $field = field::factory($this->fields[$this->order_field]['type'])
                     ->set($record[$this->order_field]);
-                db::update($this->object, array($this->order_field => $field->get()),
+                Db::update($this->object, array($this->order_field => $field->get()),
                     array($this->primary_field => $sibling_record[$this->primary_field]));
             }
             else
             {
                 $field = field::factory($this->fields[$this->order_field]['type'])
                     ->set($this->get_edge_order(!$direction, $order_conds, $order_binds));
-                db::update($this->object, array($this->order_field => $field->get()),
+                Db::update($this->object, array($this->order_field => $field->get()),
                     array($this->primary_field => $record[$this->primary_field]));
             }
         }
@@ -447,7 +449,7 @@ class admin_table extends admin
         $primary_field = $record[$this->primary_field];
         
         if ($this->active_field)
-            db::update($this->object, array($this->active_field => 1),
+            Db::update($this->object, array($this->active_field => 1),
                 array($this->primary_field => $primary_field));
         
         if ($redirect)
@@ -462,7 +464,7 @@ class admin_table extends admin
         $primary_field = $record[$this->primary_field];
         
         if ($this->active_field)
-            db::update($this->object, array($this->active_field => 0),
+            Db::update($this->object, array($this->active_field => 0),
                 array($this->primary_field => $primary_field));
         
         if ($redirect)
@@ -480,7 +482,7 @@ class admin_table extends admin
         {
             $query = 'select count(*) as _count from ' . $this->object . '
                 where ' . $this->parent_field . ' = :primary_field';
-            $records_count = db::select_row($query, array('primary_field' => $primary_field));
+            $records_count = Db::selectRow($query, array('primary_field' => $primary_field));
             
             if ($records_count['_count'])
                 throw new AlarmException('Ошибка. Невозможно удалить запись, так как у нее есть дочерние записи.');
@@ -500,23 +502,23 @@ class admin_table extends admin
                     {
                         $link_query = 'select ' . $link_table_desc['primary_field'] . ' from ' . $link_desc['table'] . '
                             where ' . $link_desc['field'] . ' = :primary_field';
-                        $link_records = db::select_all($link_query, array('primary_field' => $primary_field));
+                        $link_records = Db::selectAll($link_query, array('primary_field' => $primary_field));
                         
                         foreach ($link_records as $link_record)
                             $this->delete_translate_record($link_desc['table'], $link_record[$link_table_desc['primary_field']]);
                     }
                     
                     if ($ondelete_action == 'cascade')
-                        db::delete($link_desc['table'], array($link_desc['field'] => $primary_field));
+                        Db::delete($link_desc['table'], array($link_desc['field'] => $primary_field));
                     else
-                        db::update($link_desc['table'], array($link_desc['field'] => null),
+                        Db::update($link_desc['table'], array($link_desc['field'] => null),
                             array($link_desc['field'] => $primary_field));
                 }
                 else if ($ondelete_action != 'ignore')
                 {
                     $query = 'select count(*) as _count from ' . $link_desc['table'] . '
                         where ' . $link_desc['field'] . ' = :primary_field';
-                    $records_count = db::select_row($query, array('primary_field' => $primary_field));
+                    $records_count = Db::selectRow($query, array('primary_field' => $primary_field));
                     
                     if ($records_count['_count'])
                         throw new AlarmException('Ошибка. Невозможно удалить запись, так как у нее есть зависимые записи в таблице "' .
@@ -527,11 +529,11 @@ class admin_table extends admin
         
         if (isset($this->relations) && is_array($this->relations))
             foreach ($this->relations as $relation_name => $relation_desc)
-                db::delete($relation_desc['relation_table'], array($relation_desc['primary_field'] => $primary_field));
+                Db::delete($relation_desc['relation_table'], array($relation_desc['primary_field'] => $primary_field));
         
         $this->delete_translate_record($this->object, $primary_field);
         
-        db::delete($this->object, array($this->primary_field => $primary_field));
+        Db::delete($this->object, array($this->primary_field => $primary_field));
         
         if ($redirect)
             $this->redirect();
@@ -553,9 +555,9 @@ class admin_table extends admin
             $relation_key = array($relation['primary_field'] => $primary_record[$this->primary_field],
                 $relation['secondary_field'] => $checked_id);
             
-            db::delete($relation['relation_table'], $relation_key);
+            Db::delete($relation['relation_table'], $relation_key);
             if ($checked_value)
-                db::insert($relation['relation_table'], $relation_key);
+                Db::insert($relation['relation_table'], $relation_key);
         }
         
         if ($redirect)
@@ -672,7 +674,7 @@ class admin_table extends admin
         $query = 'select ' . join(', ', $query_fields) . ' from ' . $this->object . ' ' .join(' ', $query_joins) . ' ' .
             $this->filter_clause . ' order by ' . $this->sort_field . ' ' . $this->sort_order . ' ' . $this->limit_clause;
         
-        return db::select_all($query, $this->filter_binds + $query_binds);
+        return Db::selectAll($query, $this->filter_binds + $query_binds);
     }
     
     public function get_table_records($table, $except = array())
@@ -701,7 +703,7 @@ class admin_table extends admin
     protected function get_records_count()
     {
         $query = 'select count(*) as _count from ' . $this->object . ' ' . $this->filter_clause;
-        $records_count = db::select_row($query, $this->filter_binds);
+        $records_count = Db::selectRow($query, $this->filter_binds);
         
         return $records_count['_count'];
     }
@@ -919,7 +921,7 @@ class admin_table extends admin
             $query = 'select count(*) as _count from ' . $this->object . '
                 where ' . join(' and ', $group_conds);
             
-            $records_count = db::select_row($query, $group_binds);
+            $records_count = Db::selectRow($query, $group_binds);
             
             if ($records_count['_count'])
                 throw new AlarmException('Ошибка. Запись не удовлетворяет условию группировки.');
@@ -937,7 +939,7 @@ class admin_table extends admin
                     foreach ($field_desc['group'] as $group_field_name)
                         $group_where[$group_field_name] = $record[$group_field_name];
                 
-                db::update($this->object, array($field_name => 0), $group_where);
+                Db::update($this->object, array($field_name => 0), $group_where);
             }
         }
     }
@@ -948,7 +950,7 @@ class admin_table extends admin
         
         $query = 'select ' . ($direction ? 'max' : 'min') . '(' . $this->order_field . ') as _edge_order
             from ' . $this->object . ' ' . $order_clause;
-        $max_record = db::select_row($query, $order_binds);
+        $max_record = Db::selectRow($query, $order_binds);
         
         $edge_order = $max_record['_edge_order'];
         
@@ -965,7 +967,7 @@ class admin_table extends admin
         $query = 'select * from ' . $this->object . ' ' . $order_clause . '
             order by ' . $this->order_field . ' ' . ($direction ? 'asc' : 'desc') . ' limit 1';
         
-        return db::select_row($query, $order_binds);
+        return Db::selectRow($query, $order_binds);
     }
     
     protected function get_record($primary_field = '')
@@ -973,7 +975,7 @@ class admin_table extends admin
         if ($primary_field === '') $primary_field = id();
         
         $query = 'select * from ' . $this->object . ' where ' . $this->primary_field . ' = :primary_field';
-        $record = db::select_row($query, array('primary_field' => $primary_field));
+        $record = Db::selectRow($query, array('primary_field' => $primary_field));
         
         if (!$record)
             throw new AlarmException('Ошибка. Запись не найдена.');
@@ -1130,7 +1132,7 @@ class admin_table extends admin
     
     protected function get_translate_values($table_name, $field_name, $table_record)
     {
-        $translate_values = db::select_all('
+        $translate_values = Db::selectAll('
                 select lang.lang_id, translate.record_value
                 from translate left join lang on lang.lang_id = translate.record_lang
                 where table_name = :table_name and field_name = :field_name and table_record = :table_record
@@ -1150,14 +1152,14 @@ class admin_table extends admin
         {
             $translate_record = array('table_name' => $table_name, 'field_name' => $field_name, 'table_record' => $table_record);
             
-            db::delete('translate', $translate_record);
+            Db::delete('translate', $translate_record);
             
             foreach ($field_values as $record_lang => $record_value)
             {
                 $translate_record['record_lang'] = $record_lang;
                 $translate_record['record_value'] = $record_value;
                 
-                db::insert('translate', $translate_record);
+                Db::insert('translate', $translate_record);
             }
         }
     }
@@ -1192,7 +1194,7 @@ class admin_table extends admin
     {
         if (isset($this->records_by_parent[$parent_field_id])) {
             foreach ($this->records_by_parent[$parent_field_id] as $record) {
-                if (!in_array($record[$this->primary_field], $this->except )) {
+                if (!in_array($record[$this->primary_field], $this->except)) {
                     $record['_depth'] = $depth;
                     $record['_has_children'] = isset($this->records_by_parent[$record[$this->primary_field]]);
                     if ($record['_has_children'])

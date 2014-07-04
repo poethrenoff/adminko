@@ -88,7 +88,7 @@ class model
     public function get($primary_field, $record = null) {
         if (!isset(self::$object_cache[$this->object][$primary_field])) {
             if (is_null($record)) {
-                $record = Db::select_row("select * from {$this->object} where {$this->primary_field} = :{$this->primary_field}",
+                $record = Db::selectRow("select * from {$this->object} where {$this->primary_field} = :{$this->primary_field}",
                     array($this->primary_field => $primary_field)
                 );
                 if (!$record){
@@ -149,7 +149,7 @@ class model
     // Получение количества объектов
     public function get_count($where = array()) {
         list($filter_clause, $filter_binds) = $this->get_filter_condition($where);
-        return Db::select_cell("select count(*) from {$this->object} {$filter_clause}", $filter_binds);
+        return Db::selectCell("select count(*) from {$this->object} {$filter_clause}", $filter_binds);
     }
 
     // Получение списка объектов
@@ -158,7 +158,7 @@ class model
         $order_clause = $this->get_order_clause($order);
         $limit_clause = $this->get_limit_clause($limit, $offset);
         
-        $records = Db::select_all("select * from {$this->object} {$filter_clause} {$order_clause} {$limit_clause}", $filter_binds);
+        $records = Db::selectAll("select * from {$this->object} {$filter_clause} {$order_clause} {$limit_clause}", $filter_binds);
         
         return $this->get_batch($records);
     }
@@ -182,7 +182,7 @@ class model
         }
         
         if ($this->is_new) {
-            Db::insert($this->object, $record); $this->get(Db::last_insert_id());
+            Db::insert($this->object, $record); $this->get(Db::lastInsertId());
         } else {
             Db::update($this->object, $record, array($this->primary_field => $this->get_id()));
         }
