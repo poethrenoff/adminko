@@ -1,7 +1,9 @@
 <?php
+namespace Adminko\Model;
+
 use Adminko\Db\Db;
 
-class model_text extends model
+class Text extends Model
 {
     // Получение текста по тегу
     public function get_by_tag($text_tag) {

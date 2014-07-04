@@ -255,16 +255,6 @@ function delete_directory($dir)
     return rmdir($dir);
 }
 
-function block($template, $params = array())
-{
-    $view = new view();
-    
-    foreach ($params as $key => $value)
-        $view->assign($key, $value);
-    
-    return $view->fetch($template);
-}
-
 function normalize_path($path)
 {
     return preg_replace("/\/+/", "/", str_replace("\\", "/", trim($path)));
@@ -323,7 +313,7 @@ spl_autoload_register('global_autoload');
 
 function exception_handler($e, $return = false, $admin = false)
 {
-    $error_view = new view();
+    $error_view = new Adminko\View();
     $error_plug = $error_view->fetch('block/error');
     
     $error_view->assign('message', $e->getMessage());
@@ -370,4 +360,4 @@ class AlarmException extends Exception {
     // Уведомительное исключение, не прерывающее выполнение программы
 }
 
-system::init();
+Adminko\System::init();

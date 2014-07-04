@@ -1,8 +1,11 @@
 <?php
+namespace Adminko;
+
 use Adminko\Db\Db;
 use Adminko\Cache\Cache;
+use Adminko\Module\Module;
 
-class system
+class System
 {
     private static $routes = null;
     
@@ -57,7 +60,7 @@ class system
     public static function dispatcher()
     {
         @session_start();
-        session::start();
+        Session::start();
         
         self::share_methods();
         $routes = self::get_routes();
@@ -89,7 +92,7 @@ class system
             }
         }
         
-        if (is_null(controller()))
+        if (is_null(self::controller()))
             not_found();
         
         if (isset(self::$page['page_redirect']))
@@ -103,18 +106,18 @@ class system
         self::set_cache_mode();
         
         if (isset(self::$site['lang']))
-            if (preg_match('/^(\w+)\/?/', controller(), $match) &&
+            if (preg_match('/^(\w+)\/?/', self::controller(), $match) &&
                     in_array($match[1], array_keys(self::$lang_list)))
                 self::$lang = $match[1];
         
-        $layout_view = new view();
+        $layout_view = new View();
         
         $layout_view->assign(array(
             'meta_title' => self::$page['meta_title'],
             'meta_keywords' => self::$page['meta_keywords'],
             'meta_description' => self::$page['meta_description']));
         
-        $is_admin = controller() == 'admin';
+        $is_admin = self::controller() == 'admin';
         
         if (isset(self::$page['block']))
         {
@@ -126,15 +129,15 @@ class system
                 
                 $module_name = $block['module_name'];
                 $module_main = (boolean) $block['area_main'];
-                $module_action = $module_main ? action() :
+                $module_action = $module_main ? self::action() :
                     ((isset($module_params['action']) && $module_params['action']) ? $module_params['action'] : 'index');
                 
                 try
                 {
                     if ($is_admin)
-                        $module_object = admin::factory(object());
+                        $module_object = Admin::factory(object());
                     else
-                        $module_object = module::factory($module_name);
+                        $module_object = Module::factory($module_name);
                     
                     $module_object->init($module_action, $module_params, $module_main);
                     
@@ -145,13 +148,13 @@ class system
                     if ($module_main)
                         $layout_view->assign($module_object->get_output());
                 }
-                catch (AlarmException $e)
+                catch (\AlarmException $e)
                 {
                     $error_content = exception_handler($e, true, $is_admin);
                     
                     $layout_view->assign($block['area_name'], $error_content);
                 }
-                catch (Exception $e)
+                catch (\Exception $e)
                 {
                     exception_handler($e, false, $is_admin);
                 }
@@ -244,9 +247,9 @@ class system
             return $_SERVER['REQUEST_URI'];
         
         if (!isset($url_array['action']))
-            $url_array['action'] = !isset($url_array['controller']) ? action() : 'index';
+            $url_array['action'] = !isset($url_array['controller']) ? self::action() : 'index';
         if (!isset($url_array['controller']))
-            $url_array['controller'] = controller();
+            $url_array['controller'] = self::controller();
         
         $routes = self::get_routes();
         
@@ -377,7 +380,7 @@ class system
                 array ('area_name' => 'auth', 'area_main' => 0, 'module_name' => 'admin', 'param' => array(
                     'action' => 'auth'))));
         
-        if (isset(metadata::$objects['lang']))
+        if (isset(Metadata::$objects['lang']))
         {
             $lang_list = Db::selectAll('select * from lang order by lang_default desc');
             
@@ -403,7 +406,7 @@ class system
             }
         }
         
-        if (isset(metadata::$objects['preference']))
+        if (isset(Metadata::$objects['preference']))
         {
             $preference_list = Db::selectAll('select * from preference');
             
@@ -500,7 +503,7 @@ class system
     public static function share_methods()
     {
         $methods = array('get_param', 'url_for', 'build', 'page', 'site', 'is_cache', 
-            'controller', 'action', 'id', 'object', 'lang', 'lang_list');
+            'object', 'lang', 'lang_list');
         
         foreach ($methods as $method)
             if (!is_callable($method) && method_exists('system', $method))

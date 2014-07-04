@@ -1,8 +1,10 @@
 <?php
+namespace Adminko;
+
 /**
  * Шаблонизатор
  */
-class view
+class View
 {
     // Каталог с шаблонами
     protected $template_dir = VIEW_DIR;
@@ -30,7 +32,7 @@ class view
         } elseif (is_string($name)) {
             $this->$name = $data;
         } else {
-            throw new AlarmException('Недопустимый тип переменной');
+            throw new \AlarmException('Недопустимый тип переменной');
         }
     }
 
@@ -57,7 +59,7 @@ class view
         $template_file = $this->template_dir . '/' . $template . '.phtml';
         
         if (!file_exists($template_file))
-            throw new AlarmException('Файл "' . normalize_path($template_file) . '" не найден');
+            throw new \AlarmException('Файл "' . normalize_path($template_file) . '" не найден');
         
         $old_error_level = error_reporting();
         error_reporting(error_reporting() & ~(E_NOTICE|E_WARNING));
@@ -90,7 +92,7 @@ class view
      *
      * @param  mixed $var
      */
-    function escape($var)
+    public function escape($var)
     {
         if (is_array($var)) {
             foreach ($var as $key => $value) {
@@ -152,5 +154,22 @@ class view
         }
         
         return $isset ? $value : $data;
+    }
+    
+    /**
+     * Получение статического блока
+     *
+     * @param  $template string
+     * @param  $params   array
+     * @return string
+     */
+    public static function block($template, $params = array())
+    {
+        $view = new View();
+        
+        foreach ($params as $key => $value)
+            $view->assign($key, $value);
+        
+        return $view->fetch($template);
     }
 }

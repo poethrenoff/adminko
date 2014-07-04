@@ -1,5 +1,7 @@
 <?php
-class paginator
+namespace Adminko;
+
+class Paginator
 {
 	public static function construct( $count, $pages = array() )
 	{
@@ -48,7 +50,7 @@ class paginator
 	
 	public static function fetch( $pages, $tpl = 'block/pages' )
 	{
-		$view = new view();
+		$view = new View();
 		$view -> assign( $pages );
 		
 		return $view -> fetch( $tpl );

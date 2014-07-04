@@ -1,20 +1,25 @@
 <?php
-class module_news extends module
+namespace Adminko\Module;
+
+use Adminko\System;
+use Adminko\Model\Model;
+
+class News extends Module
 {
     // Вывод полного списка новостей
     protected function action_index()
     {
-        $model_news = model::factory('news');
+        $model_news = Model::factory('news');
         
         $total = $model_news->get_count();
         $count = max(1, intval($this->get_param('count')));
         
-        $pages = paginator::construct($total, array('by_page' => $count));
+        $pages = \Adminko\Paginator::construct($total, array('by_page' => $count));
         
         $item_list = $model_news->get_list(array(), array('news_date' => 'desc'), $pages['by_page'], $pages['offset']);
         
         $this->view->assign('item_list', $item_list);
-        $this->view->assign('pages', paginator::fetch($pages));
+        $this->view->assign('pages', \Adminko\Paginator::fetch($pages));
         
         $this->content = $this->view->fetch('module/news/list');
     }
@@ -22,7 +27,7 @@ class module_news extends module
     // Вывод краткого списка новостей
     protected function action_preview()
     {
-        $model_news = model::factory('news');
+        $model_news = Model::factory('news');
         
         $count = max(1, intval($this->get_param('count')));
         
@@ -37,8 +42,8 @@ class module_news extends module
     protected function action_item()
     {
         try {
-            $item = model::factory('news')->get(id());
-        } catch (AlarmException $e) {
+            $item = Model::factory('news')->get(System::id());
+        } catch (\AlarmException $e) {
             not_found();
         }
         
@@ -53,6 +58,6 @@ class module_news extends module
     protected function ext_cache_key()
     {
         return parent::ext_cache_key() +
-            ($this->action == 'item' ? array('_id' => id()) : array());
+            ($this->action == 'item' ? array('_id' => System::id()) : array());
     }
 }

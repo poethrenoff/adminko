@@ -1,5 +1,7 @@
 <?php
-class session
+namespace Adminko;
+
+class Session
 {
 	private static $storage = array();
 	

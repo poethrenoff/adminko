@@ -1,5 +1,7 @@
 <?php
-class metadata
+namespace Adminko;
+
+class Metadata
 {
     public static $objects = array(
         /**

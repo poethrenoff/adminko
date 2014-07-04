@@ -1,16 +1,21 @@
 <?php
-class module_menu extends module
+namespace Adminko\Module;
+
+use Adminko\System;
+use Adminko\Model\Model;
+
+class Menu extends Module
 {
     protected function action_index()
     {
         $menu_id = $this->get_param('id');
         $menu_template = $this->get_param('template');
         
-        $menu_list = model::factory('menu')->get_list(
+        $menu_list = Model::factory('menu')->get_list(
             array('menu_active' => 1), array('menu_order' => 'asc')
         );
         
-        $site = site(); $current_page = page();
+        $site = System::site(); $current_page = System::page();
         $page_list = array_reindex($site['page'], 'page_id');
         foreach ($menu_list as $menu_index => $menu_item) {
             if (isset($page_list[$menu_item->get_menu_page()])) {
@@ -22,7 +27,7 @@ class module_menu extends module
             }
         }
         
-        $menu_tree = model::factory('menu')->get_tree($menu_list, $menu_id);
+        $menu_tree = Model::factory('menu')->get_tree($menu_list, $menu_id);
         
         $this->view->assign($menu_tree);
         $this->content = $this->view->fetch('module/menu/' . $menu_template);
@@ -33,7 +38,7 @@ class module_menu extends module
     // Дополнительные параметры хэша модуля
     protected function ext_cache_key()
     {
-        $current_page = page();
+        $current_page = System::page();
         
         return parent::ext_cache_key() +
             array('_page' => $current_page['page_id']);

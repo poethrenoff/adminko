@@ -1,5 +1,7 @@
 <?php
-abstract class object
+namespace Adminko;
+
+abstract class Object
 {
 	// Имя объекта
 	protected $object = '';

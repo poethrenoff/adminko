@@ -1,10 +1,14 @@
 <?php
-class module_text extends module
+namespace Adminko\Module;
+
+use Adminko\Model\Model;
+
+class Text extends Module
 {
     protected function action_index()
     {
         try {
-            $item = model::factory('text')->get($this->get_param('id'));
+            $item = Model::factory('text')->get($this->get_param('id'));
         } catch (AlarmException $e) {
             not_found();
         }
@@ -16,6 +20,6 @@ class module_text extends module
     // Получение текста по тегу
     public static function get_by_tag($text_tag)
     {
-        return model::factory('text')->get_by_tag($text_tag)->get_text_content();
+        return Model::factory('text')->get_by_tag($text_tag)->get_text_content();
     }
 }
