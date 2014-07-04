@@ -1,4 +1,7 @@
 <?php
+use Adminko\Db\Db;
+use Adminko\Cache\Cache;
+
 class system
 {
 	private static $routes = null;
@@ -19,7 +22,7 @@ class system
 	
 	public static function init()
 	{
-		self::$site = cache::get( self::$key_name );
+		self::$site = Cache::get( self::$key_name );
 		if ( self::$site === false )
 			self::$site = self::build();
 		
@@ -282,19 +285,19 @@ class system
 	
 	public static function build()
 	{
-		$page_list = db::select_all( 'select * from page, layout where page_layout = layout_id and page_active = 1 order by page_order' );
+		$page_list = Db::select_all( 'select * from page, layout where page_layout = layout_id and page_active = 1 order by page_order' );
 		$page_list = array_reindex( $page_list, 'page_id');
 		
-		$area_list = db::select_all( 'select * from layout_area order by area_order' );
+		$area_list = Db::select_all( 'select * from layout_area order by area_order' );
 		$area_list = array_group( $area_list, 'area_layout' );
 		
-		$block_list = db::select_all( 'select * from block, module where block_module = module_id' );
+		$block_list = Db::select_all( 'select * from block, module where block_module = module_id' );
 		$block_list = array_reindex( $block_list, 'block_page', 'block_area' );
 		
-		$block_param_list = db::select_all( 'select * from block_param, module_param where param = param_id' );
+		$block_param_list = Db::select_all( 'select * from block_param, module_param where param = param_id' );
 		$block_param_list = array_group( $block_param_list, 'block' );
 		
-		$param_value_list = db::select_all( 'select * from param_value' );
+		$param_value_list = Db::select_all( 'select * from param_value' );
 		$param_value_list = array_reindex( $param_value_list, 'value_id' );
 		
 		$site = array();
@@ -314,7 +317,7 @@ class system
 			
 			if ( $page['page_folder'] )
 			{
-				$page_redirect = db::select_row( 'select * from page where page_parent = :page_parent and page_active = 1 order by page_order',
+				$page_redirect = Db::select_row( 'select * from page where page_parent = :page_parent and page_active = 1 order by page_order',
 					array( 'page_parent' => $page['page_id'] ) );
 				
 				if ( $page_redirect )
@@ -376,13 +379,13 @@ class system
 		
 		if ( isset( metadata::$objects['lang'] ) )
 		{
-			$lang_list = db::select_all( 'select * from lang order by lang_default desc' );
+			$lang_list = Db::select_all( 'select * from lang order by lang_default desc' );
 			
 			foreach ( $lang_list as $lang )
 			{
 				$site_lang = $lang;
 				
-				$dictionary = db::select_all( "
+				$dictionary = Db::select_all( "
 					select
 						dictionary.word_name, translate.record_value
 					from
@@ -402,13 +405,13 @@ class system
 		
 		if ( isset( metadata::$objects['preference'] ) )
 		{
-			$preference_list = db::select_all( 'select * from preference' );
+			$preference_list = Db::select_all( 'select * from preference' );
 			
 			foreach ( $preference_list as $preference )
 				$site['preference'][$preference['preference_name']] = $preference['preference_value'];
 		}
 		
-		cache::set( self::$key_name, $site );
+		Cache::set( self::$key_name, $site );
 		
 		return $site;
 	}
@@ -429,7 +432,7 @@ class system
 		}
 		
 		if ( isset( $_REQUEST['cache_clear'] ) ) {
-			cache::clear();
+			Cache::clear();
 			redirect_to( request_url( array(), array( 'cache_clear' ) ) );
 		}
 		

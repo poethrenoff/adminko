@@ -16,6 +16,8 @@ define('DB_NAME', 'adminko');
 define('DB_USER', 'adminko');
 define('DB_PASSWORD', 'adminko');
 
+define('VENDOR_NAME', 'Adminko');
+
 define('APP_DIR', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 
 define('CLASS_DIR', APP_DIR . 'include' . DIRECTORY_SEPARATOR);

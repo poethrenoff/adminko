@@ -1,12 +1,16 @@
 <?php
-abstract class db
+namespace Adminko\Db;
+
+use Adminko\Db\Driver\Driver;
+
+abstract class Db
 {
 	protected static $db_driver = null;
 	
 	protected static function get_driver()
 	{
 		if ( self::$db_driver == null )
-			self::$db_driver = db_driver::factory( DB_TYPE, DB_HOST, '', DB_NAME, DB_USER, DB_PASSWORD );
+			self::$db_driver = Driver::factory( DB_TYPE, DB_HOST, '', DB_NAME, DB_USER, DB_PASSWORD );
 		
 		return self::$db_driver;
 	}

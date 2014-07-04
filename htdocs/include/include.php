@@ -310,7 +310,10 @@ function to_translit($string) {
 
 function global_autoload( $class_name )
 {
-	$class_path = join( DIRECTORY_SEPARATOR, explode( '_', $class_name ) );
+    $class_path = join( DIRECTORY_SEPARATOR, explode( '\\', $class_name ) );
+    $class_path = str_replace(VENDOR_NAME . DIRECTORY_SEPARATOR, '', $class_path);
+    
+	$class_path = join( DIRECTORY_SEPARATOR, explode( '_', $class_path ) );
 	
 	if ( file_exists( $class_file = CLASS_DIR . $class_path . '.php' ) )
 		include_once( $class_file );

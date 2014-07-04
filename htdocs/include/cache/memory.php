@@ -1,5 +1,7 @@
 <?php
-class cache_memory
+namespace Adminko\Cache;
+
+class Memory
 {
 	const CACHE_HOST = 'localhost';
 	const CACHE_PORT = '11211';

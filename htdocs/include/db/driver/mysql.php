@@ -1,5 +1,9 @@
 <?php
-class db_driver_mysql extends db_driver
+namespace Adminko\Db\Driver;
+
+use PDO;
+
+class Mysql extends Driver
 {
     protected function __construct($db_type, $db_host, $db_port, $db_name, $db_user, $db_password)
     {

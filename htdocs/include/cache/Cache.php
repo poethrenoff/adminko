@@ -1,5 +1,7 @@
 <?php
-abstract class cache
+namespace Adminko\Cache;
+
+abstract class Cache
 {
 	private static $cache_driver = null;
 	
@@ -13,7 +15,7 @@ abstract class cache
 	
 	private static function factory( $cache_type = CACHE_TYPE )
 	{
-		$driver_name = 'cache_' . $cache_type;
+		$driver_name = __NAMESPACE__ . '\\' . ucfirst($cache_type);
 		
 		return new $driver_name( $cache_type );
 	}

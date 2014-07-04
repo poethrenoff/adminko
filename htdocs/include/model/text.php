@@ -1,4 +1,6 @@
 <?php
+use Adminko\Db\Db;
+
 class model_text extends model
 {
     // Получение текста по тегу

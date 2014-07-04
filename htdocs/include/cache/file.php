@@ -1,5 +1,7 @@
 <?php
-class cache_file
+namespace Adminko\Cache;
+
+class File
 {
 	public function get( $file_name, $expire )
 	{
