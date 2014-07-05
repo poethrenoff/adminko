@@ -3,6 +3,7 @@ namespace Adminko;
 
 use Adminko\Db\Db;
 use Adminko\Cache\Cache;
+use Adminko\Admin\Admin;
 use Adminko\Module\Module;
 
 class System
@@ -62,7 +63,6 @@ class System
         @session_start();
         Session::start();
         
-        self::share_methods();
         $routes = self::get_routes();
         
         self::$page = null;
@@ -97,7 +97,7 @@ class System
         
         if (isset(self::$page['page_redirect']))
         {
-            if (action() == 'index')
+            if (self::action() == 'index')
                 redirect_to(self::$page['page_redirect']);
             else
                 not_found();
@@ -135,7 +135,7 @@ class System
                 try
                 {
                     if ($is_admin)
-                        $module_object = Admin::factory(object());
+                        $module_object = Admin::factory(System::object());
                     else
                         $module_object = Module::factory($module_name);
                     
@@ -498,15 +498,5 @@ class System
     public static function is_ajax()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    }
-    
-    public static function share_methods()
-    {
-        $methods = array('get_param', 'url_for', 'build', 'page', 'site', 'is_cache', 
-            'object', 'lang', 'lang_list');
-        
-        foreach ($methods as $method)
-            if (!is_callable($method) && method_exists('system', $method))
-                eval('function ' . $method . '() { $args = func_get_args(); return call_user_func_array(array("system", "' . $method . '"), $args); }');
     }
 }

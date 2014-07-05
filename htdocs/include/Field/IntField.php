@@ -1,6 +1,8 @@
 <?php
 namespace Adminko\Field;
 
+use Adminko\Valid\Valid;
+
 class IntField extends Field
 {
     public function set($content) {
@@ -9,7 +11,7 @@ class IntField extends Field
     }
     
     public function check($errors = array()) {
-        return valid::factory('int')->check($this->get()) &&
+        return Valid::factory('int')->check($this->get()) &&
             parent::check($errors);
     }
 }

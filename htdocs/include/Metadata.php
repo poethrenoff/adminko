@@ -54,7 +54,7 @@ class Metadata
          */
         'preference' => array(
             'title' => 'Настройки',
-            'class' => 'builder',
+            'class' => 'Builder',
             'fields' => array(
                 'preference_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'preference_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require')),
@@ -68,7 +68,7 @@ class Metadata
          */
         'page' => array(
             'title' => 'Разделы',
-            'class' => 'page',
+            'class' => 'Page',
             'fields' => array(
                 'page_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'page_parent' => array('title' => 'Родительский раздел', 'type' => 'parent'),
@@ -92,7 +92,7 @@ class Metadata
          */
         'block' => array(
             'title' => 'Блоки',
-            'class' => 'block',
+            'class' => 'Block',
             'fields' => array(
                 'block_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'block_page' => array('title' => 'Раздел', 'type' => 'table', 'table' => 'page', 'errors' => array('require')),
@@ -110,7 +110,7 @@ class Metadata
          */
         'layout' => array(
             'title' => 'Шаблоны',
-            'class' => 'layout',
+            'class' => 'Layout',
             'fields' => array(
                 'layout_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'layout_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
@@ -127,7 +127,7 @@ class Metadata
          */
         'layout_area' => array(
             'title' => 'Области шаблона',
-            'class' => 'builder',
+            'class' => 'Builder',
             'fields' => array(
                 'area_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'area_layout' => array('title' => 'Шаблон', 'type' => 'table', 'table' => 'layout', 'errors' => array('require')),
@@ -146,7 +146,7 @@ class Metadata
          */
         'module' => array(
             'title' => 'Модули',
-            'class' => 'module',
+            'class' => 'Module',
             'fields' => array(
                 'module_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'module_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
@@ -163,7 +163,7 @@ class Metadata
          */
         'module_param' => array(
             'title' => 'Параметры модулей',
-            'class' => 'moduleParam',
+            'class' => 'ModuleParam',
             'fields' => array(
                 'param_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'param_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => array('require')),
@@ -192,7 +192,7 @@ class Metadata
          */
         'param_value' => array(
             'title' => 'Значения параметров модулей',
-            'class' => 'paramValue',
+            'class' => 'ParamValue',
             'fields' => array(
                 'value_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'value_param' => array('title' => 'Параметр', 'type' => 'table', 'table' => 'module_param', 'errors' => array('require')),
@@ -283,7 +283,7 @@ class Metadata
          */
         'lang' => array(
             'title' => 'Языки',
-            'class' => 'builder',
+            'class' => 'Builder',
             'fields' => array(
                 'lang_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'lang_title' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'main' => 1, 'errors' => array('require'), 'sort' => 'asc'),
@@ -307,7 +307,7 @@ class Metadata
         
         'dictionary' => array(
             'title' => 'Системные слова',
-            'class' => 'builder',
+            'class' => 'Builder',
             'fields' => array(
                 'word_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'word_name' => array('title' => 'Название', 'type' => 'string', 'show' => 1, 'sort' => 'asc', 'group' => array(), 'filter' => 1, 'errors' => array('require', 'alpha')),
@@ -395,7 +395,7 @@ class Metadata
          */
         'fm' => array(
             'title' => 'Файл-менеджер',
-            'class' => 'fm',
+            'class' => 'Fm',
         ),
         
         /**
@@ -403,7 +403,7 @@ class Metadata
          */
         'delivery' => array(
             'title' => 'Почтовая рассылка',
-            'class' => 'delivery',
+            'class' => 'Delivery',
         ),
    );
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Adminko\Field;
 
+use Adminko\Valid\Valid;
+
 class TableField extends IntField
 {
     protected $value = 0;
@@ -10,8 +12,12 @@ class TableField extends IntField
         return $this;
     }
     
+    public function view() {
+        return $this->get() ?: '';
+    }
+    
     public function check($errors = array()) {
-        return valid::factory('require')->check($this->get()) && parent::check($errors) &&
+        return Valid::factory('require')->check($this->get()) && parent::check($errors) &&
             (in_array('require', $errors) ? ($this->get() > 0) : ($this->get() >= 0));
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Adminko\Field;
 
+use Adminko\Valid\Valid;
+
 class OrderField extends IntField
 {
     protected $value = 0;
@@ -11,7 +13,7 @@ class OrderField extends IntField
     }
     
     public function check($errors = array()) {
-        return valid::factory('require')->check($this->get()) &&
+        return Valid::factory('require')->check($this->get()) &&
             parent::check($errors);
     }
 }

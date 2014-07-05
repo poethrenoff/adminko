@@ -1,26 +1,29 @@
 <?php
 namespace Adminko\Field;
 
+use Adminko\Date;
+use Adminko\Valid\Valid;
+
 class DatetimeField extends StringField
 {
     public function parse($content) {
-        $result = valid::factory('datetime')->parse_check($content);
+        $result = Valid::factory('datetime')->parse_check($content);
         if ($result) {
-            $this->set(date::set($content, 'long'));
+            $this->set(Date::set($content, 'long'));
         }
         return $result;
     }
     
     public function form() {
-        return date::get($this->get(), 'long');
+        return Date::get($this->get(), 'long');
     }
     
     public function view() {
-        return preg_replace('/\s+/', '&nbsp;', date::get($this->get(), 'long'));
+        return preg_replace('/\s+/', '&nbsp;', Date::get($this->get(), 'long'));
     }
     
     public function check($errors = array()) {
-        return valid::factory('datetime')->check($this->get()) &&
+        return Valid::factory('datetime')->check($this->get()) &&
             parent::check($errors);
     }
 }

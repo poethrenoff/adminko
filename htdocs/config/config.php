@@ -39,4 +39,4 @@ define('ERROR_SUBLECT', 'Сообщение об ошибке');
 
 define('LOG_DIR', dirname(APP_DIR) . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR);
 
-include_once CLASS_DIR . 'include.php';
+include_once CLASS_DIR . 'Include.php';

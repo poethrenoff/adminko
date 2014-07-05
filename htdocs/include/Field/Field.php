@@ -1,6 +1,8 @@
 <?php
 namespace Adminko\Field;
 
+use Adminko\Valid\Valid;
+
 class Field
 {
     // Значение поля
@@ -38,7 +40,7 @@ class Field
     // Проверяет валидности поля
     public function check($errors = array()) {
         foreach ($errors as $error) {
-            if (!valid::factory($error)->check($this->get())) {
+            if (!Valid::factory($error)->check($this->get())) {
                 return false;
             }
         }

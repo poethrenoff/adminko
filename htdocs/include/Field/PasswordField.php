@@ -1,10 +1,12 @@
 <?php
 namespace Adminko\Field;
 
+use Adminko\Valid\Valid;
+
 class PasswordField extends StringField
 {
     public function parse($content) {
-        $result = valid::factory('alpha')->parse_check($content);
+        $result = Valid::factory('alpha')->parse_check($content);
         if ($result) {
             $this->set(md5($content));
         }
