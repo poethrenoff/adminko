@@ -1,4 +1,6 @@
 <?php
+namespace Adminko;
+
 class Sendmail
 {
     public static function send($to, $from, $name, $subject, $message, $files = array())

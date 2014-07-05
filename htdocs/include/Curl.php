@@ -1,4 +1,6 @@
 <?php
+namespace Adminko;
+
 /**
  * Базовый класс для работы с cUrl
  */

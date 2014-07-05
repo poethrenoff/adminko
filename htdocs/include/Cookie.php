@@ -1,4 +1,6 @@
 <?php
+namespace Adminko;
+
 class Cookie
 {
     // Записывает массив (или произвольный объект) в куки.

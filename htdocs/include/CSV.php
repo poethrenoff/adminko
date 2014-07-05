@@ -1,4 +1,6 @@
 <?php
+namespace Adminko;
+
 class CSV
 {
     // Функция пытается определить разделитель полей в CSV файле
