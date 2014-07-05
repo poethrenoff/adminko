@@ -4,7 +4,7 @@ namespace Adminko\Module;
 use Adminko\System;
 use Adminko\Model\Model;
 
-class Menu extends Module
+class MenuModule extends Module
 {
     protected function action_index()
     {

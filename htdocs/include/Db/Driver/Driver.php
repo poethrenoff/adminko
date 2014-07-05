@@ -10,7 +10,7 @@ abstract class Driver
     public static function factory($db_type = DB_TYPE, $db_host = DB_HOST, $db_port = '',
         $db_name = DB_NAME, $db_user = DB_USER, $db_password = DB_PASSWORD)
     {
-        $driver_name = __NAMESPACE__ . '\\' . ucfirst($db_type);
+        $driver_name = __NAMESPACE__ . '\\' . ucfirst($db_type) . 'Driver';
         
         return new $driver_name($db_type, $db_host, $db_port, $db_name, $db_user, $db_password);
     }

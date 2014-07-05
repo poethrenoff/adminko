@@ -3,7 +3,7 @@ namespace Adminko\Module;
 
 use Adminko\Model\Model;
 
-class Text extends Module
+class TextModule extends Module
 {
     protected function action_index()
     {

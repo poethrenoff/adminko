@@ -20,10 +20,10 @@ abstract class Module extends \Adminko\Object
 	// Создание объекта модуля
 	public static final function factory( $object )
 	{
-		$class_name = __NAMESPACE__ . '\\' . $object;
+		$class_name = __NAMESPACE__ . '\\' . ucfirst($object) . 'Module';
 		
 		if ( !class_exists( $class_name ) )
-			throw new Exception( 'Ошибка. Класс "' . $class_name . '" не найден.' );
+			throw new \Exception( 'Ошибка. Класс "' . $class_name . '" не найден.' );
 		
 		return new $class_name( $object );
 	}
@@ -44,7 +44,7 @@ abstract class Module extends \Adminko\Object
 		if ( !method_exists( $this, $action_name ) )
 		{
 			if ( !$is_main )
-				throw new AlarmException( 'Ошибка. Метод "' . $action_name . '" не найден.' );
+				throw new \AlarmException( 'Ошибка. Метод "' . $action_name . '" не найден.' );
 			else
 				not_found();
 			

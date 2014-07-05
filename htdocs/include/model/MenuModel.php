@@ -1,7 +1,7 @@
 <?php
 namespace Adminko\Model;
 
-class Menu extends Hierarchy
+class MenuModel extends Hierarchy
 {
     ///
 }

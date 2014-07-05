@@ -41,7 +41,7 @@ class Model
         $this->fields_desc = $object_desc['fields'];
         
         foreach ($this->fields_desc as $field_name => $field_desc) {
-            $this->fields[$field_name] = field::factory($this->fields_desc[$field_name]['type']);
+            $this->fields[$field_name] = Field::factory($this->fields_desc[$field_name]['type']);
             if ($field_desc['type'] == 'pk') {
                 $this->primary_field = $field_name;
             }
@@ -81,7 +81,7 @@ class Model
             $class_name = ucfirst($object);
         }
         
-        $class_name = __NAMESPACE__ . '\\' . $class_name;
+        $class_name = __NAMESPACE__ . '\\' . $class_name . 'Model';
         
         if (!class_exists($class_name)) {
             $class_name = __NAMESPACE__ . '\\' . 'Model';

@@ -4,7 +4,7 @@ namespace Adminko\Module;
 use Adminko\System;
 use Adminko\Model\Model;
 
-class News extends Module
+class NewsModule extends Module
 {
     // Вывод полного списка новостей
     protected function action_index()

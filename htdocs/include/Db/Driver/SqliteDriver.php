@@ -1,19 +1,14 @@
 <?php
-class db_driver_pgsql extends db_driver
+namespace Adminko\Db\Driver;
+
+use PDO;
+
+class SqliteDriver extends Driver
 {
     protected function __construct($db_type, $db_host, $db_port, $db_name, $db_user, $db_password)
     {
-        $this->dbh = new PDO("{$db_type}:host={$db_host};dbname={$db_name}" . ($db_port ? ";port={$db_port}" : ""),
-            $db_user, $db_password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-    }
-    
-    public function last_insert_id($sequence = null)
-    {
-        if (is_null($sequence)) {
-            return $this->select_cell("select lastval()");
-        } else {
-            return $this->select_cell("select currval('{$sequence}')");
-        }
+        $this->dbh = new PDO("{$db_type}:{$db_name}",
+            null, null, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
     }
     
     public function create()
@@ -31,22 +26,19 @@ class db_driver_pgsql extends db_driver
             $fields = array(); $pk_field = '';
             foreach ($object_desc['fields'] as $field_name => $field_desc) {
                 switch ($field_desc['type']) {
-                    case 'pk': $type = 'serial'; $pk_field = $field_name; break;
+                    case 'pk': $type = "integer primary key autoincrement"; break;
                     case 'string': case 'select': case 'image': case 'file': case 'password':
-                        $type = 'varchar'; break;
-                    case 'date': case 'datetime': $type = 'varchar(14)'; break;
-                    case 'text': $type = 'text'; break;
-                    case 'int': $type = 'integer'; break;
-                    case 'float': $type = 'double precision'; break;
+                        $type = "varchar not null default ''"; break;
+                    case 'date': case 'datetime': $type = "varchar(14) not null default ''"; break;
+                    case 'text': $type = "text"; break;
+                    case 'int': $type = "integer default '0'"; break;
+                    case 'float': $type = "double default '0'"; break;
                     case 'active': case 'boolean': case 'order':
                     case 'default': case 'table': case 'parent':
-                        $type = 'integer'; break;
-                    default: $type = 'error';
+                        $type = "integer not null default '0'"; break;
+                    default: $type = "error";
                 }
                 $fields[] = "\t{$field_name} {$type}";
-            }
-            if ($pk_field) {
-                $fields[] = "\tprimary key ({$pk_field})";
             }
             
             $sql .= join(",\n", $fields) . "\n";
@@ -56,7 +48,7 @@ class db_driver_pgsql extends db_driver
             foreach ($object_desc['fields'] as $field_name => $field_desc) {
                 switch ($field_desc['type']) {
                     case 'select': case 'table': case 'active': case 'parent': case 'order':
-                        $sql .= "create index {$object_name}_idx" . $index_count++ . "\n\ton {$object_name} using btree ({$field_name});\n";
+                        $sql .= "create index {$object_name}_idx" . $index_count++ . "\n\ton {$object_name} ({$field_name} asc);\n";
                 }
             }
             
