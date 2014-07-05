@@ -2,13 +2,12 @@
 namespace Adminko\Admin;
 
 use Adminko\System;
-use Adminko\Object;
 use Adminko\Session;
 use Adminko\Metadata;
-use Adminko\Db\Db;
 use Adminko\View;
+use Adminko\Db\Db;
 
-abstract class Admin extends Object
+abstract class Admin extends \Adminko\Object
 {
     // Метаданные объекта
     protected $object_desc = array();
