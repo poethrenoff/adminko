@@ -17,7 +17,7 @@ $delivery_queue_list = Db::selectAll('
 
 if (!count($delivery_queue_list)) exit;
 
-set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_DIR . 'PEAR');
+set_include_path(get_include_path() . PATH_SEPARATOR . CLASS_DIR . 'PEAR');
 
 include_once 'Mail.php';
 

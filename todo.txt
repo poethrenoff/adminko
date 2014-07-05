@@ -12,6 +12,7 @@
         - Форматирование
 
 - Баг http://adminko/admin/dictionary/edit/1
+- Выделить из helpers.php функции для работы с урлами и языками (класс Url и Lang)
 
 - Тесты!
 

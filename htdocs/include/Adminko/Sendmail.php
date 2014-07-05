@@ -14,7 +14,7 @@ class Sendmail
     
     public static function prepare($from, $name, $subject, $message, $files = array())
     {
-        set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_DIR . 'PEAR');
+        set_include_path(get_include_path() . PATH_SEPARATOR . CLASS_DIR . 'PEAR');
         
         include_once 'Mail.php';
         include_once 'Mail/mime.php';
