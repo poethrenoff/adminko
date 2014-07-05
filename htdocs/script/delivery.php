@@ -1,7 +1,7 @@
 <?php
 use Adminko\Db\Db;
 
-include_once dirname(dirname(dirname(__FILE__))) . '/config/config.php';
+include_once dirname(dirname(__FILE__)) . '/config/config.php';
 
 $delivery_body_list = Db::selectAll('select * from delivery_body');
 
@@ -17,7 +17,7 @@ $delivery_queue_list = Db::selectAll('
 
 if (!count($delivery_queue_list)) exit;
 
-set_include_path(get_include_path() . PATH_SEPARATOR . CLASS_DIR . 'PEAR');
+set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_DIR . 'PEAR');
 
 include_once 'Mail.php';
 

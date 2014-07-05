@@ -2,6 +2,7 @@
 namespace Adminko\Admin\Tool;
 
 use Adminko\System;
+use Adminko\Sendmail;
 use Adminko\Db\Db;
 use Adminko\Admin\Admin;
 

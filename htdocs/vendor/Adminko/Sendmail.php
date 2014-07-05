@@ -14,7 +14,7 @@ class Sendmail
     
     public static function prepare($from, $name, $subject, $message, $files = array())
     {
-        set_include_path(get_include_path() . PATH_SEPARATOR . CLASS_DIR . 'PEAR');
+        set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_DIR . 'PEAR');
         
         include_once 'Mail.php';
         include_once 'Mail/mime.php';
@@ -23,7 +23,7 @@ class Sendmail
             'head_encoding' => 'base64', 'text_encoding' => 'base64', 'html_encoding' => 'base64',
             'html_charset'  => 'UTF-8', 'text_charset'  => 'UTF-8', 'head_charset'  => 'UTF-8');
         
-        $mime = new Mail_Mime($build_params);
+        $mime = new \Mail_Mime($build_params);
         
         $mime->setSubject(self::header_encode($subject));
         $mime->setFrom(!empty($name) ? '"' . self::header_encode($name) . '" <' . $from . '>' : '<' . $from . '>');
