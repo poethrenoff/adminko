@@ -1,6 +1,7 @@
 <?php
 namespace Adminko\Module;
 
+use Adminko\System;
 use Adminko\Model\Model;
 
 class TextModule extends Module
@@ -10,7 +11,7 @@ class TextModule extends Module
         try {
             $item = Model::factory('text')->get($this->get_param('id'));
         } catch (AlarmException $e) {
-            not_found();
+            System::notFound();
         }
         
         $this->view->assign($item);

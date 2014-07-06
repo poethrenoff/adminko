@@ -21,9 +21,9 @@ class DeliveryTool extends Admin
         $this->view->assign('mail_count', $mail_count);
         $this->view->assign('prev_mail', $prev_mail);
         
-        $form_url = System::url_for(array('object' => 'delivery', 'action' => 'send'));
+        $form_url = System::urlFor(array('object' => 'delivery', 'action' => 'send'));
         $this->view->assign('form_url', $form_url);
-        $cancel_url = System::url_for(array('object' => 'delivery', 'action' => 'clear'));
+        $cancel_url = System::urlFor(array('object' => 'delivery', 'action' => 'clear'));
         $this->view->assign('cancel_url', $cancel_url);
         
         $this->content = $this->view->fetch('admin/delivery/delivery');

@@ -117,43 +117,6 @@ function array_make_in($array, $key = '', $quote = false)
     return $in;
 }
 
-function get_translate_clause($table_name, $field_name, $table_record, $record_lang, $field_title = null)
-{
-    if (is_null($field_title)) {
-        $field_title = $field_name;
-    }
-
-    return "(
-        select
-            record_value
-        from
-            translate, lang
-        where
-            translate.table_record = {$table_record} and 
-            translate.table_name = '{$table_name}' and
-            translate.field_name = '{$field_name}' and
-            lang.lang_id = translate.record_lang and
-            lang.lang_name = '{$record_lang}'
-   ) as {$field_title}";
-}
-
-function get_translate_values($table_name, $field_name, $table_record, $record_lang = null)
-{
-    $translate_values = Adminko\Db\Db::selectAll('
-        select lang.lang_name, translate.record_value
-        from translate left join lang on lang.lang_id = translate.record_lang
-        where table_name = :table_name and field_name = :field_name and table_record = :table_record
-        order by lang.lang_default desc', array('table_name' => $table_name, 'field_name' => $field_name, 'table_record' => $table_record));
-
-    $record_values = array_reindex($translate_values, 'lang_name');
-
-    if (!is_null($record_lang)) {
-        return $record_values[$record_lang];
-    }
-
-    return $record_values;
-}
-
 function get_preference($preference_name, $default_value = '')
 {
     if (defined($preference_name)) {
@@ -161,63 +124,6 @@ function get_preference($preference_name, $default_value = '')
     } else {
         return $default_value;
     }
-}
-
-function redirect_to($url_array = array())
-{
-    if (!is_array($url_array))
-        $location = $url_array;
-    else
-        $location = \Adminko\System::url_for($url_array);
-
-    header('Location: ' . $location);
-
-    exit;
-}
-
-function redirect_back()
-{
-    $back_url = '/';
-
-    if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'])) {
-        $back_url = $_SERVER['HTTP_REFERER'];
-    }
-
-    redirect_to($back_url);
-}
-
-function prepare_query($include = array(), $exclude = array())
-{
-    foreach ($include as $var_name => $var_value) {
-        if (in_array($var_name, $exclude) || is_empty($var_value)) {
-            unset($include[$var_name]);
-        }
-    }
-
-    return $include;
-}
-
-function self_url($include = array(), $exclude = array())
-{
-    $self_url = preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']);
-
-    $query_string = http_build_query(prepare_query($include, $exclude));
-
-    return $self_url . ($query_string ? '?' . $query_string : '');
-}
-
-function request_url($include = array(), $exclude = array())
-{
-    return self_url(array_merge($_GET, $include), $exclude);
-}
-
-function not_found()
-{
-    header('HTTP/1.0 404 Not Found');
-
-    print Adminko\View::block('404');
-
-    exit;
 }
 
 function is_empty($var)

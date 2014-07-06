@@ -46,7 +46,7 @@ abstract class Module extends \Adminko\Object
             if (!$is_main)
                 throw new \AlarmException('Ошибка. Метод "' . $action_name . '" не найден.');
             else
-                not_found();
+                System::notFound();
             
             return;
         }
@@ -85,7 +85,7 @@ abstract class Module extends \Adminko\Object
     // Вычисляет хэш параметров модуля
     protected function get_cache_key()
     {
-        if (!System::is_cache()) return false;
+        if (!System::isCache()) return false;
         
         if (!empty($_POST)) return false;
         

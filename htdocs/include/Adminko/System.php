@@ -1,7 +1,6 @@
 <?php
 namespace Adminko;
 
-use Adminko\View;
 use Adminko\Db\Db;
 use Adminko\Cache\Cache;
 use Adminko\Admin\Admin;
@@ -67,12 +66,12 @@ class System
     {
         Session::start();
 
-        set_exception_handler('Adminko\System::exception_handler');
+        set_exception_handler('Adminko\System::exceptionHandler');
 
-        $routes = self::get_routes();
+        $routes = self::getRoutes();
 
         self::$page = null;
-        $url = '/' . trim(self_url(), '/');
+        $url = '/' . trim(Url::selfUrl(), '/');
 
         $page_list = array_reindex(self::$site['page'], 'page_path');
 
@@ -98,18 +97,18 @@ class System
         }
 
         if (is_null(self::controller())) {
-            not_found();
+            self::notFound();
         }
 
         if (isset(self::$page['page_redirect'])) {
             if (self::action() == 'index') {
-                redirect_to(self::$page['page_redirect']);
+                Url::redirectTo(self::$page['page_redirect']);
             } else {
-                not_found();
+                self::notFound();
             }
         }
 
-        self::set_cache_mode();
+        self::setCacheMode();
 
         if (isset(self::$site['lang'])) {
             if (preg_match('/^(\w+)\/?/', self::controller(), $match) &&
@@ -148,7 +147,7 @@ class System
 
                     $module_object->init($module_action, $module_params, $module_main);
 
-                    if ($module_main && self::is_ajax()) {
+                    if ($module_main && self::isAjax()) {
                         die($module_object->get_content());
                     }
 
@@ -157,11 +156,11 @@ class System
                         $layout_view->assign($module_object->get_output());
                     }
                 } catch (\AlarmException $e) {
-                    $error_content = self::exception_handler($e, true, $is_admin);
+                    $error_content = self::exceptionHandler($e, true, $is_admin);
 
                     $layout_view->assign($block['area_name'], $error_content);
                 } catch (\Exception $e) {
-                    self::exception_handler($e, false, $is_admin);
+                    self::exceptionHandler($e, false, $is_admin);
                 }
             }
         }
@@ -169,7 +168,7 @@ class System
         $layout_view->display(self::$page['page_layout']);
     }
 
-    public static function get_routes()
+    public static function getRoutes()
     {
         if (!is_null(self::$routes)) {
             return self::$routes;
@@ -238,10 +237,10 @@ class System
         return self::$routes;
     }
 
-    public static function url_for($url_array = array(), $url_host = '')
+    public static function urlFor($url_array = array(), $url_host = '')
     {
         if (!is_array($url_array) || count($url_array) == 0) {
-            return $_SERVER['REQUEST_URI'];
+            return Url::selfUrl();
         }
 
         if (!isset($url_array['action'])) {
@@ -251,7 +250,7 @@ class System
             $url_array['controller'] = self::controller();
         }
 
-        $routes = self::get_routes();
+        $routes = self::getRoutes();
 
         $most_match_rule = '';
         $most_match_count = 0;
@@ -283,7 +282,7 @@ class System
             $url = preg_replace('/@' . $route_param_name . '/', $url_array[$route_param_name], $url);
         }
 
-        $query_string = http_build_query(prepare_query($url_array, array_keys($routes[$most_match_rule]['params'])));
+        $query_string = http_build_query(Url::prepareQuery($url_array, array_keys($routes[$most_match_rule]['params'])));
 
         $url = $url_host . '/' . trim($url, '/') . ($query_string ? '?' . $query_string : '');
 
@@ -419,7 +418,7 @@ class System
     }
 
     // Обработка исключений в зависимости от типа и среды
-    public static function exception_handler($e, $return = false, $admin = false)
+    public static function exceptionHandler($e, $return = false, $admin = false)
     {
         $error_view = new View();
         $error_plug = $error_view->fetch('block/error');
@@ -458,7 +457,7 @@ class System
         die($error_content);
     }
 
-    public static function set_cache_mode()
+    public static function setCacheMode()
     {
         if (!isset($_SESSION['_cache_mode'])) {
             $_SESSION['_cache_mode'] = CACHE_SITE;
@@ -466,23 +465,32 @@ class System
 
         if (isset($_REQUEST['cache_on'])) {
             $_SESSION['_cache_mode'] = true;
-            redirect_to(request_url(array(), array('cache_on')));
+            Url::redirectTo(Url::requestUrl(array(), array('cache_on')));
         }
 
         if (isset($_REQUEST['cache_off'])) {
             $_SESSION['_cache_mode'] = false;
-            redirect_to(request_url(array(), array('cache_off')));
+            Url::redirectTo(Url::requestUrl(array(), array('cache_off')));
         }
 
         if (isset($_REQUEST['cache_clear'])) {
             Cache::clear();
-            redirect_to(request_url(array(), array('cache_clear')));
+            Url::redirectTo(Url::requestUrl(array(), array('cache_clear')));
         }
 
         self::$cache_mode = $_SESSION['_cache_mode'];
     }
 
-    public static function get_param($param_name, $param_value = null)
+    public static function notFound()
+    {
+        header('HTTP/1.0 404 Not Found');
+
+        print View::block('404');
+
+        exit;
+    }
+    
+    public static function getParam($param_name, $param_value = null)
     {
         if (isset(self::$params[$param_name])) {
             return self::$params[$param_name];
@@ -493,25 +501,25 @@ class System
 
     public static function controller()
     {
-        return self::get_param('controller');
+        return self::getParam('controller');
     }
 
     public static function action()
     {
-        return self::get_param('action', 'index');
+        return self::getParam('action', 'index');
     }
 
     public static function id()
     {
-        return self::get_param('id', '');
+        return self::getParam('id', '');
     }
 
     public static function object()
     {
-        return self::get_param('object');
+        return self::getParam('object');
     }
 
-    public static function is_cache()
+    public static function isCache()
     {
         return self::$cache_mode;
     }
@@ -521,7 +529,7 @@ class System
         return self::$lang;
     }
 
-    public static function lang_list()
+    public static function langList()
     {
         return self::$lang_list;
     }
@@ -536,7 +544,7 @@ class System
         return self::$site;
     }
 
-    public static function is_ajax()
+    public static function isAjax()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
     }

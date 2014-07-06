@@ -99,11 +99,11 @@ class BlockTable extends BuilderTable
         $this->view->assign('action_title', $action_title);
         $this->view->assign('fields', $form_fields);
         
-        $form_url = System::url_for(array('object' => $this->object, 'action' => 'param_save', 'id' => $record[$this->primary_field]));
+        $form_url = System::urlFor(array('object' => $this->object, 'action' => 'param_save', 'id' => $record[$this->primary_field]));
         $this->view->assign('form_url', $form_url);
         
         $prev_url = $this->restore_state();
-        $this->view->assign('back_url', System::url_for($prev_url));
+        $this->view->assign('back_url', System::urlFor($prev_url));
         
         $this->content = $this->view->fetch('/admin/form');
         $this->output['meta_title'] .= ' :: ' . $record_title . ' :: ' . $action_title;
@@ -232,9 +232,9 @@ class BlockTable extends BuilderTable
         $actions = parent::get_record_actions($record);
         
         $actions['property'] = array('title' => 'Параметры', 'url' =>
-            System::url_for(array('object' => $this->object, 'action' => 'param', 'id' => $record[$this->primary_field])));
+            System::urlFor(array('object' => $this->object, 'action' => 'param', 'id' => $record[$this->primary_field])));
         $actions['multiply'] = array('title' => 'Размножить блок', 'url' =>
-            System::url_for(array('object' => $this->object, 'action' => 'multiply', 'id' => $record[$this->primary_field])),
+            System::urlFor(array('object' => $this->object, 'action' => 'multiply', 'id' => $record[$this->primary_field])),
                 'event' => array('method' => 'onclick', 'value' => 'return confirm(\'Вы действительно хотите размножить этот блок?\')'));
         
         return $actions;

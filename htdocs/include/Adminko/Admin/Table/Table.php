@@ -6,6 +6,7 @@ use Adminko\Metadata;
 use Adminko\Paginator;
 use Adminko\View;
 use Adminko\Upload;
+use Adminko\Url;
 use Adminko\Admin\Admin;
 use Adminko\Field\Field;
 use Adminko\Db\Db;
@@ -167,7 +168,7 @@ class Table extends Admin
             $records_header[$show_field] = $secondary_object->fields[$show_field];
             $field_sort_order = $show_field == $secondary_object->sort_field && $secondary_object->sort_order == 'asc' ? 'desc' : 'asc';
             $records_header[$show_field]['sort_url'] =
-                request_url(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
+                Url::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
             if ($show_field == $secondary_object->sort_field)
                 $records_header[$show_field]['sort_sign'] = $field_sort_order == 'asc' ? 'desc' : 'asc';
         }
@@ -244,9 +245,9 @@ class Table extends Admin
         
         $this->view->assign('mode', 'form');
         
-        $this->view->assign('back_url', System::url_for($this->restore_state()));
+        $this->view->assign('back_url', System::urlFor($this->restore_state()));
         
-        $form_url = System::url_for(array('object' => $this->object, 'action' => 'relation_save',
+        $form_url = System::urlFor(array('object' => $this->object, 'action' => 'relation_save',
             'relation' => $relation_name, 'id' => $primary_record[$this->primary_field]));
         $this->view->assign('form_url', $form_url);
         
@@ -723,7 +724,7 @@ class Table extends Admin
         
         if ($this->is_action_allow('add'))
             $actions['add'] = array('title' => 'Добавить', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'add')));
+                System::urlFor(array('object' => $this->object, 'action' => 'add')));
         
         return $actions;
     }
@@ -742,7 +743,7 @@ class Table extends Admin
             $records_header[$show_field] = $this->fields[$show_field];
             $field_sort_order = $show_field == $this->sort_field && $this->sort_order == 'asc' ? 'desc' : 'asc';
             $records_header[$show_field]['sort_url'] =
-                request_url(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
+                Url::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
             if ($show_field == $this->sort_field)
                 $records_header[$show_field]['sort_sign'] = $field_sort_order == 'asc' ? 'desc' : 'asc';
         }
@@ -771,39 +772,39 @@ class Table extends Admin
         
         if ($this->parent_field && $this->is_action_allow('add'))
             $actions['add'] = array('title' => 'Добавить', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'add',
+                System::urlFor(array('object' => $this->object, 'action' => 'add',
                     'id' => $record[$this->primary_field])));
         if ($this->is_action_allow('edit'))
             $actions['edit'] = array('title' => 'Редактировать', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'edit',
+                System::urlFor(array('object' => $this->object, 'action' => 'edit',
                     'id' => $record[$this->primary_field])));
         if ($this->is_action_allow('add'))
             $actions['copy'] = array('title' => 'Копировать', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'copy',
+                System::urlFor(array('object' => $this->object, 'action' => 'copy',
                     'id' => $record[$this->primary_field])));
         if ($this->order_field && $this->is_action_allow('edit'))
         {
             $actions['move_down'] = array('title' => 'Опустить вниз', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'move', 'dir' => 1, 
+                System::urlFor(array('object' => $this->object, 'action' => 'move', 'dir' => 1, 
                     'id' => $record[$this->primary_field])));
             $actions['move_up'] = array('title' => 'Поднять наверх', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'move', 'dir' => 0,
+                System::urlFor(array('object' => $this->object, 'action' => 'move', 'dir' => 0,
                     'id' => $record[$this->primary_field])));
         }
         if ($this->active_field && $this->is_action_allow('edit'))
         {
             if (!$record[$this->active_field])
                 $actions['show'] = array('title' => 'Показать', 'url' =>
-                    System::url_for(array('object' => $this->object, 'action' => 'show',
+                    System::urlFor(array('object' => $this->object, 'action' => 'show',
                         'id' => $record[$this->primary_field])));
             else
                 $actions['hide'] = array('title' => 'Скрыть', 'url' =>
-                    System::url_for(array('object' => $this->object, 'action' => 'hide',
+                    System::urlFor(array('object' => $this->object, 'action' => 'hide',
                         'id' => $record[$this->primary_field])));
         }
         if ($this->is_action_allow('delete'))
             $actions['delete'] = array('title' => 'Удалить', 'url' =>
-                System::url_for(array('object' => $this->object, 'action' => 'delete',
+                System::urlFor(array('object' => $this->object, 'action' => 'delete',
                     'id' => $record[$this->primary_field])),
                 'event' => array('method' => 'onclick', 'value' => 'return confirm(\'Вы действительно хотите удалить эту запись?\')'));
         
@@ -838,7 +839,7 @@ class Table extends Admin
             if (!$show_link) continue;
             
             $links[$link_name] = array('title' => 'Перейти',
-                'url' => System::url_for(array('object' => $link_desc['table'], $link_desc['field'] => $record[$this->primary_field])));
+                'url' => System::urlFor(array('object' => $link_desc['table'], $link_desc['field'] => $record[$this->primary_field])));
         }
         
         return $links;
@@ -852,7 +853,7 @@ class Table extends Admin
         $relations = array();
         foreach ($this->relations as $relation_name => $relation_desc)
             $relations[$relation_name] = array('title' => 'Перейти',
-                'url' => System::url_for(array('object' => $this->object, 'action' => 'relation', 'relation' => $relation_name,
+                'url' => System::urlFor(array('object' => $this->object, 'action' => 'relation', 'relation' => $relation_name,
                     'id' => $record[$this->primary_field])));
         
         return $relations;
@@ -883,9 +884,9 @@ class Table extends Admin
         $view = new View();
         
         $view->assign('fields', $search_fields);
-        $view->assign('form_url', self_url());
+        $view->assign('form_url', Url::selfUrl());
         
-        $hidden_fields = prepare_query($_GET, array_merge(array_keys($search_fields), array('page')));
+        $hidden_fields = Url::prepareQuery($_GET, array_merge(array_keys($search_fields), array('page')));
         $view->assign('hidden', $hidden_fields);
         
         return $view->fetch('admin/filter');
@@ -1096,13 +1097,13 @@ class Table extends Admin
         $this->view->assign('action_title', $action_title);
         $this->view->assign('fields', $form_fields);
         
-        $form_url = System::url_for(array_merge(array('object' => $this->object, 'action' => $action . '_save'),
+        $form_url = System::urlFor(array_merge(array('object' => $this->object, 'action' => $action . '_save'),
             $action != 'add' ? array('id' => $record[$this->primary_field]) : array()));
         $this->view->assign('form_url', $form_url);
         
         $this->view->assign('scripts', $this->get_card_scripts($action, $action == 'edit' ? $record : null));
         
-        $this->view->assign('back_url', System::url_for($prev_url));
+        $this->view->assign('back_url', System::urlFor($prev_url));
         
         $this->content = $this->view->fetch('admin/form');
         $this->output['meta_title'] .= ($record_title ? ' :: ' . $record_title : '') . ' :: ' . $action_title;

@@ -45,7 +45,7 @@ class NewsModule extends Module
         try {
             $item = Model::factory('news')->get(System::id());
         } catch (\AlarmException $e) {
-            not_found();
+            System::notFound();
         }
         
         $this->view->assign($item);

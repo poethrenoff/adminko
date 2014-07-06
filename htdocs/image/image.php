@@ -1,4 +1,6 @@
 <?php
+use Adminko\System;
+
 include_once dirname(dirname(__FILE__)) . '/config/config.php';
 
 try {
@@ -9,7 +11,7 @@ try {
 
     $source_image = str_replace(UPLOAD_ALIAS, UPLOAD_DIR, $url);
     if (!file_exists($source_image)) {
-        not_found();
+        System::notFound();
     }
 
     $path_parts = pathinfo($source_image);
@@ -26,16 +28,19 @@ try {
 
     switch ($image_type) {
         case 1:
-            header("Content-type: image/gif"); break;
+            header("Content-type: image/gif");
+            break;
         case 2:
-            header("Content-type: image/jpeg"); break;
+            header("Content-type: image/jpeg");
+            break;
         case 3:
-            header("Content-type: image/png"); break;
+            header("Content-type: image/png");
+            break;
         default:
-            not_found();
+            System::notFound();
     }
-    
+
     readfile($dest_image);
 } catch (Exception $e) {
-    not_found();
+    System::notFound();
 }
