@@ -1016,13 +1016,16 @@ class Table extends Admin
             $form_fields[$field_name] = $field_desc;
             
             if ($action == 'edit' || $action == 'copy') {
-                if (isset($field_desc['translate']) && $field_desc['translate'])
-                    foreach ($record[$field_name] as $record_lang => $record_value)
+                if (isset($field_desc['translate']) && $field_desc['translate']) {
+                    foreach ($record[$field_name] as $record_lang => $record_value) {
                         $form_fields[$field_name]['value'][$record_lang] =
                             Field::factory($field_desc['type'])->set($record_value)->form();
-                else
+                    }
+                    reset($record[$field_name]);
+                } else {
                     $form_fields[$field_name]['value'] =
                         Field::factory($field_desc['type'])->set($record[$field_name])->form();
+                }
             }
             
             if ($action == 'add')
@@ -1071,8 +1074,6 @@ class Table extends Admin
         if (count($form_fields) == 0)
             throw new \AlarmException('Ошибка. Нет полей, доступных для изменения.');
         
-        if (is_array($record[$this->main_field]))
-            reset($record[$this->main_field]);
         $record_title = ($action != 'add') ? Field::factory($this->fields[$this->main_field]['type'])
             ->set(is_array($record[$this->main_field]) ? current($record[$this->main_field]) : $record[$this->main_field])->view() : '';
         

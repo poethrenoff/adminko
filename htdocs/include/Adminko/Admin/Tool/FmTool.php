@@ -1,4 +1,5 @@
 <?php
+
 namespace Adminko\Admin\Tool;
 
 use Adminko\System;
@@ -12,10 +13,6 @@ class FmTool extends Admin
     protected $upload_path = '/upload/';
 
     protected $records_per_page = 20;
-
-    protected $sort_field = 'name';
-
-    protected $sort_order = 'asc';
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,12 +36,12 @@ class FmTool extends Admin
         }
 
         $sort_field = init_string('sort_field');
-        $sort_order = init_string('sort_order');
-        if ($sort_field && in_array($sort_field, array('id', 'name', 'size', 'date'))) {
-            $this->sort_field = $sort_field;
+        if (!in_array($sort_field, array('id', 'name', 'size', 'date'))) {
+            $sort_field = 'name';
         }
-        if ($sort_order && in_array($sort_order, array('asc', 'desc'))) {
-            $this->sort_order = $sort_order;
+        $sort_order = init_string('sort_order');
+        if (!in_array($sort_order, array('asc', 'desc'))) {
+            $sort_order = 'asc';
         }
 
         $records_header['id'] = array('title' => 'ID');
@@ -54,9 +51,9 @@ class FmTool extends Admin
         $records_header['_action'] = array('title' => 'Действия');
 
         foreach (array('id', 'name', 'size', 'date') as $show_field) {
-            $field_sort_order = $show_field == $this->sort_field && $this->sort_order == 'asc' ? 'desc' : 'asc';
+            $field_sort_order = $show_field == $sort_field && $sort_order == 'asc' ? 'desc' : 'asc';
             $records_header[$show_field]['sort_url'] = Url::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
-            if ($show_field == $this->sort_field) {
+            if ($show_field == $sort_field) {
                 $records_header[$show_field]['sort_sign'] = $field_sort_order == 'asc' ? 'desc' : 'asc';
             }
         }
@@ -76,7 +73,14 @@ class FmTool extends Admin
             $file_list[$file_index]['id'] = $file_index + 1;
         }
 
-        usort($file_list, array($this, 'sort_file_list'));
+        usort($file_list, function($a, $b) use ($sort_field, $sort_order) {
+            if ($sort_field == 'size') {
+                $result = strnatcmp($a[$sort_field], $b[$sort_field]);
+            } else {
+                $result = strcmp($a[$sort_field], $b[$sort_field]);
+            }
+            return (($sort_order == 'asc') ? 1 : -1) * $result;
+        });
 
         $records_count = count($file_list);
 
@@ -85,7 +89,7 @@ class FmTool extends Admin
         foreach ($file_list as $file_index => $file_item) {
             if ($file_index >= $pages['current_page'] * $this->records_per_page &&
                     $file_index < ( $pages['current_page'] + 1 ) * $this->records_per_page) {
-                $file_list[$file_index]['name'] = '<a href="' . $this->upload_path . $file_item['name'] . '">' . $file_item['name'] . '</a>';
+                $file_list[$file_index]['name'] = '<a href="' . $this->upload_path . urlencode($file_item['name']) . '">' . $file_item['name'] . '</a>';
                 $file_list[$file_index]['date'] = str_replace(' ', '&nbsp;', date('d.m.Y H:i', $file_item['date']));
                 $file_list[$file_index]['_action'] = array('delete' => array('title' => 'Удалить', 'url' =>
                         System::urlFor(array('object' => 'fm', 'action' => 'delete', 'file' => urlencode($file_item['name']))),
@@ -96,7 +100,7 @@ class FmTool extends Admin
         }
 
         $actions = array('add' => array('title' => 'Закачать файл', 'url' =>
-                System::urlFor(array('object' => $this->object, 'action' => 'upload'))));
+            System::urlFor(array('object' => $this->object, 'action' => 'upload'))));
 
         $this->view->assign('title', $this->object_desc['title']);
         $this->view->assign('actions', $actions);
@@ -113,15 +117,17 @@ class FmTool extends Admin
 
     protected function action_delete()
     {
-        $file = init_string('file');
+        $file = urldecode(init_string('file'));
 
         $real_file_path = $this->get_upload_path() . $file;
-
-        if ($real_file_path != realpath($real_file_path))
+        
+        if ($real_file_path != realpath($real_file_path)) {
             throw new \AlarmException('Ошибка. Недопустимое имя файла "' . $real_file_path . '".');
+        }
 
-        if (!file_exists($real_file_path) || !is_file($real_file_path))
+        if (!file_exists($real_file_path) || !is_file($real_file_path)) {
             throw new \AlarmException('Ошибка. Файл "' . $real_file_path . '" не существует.');
+        }
 
         @unlink($real_file_path);
 
@@ -179,15 +185,5 @@ class FmTool extends Admin
         }
 
         die('<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "' . $upload->get_file_link(true) . '", "");</script>');
-    }
-
-    private function sort_file_list($a, $b)
-    {
-        if ($this->sort_field == 'size') {
-            $result = strnatcmp($a[$this->sort_field], $b[$this->sort_field]);
-        } else {
-            $result = strcmp($a[$this->sort_field], $b[$this->sort_field]);
-        }
-        return ( ( $this->sort_order == 'asc' ) ? 1 : -1 ) * $result;
     }
 }
