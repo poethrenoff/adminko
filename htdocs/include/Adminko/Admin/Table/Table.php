@@ -1070,8 +1070,10 @@ class Table extends Admin
         if (count($form_fields) == 0)
             throw new \AlarmException('Ошибка. Нет полей, доступных для изменения.');
         
+        if (is_array($record[$this->main_field]))
+            reset($record[$this->main_field]);
         $record_title = ($action != 'add') ? Field::factory($this->fields[$this->main_field]['type'])
-            ->set($record[$this->main_field])->view() : '';
+            ->set(is_array($record[$this->main_field]) ? current($record[$this->main_field]) : $record[$this->main_field])->view() : '';
         
         switch ($action)
         {
