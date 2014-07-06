@@ -789,9 +789,10 @@ class Upload
      * @access    public
      * @return    string
      */
-    function get_file_link()
+    function get_file_link($absolute_url = false)
     {
-        return str_replace(normalize_path(UPLOAD_DIR), UPLOAD_ALIAS, $this->get_file_path());
+        return ($absolute_url ? ('http://' . filter_input(INPUT_SERVER, 'HTTP_HOST')) : '') .
+            str_replace( normalize_path( UPLOAD_DIR ), UPLOAD_ALIAS, $this -> get_file_path() );
     }
     
     // --------------------------------------------------------------------

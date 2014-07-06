@@ -173,7 +173,7 @@ class FmTool extends Admin
         else
             die( '<script type="text/javascript">alert( "Ошибка! Отсутствует файл для закачки." ); window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "", "");</script>' );
         
-        die( '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "' . $upload -> get_file_link() . '", "");</script>' );
+        die( '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "' . $upload -> get_file_link(true) . '", "");</script>' );
     }
     
     private function sort_file_list( $a, $b )
