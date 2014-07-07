@@ -8,16 +8,16 @@ use Adminko\Model\Model;
 class NewsModule extends Module
 {
     // Вывод полного списка новостей
-    protected function action_index()
+    protected function actionIndex()
     {
         $model_news = Model::factory('news');
         
-        $total = $model_news->get_count();
-        $count = max(1, intval($this->get_param('count')));
+        $total = $model_news->getCount();
+        $count = max(1, intval($this->getParam('count')));
         
-        $pages = Paginator::construct($total, array('by_page' => $count));
+        $pages = Paginator::create($total, array('by_page' => $count));
         
-        $item_list = $model_news->get_list(array(), array('news_date' => 'desc'), $pages['by_page'], $pages['offset']);
+        $item_list = $model_news->getList(array(), array('news_date' => 'desc'), $pages['by_page'], $pages['offset']);
         
         $this->view->assign('item_list', $item_list);
         $this->view->assign('pages', Paginator::fetch($pages));
@@ -26,13 +26,13 @@ class NewsModule extends Module
     }
     
     // Вывод краткого списка новостей
-    protected function action_preview()
+    protected function actionPreview()
     {
         $model_news = Model::factory('news');
         
-        $count = max(1, intval($this->get_param('count')));
+        $count = max(1, intval($this->getParam('count')));
         
-        $item_list = $model_news->get_list(array(), array(), $count);
+        $item_list = $model_news->getList(array(), array(), $count);
         
         $this->view->assign('item_list', $item_list);
         
@@ -40,7 +40,7 @@ class NewsModule extends Module
     }
     
     // Вывод конкретной новости
-    protected function action_item()
+    protected function actionItem()
     {
         try {
             $item = Model::factory('news')->get(System::id());
@@ -49,16 +49,16 @@ class NewsModule extends Module
         }
         
         $this->view->assign($item);
-        $this->output['meta_title'] = $item->get_news_title();
+        $this->output['meta_title'] = $item->getNewsTitle();
         $this->content = $this->view->fetch('module/news/item');
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
     // Дополнительные параметры хэша модуля
-    protected function ext_cache_key()
+    protected function extCacheKey()
     {
-        return parent::ext_cache_key() +
+        return parent::extCacheKey() +
             ($this->action == 'item' ? array('_id' => System::id()) : array());
     }
 }

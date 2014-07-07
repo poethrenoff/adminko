@@ -71,7 +71,7 @@ class System
         $routes = self::getRoutes();
 
         self::$page = null;
-        $url = '/' . trim(Url::selfUrl(), '/');
+        $url = '/' . trim(self::selfUrl(), '/');
 
         $page_list = array_reindex(self::$site['page'], 'page_path');
 
@@ -102,7 +102,7 @@ class System
 
         if (isset(self::$page['page_redirect'])) {
             if (self::action() == 'index') {
-                Url::redirectTo(self::$page['page_redirect']);
+                self::redirectTo(self::$page['page_redirect']);
             } else {
                 self::notFound();
             }
@@ -148,12 +148,12 @@ class System
                     $module_object->init($module_action, $module_params, $module_main);
 
                     if ($module_main && self::isAjax()) {
-                        die($module_object->get_content());
+                        die($module_object->getContent());
                     }
 
-                    $layout_view->assign($block['area_name'], $module_object->get_content());
+                    $layout_view->assign($block['area_name'], $module_object->getContent());
                     if ($module_main) {
-                        $layout_view->assign($module_object->get_output());
+                        $layout_view->assign($module_object->getOutput());
                     }
                 } catch (\AlarmException $e) {
                     $error_content = self::exceptionHandler($e, true, $is_admin);
@@ -240,7 +240,7 @@ class System
     public static function urlFor($url_array = array(), $url_host = '')
     {
         if (!is_array($url_array) || count($url_array) == 0) {
-            return Url::selfUrl();
+            return self::selfUrl();
         }
 
         if (!isset($url_array['action'])) {
@@ -282,11 +282,63 @@ class System
             $url = preg_replace('/@' . $route_param_name . '/', $url_array[$route_param_name], $url);
         }
 
-        $query_string = http_build_query(Url::prepareQuery($url_array, array_keys($routes[$most_match_rule]['params'])));
+        $query_string = http_build_query(self::prepareQuery($url_array, array_keys($routes[$most_match_rule]['params'])));
 
         $url = $url_host . '/' . trim($url, '/') . ($query_string ? '?' . $query_string : '');
 
         return $url;
+    }
+    
+    public static function prepareQuery($include = array(), $exclude = array())
+    {
+        foreach ($include as $var_name => $var_value) {
+            if (in_array($var_name, $exclude) || is_empty($var_value)) {
+                unset($include[$var_name]);
+            }
+        }
+
+        return $include;
+    }
+    
+    public static function selfUrl($include = array(), $exclude = array())
+    {
+        $self_url = preg_replace('/\?.*$/', '', filter_input(INPUT_SERVER, 'REQUEST_URI'));
+
+        $query_string = http_build_query(self::prepareQuery($include, $exclude));
+
+        return $self_url . ($query_string ? '?' . $query_string : '');
+    }
+
+    public static function requestUrl($include = array(), $exclude = array())
+    {
+        return self::selfUrl(array_merge($_GET, $include), $exclude);
+    }
+    
+    public static function redirectTo($url_array = array())
+    {
+        if (!is_array($url_array)) {
+            $location = $url_array;
+        } else {
+            $location = self::urlFor($url_array);
+        }
+
+        header('Location: ' . $location);
+
+        exit;
+    }
+    
+    public static function redirectBack()
+    {
+        $back_url = '/';
+        
+        $http_host = filter_input(INPUT_SERVER, 'HTTP_REFERER');
+        $http_refferer = filter_input(INPUT_SERVER, 'HTTP_REFERER');
+
+        if (!is_null($http_refferer) && strstr($http_refferer, $http_host)) {
+            $back_url = $http_refferer;
+        }
+
+        self::redirectTo($back_url);
     }
 
     public static function build()
@@ -465,17 +517,17 @@ class System
 
         if (isset($_REQUEST['cache_on'])) {
             $_SESSION['_cache_mode'] = true;
-            Url::redirectTo(Url::requestUrl(array(), array('cache_on')));
+            self::redirectTo(self::requestUrl(array(), array('cache_on')));
         }
 
         if (isset($_REQUEST['cache_off'])) {
             $_SESSION['_cache_mode'] = false;
-            Url::redirectTo(Url::requestUrl(array(), array('cache_off')));
+            self::redirectTo(self::requestUrl(array(), array('cache_off')));
         }
 
         if (isset($_REQUEST['cache_clear'])) {
             Cache::clear();
-            Url::redirectTo(Url::requestUrl(array(), array('cache_clear')));
+            self::redirectTo(self::requestUrl(array(), array('cache_clear')));
         }
 
         self::$cache_mode = $_SESSION['_cache_mode'];

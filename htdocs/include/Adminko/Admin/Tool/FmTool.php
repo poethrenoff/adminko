@@ -1,11 +1,9 @@
 <?php
-
 namespace Adminko\Admin\Tool;
 
 use Adminko\System;
 use Adminko\Paginator;
 use Adminko\Upload;
-use Adminko\Url;
 use Adminko\Admin\Admin;
 
 class FmTool extends Admin
@@ -16,14 +14,14 @@ class FmTool extends Admin
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public function get_upload_path()
+    public function getUploadPath()
     {
         return realpath(filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . $this->upload_path) . DIRECTORY_SEPARATOR;
     }
 
-    protected function action_index()
+    protected function actionIndex()
     {
-        $real_upload_path = $this->get_upload_path();
+        $real_upload_path = $this->getUploadPath();
 
         if (!file_exists($real_upload_path)) {
             if (!( @mkdir($real_upload_path, 0777, true) )) {
@@ -52,7 +50,7 @@ class FmTool extends Admin
 
         foreach (array('id', 'name', 'size', 'date') as $show_field) {
             $field_sort_order = $show_field == $sort_field && $sort_order == 'asc' ? 'desc' : 'asc';
-            $records_header[$show_field]['sort_url'] = Url::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
+            $records_header[$show_field]['sort_url'] = System::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
             if ($show_field == $sort_field) {
                 $records_header[$show_field]['sort_sign'] = $field_sort_order == 'asc' ? 'desc' : 'asc';
             }
@@ -84,7 +82,7 @@ class FmTool extends Admin
 
         $records_count = count($file_list);
 
-        $pages = Paginator::construct($records_count, array('by_page' => $this->records_per_page));
+        $pages = Paginator::create($records_count, array('by_page' => $this->records_per_page));
 
         foreach ($file_list as $file_index => $file_item) {
             if ($file_index >= $pages['current_page'] * $this->records_per_page &&
@@ -112,14 +110,14 @@ class FmTool extends Admin
 
         $this->content = $this->view->fetch('admin/table');
 
-        $this->store_state();
+        $this->storeState();
     }
 
-    protected function action_delete()
+    protected function actionDelete()
     {
         $file = urldecode(init_string('file'));
 
-        $real_file_path = $this->get_upload_path() . $file;
+        $real_file_path = $this->getUploadPath() . $file;
         
         if ($real_file_path != realpath($real_file_path)) {
             throw new \AlarmException('Ошибка. Недопустимое имя файла "' . $real_file_path . '".');
@@ -138,7 +136,7 @@ class FmTool extends Admin
         $this->redirect();
     }
 
-    protected function action_upload()
+    protected function actionUpload()
     {
         $action_title = 'Закачка файла';
         $form_url = System::urlFor(array('object' => 'fm', 'action' => 'upload_save'));
@@ -147,13 +145,13 @@ class FmTool extends Admin
         $this->view->assign('action_title', $action_title);
         $this->view->assign('form_url', $form_url);
 
-        $this->view->assign('back_url', System::urlFor($this->restore_state()));
+        $this->view->assign('back_url', System::urlFor($this->restoreState()));
 
         $this->content = $this->view->fetch('admin/fm/upload');
         $this->output['meta_title'] .= ' :: ' . $action_title;
     }
 
-    protected function action_upload_save()
+    protected function actionUploadSave()
     {
         $field_name = 'file';
 
@@ -170,7 +168,7 @@ class FmTool extends Admin
         $this->redirect();
     }
 
-    protected function action_upload_file()
+    protected function actionUploadFile()
     {
         $CKEditorFuncNum = intval(init_string('CKEditorFuncNum'));
 
@@ -184,6 +182,6 @@ class FmTool extends Admin
             die('<script type="text/javascript">alert( "Ошибка! Отсутствует файл для закачки." ); window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "", "");</script>');
         }
 
-        die('<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "' . $upload->get_file_link(true) . '", "");</script>');
+        die('<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "' . $upload->getFileLink(true) . '", "");</script>');
     }
 }

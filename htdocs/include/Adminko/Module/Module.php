@@ -20,11 +20,13 @@ abstract class Module extends \Adminko\Object
     // Создание объекта модуля
     public static final function factory($object)
     {
-        $class_name = __NAMESPACE__ . '\\' . ucfirst($object) . 'Module';
+        $class_namespace = 'Module';
+        $class_name = __NAMESPACE__ . '\\' . to_class_name($object) . $class_namespace;
         
-        if (!class_exists($class_name))
+        if (!class_exists($class_name)) {
             throw new \Exception('Ошибка. Класс "' . $class_name . '" не найден.');
-        
+        }
+
         return new $class_name($object);
     }
     
@@ -33,25 +35,25 @@ abstract class Module extends \Adminko\Object
     {
         $this->view = new View();
         
-        foreach ($params as $param_name => $param_value)
+        foreach ($params as $param_name => $param_value) {
             $this->params[$param_name] = $param_value;
-        
+        }
+
         $this->action = $action;
         $this->is_main = $is_main;
         
-        $action_name = 'action_' . $action;
+        $action_name = 'action' . to_class_name($action);
         
         if (!method_exists($this, $action_name))
         {
-            if (!$is_main)
+            if (!$is_main) {
                 throw new \AlarmException('Ошибка. Метод "' . $action_name . '" не найден.');
-            else
+            } else {
                 System::notFound();
-            
-            return;
+            }
         }
         
-        $cache_key = $this->get_cache_key();
+        $cache_key = $this->getCacheKey();
         
         if (!$cache_key || ($cache_values = cache::get($cache_key)) === false)
         {
@@ -71,10 +73,10 @@ abstract class Module extends \Adminko\Object
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
     // У модуля обязательно должно быть действие по умолчанию
-    protected abstract function action_index();
+    protected abstract function actionIndex();
     
     // Возврашает значение параметра по его имени 
-    protected function get_param($varname, $vardef = '')
+    protected function getParam($varname, $vardef = '')
     {
         if (isset($this->params[$varname]))
             return $this->params[$varname];
@@ -83,7 +85,7 @@ abstract class Module extends \Adminko\Object
     }
     
     // Вычисляет хэш параметров модуля
-    protected function get_cache_key()
+    protected function getCacheKey()
     {
         if (!System::isCache()) return false;
         
@@ -98,7 +100,7 @@ abstract class Module extends \Adminko\Object
         parse_str($_SERVER['QUERY_STRING'], $query_string);
         $cache_key += $query_string;
         
-        $cache_key += $this->ext_cache_key();
+        $cache_key += $this->extCacheKey();
         
         $cache_key = serialize($cache_key);
         
@@ -106,7 +108,7 @@ abstract class Module extends \Adminko\Object
     }
     
     // Дополнительные параметры хэша модуля
-    protected function ext_cache_key()
+    protected function extCacheKey()
     {
         return array();
     }

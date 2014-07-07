@@ -295,7 +295,7 @@ class Image {
      *
      * @return  string
      */
-    public function get_file_path() {
+    public function getFilePath() {
         return normalize_path($this->dest_image);
     }
     
@@ -304,7 +304,7 @@ class Image {
      *
      * @return  string
      */
-    public function get_file_link() {
-        return str_replace( normalize_path( UPLOAD_DIR ), UPLOAD_ALIAS, $this -> get_file_path() );
+    public function getFileLink() {
+        return str_replace( normalize_path( UPLOAD_DIR ), UPLOAD_ALIAS, $this -> getFilePath() );
     }
 }

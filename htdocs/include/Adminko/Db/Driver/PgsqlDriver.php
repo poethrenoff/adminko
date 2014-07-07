@@ -11,7 +11,7 @@ class PgsqlDriver extends Driver
             $db_user, $db_password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
     }
     
-    public function last_insert_id($sequence = null)
+    public function lastInsertId($sequence = null)
     {
         if (is_null($sequence)) {
             return $this->select_cell("select lastval()");

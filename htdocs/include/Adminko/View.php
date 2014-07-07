@@ -116,9 +116,9 @@ class View
      * @param  $data string
      * @return bool
      */
-    public function in_request($name, $data = null)
+    public function inRequest($name, $data = null)
     {
-        $isset = !is_null($value = $this->from_request($name));
+        $isset = !is_null($value = $this->fromRequest($name));
         
         return (is_null($data) || !$isset) ? $isset : ($value == $data);
     }
@@ -135,7 +135,7 @@ class View
      * @param  $data string
      * @return bool
      */
-    public function from_request($name, $data = null)
+    public function fromRequest($name, $data = null)
     {
         $path = array();
         if (preg_match('/^(.+)\[(.+)\]$/U', $name, $match)) {

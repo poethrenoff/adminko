@@ -55,13 +55,13 @@ class Captcha
     );
 
     /** Wave configuracion in X and Y axes */
-    public $Yperiod = 10;
+    public $yPeriod = 10;
 
-    public $Yamplitude = 1;
+    public $yAmplitude = 1;
 
-    public $Xperiod = 10;
+    public $xPeriod = 10;
 
-    public $Xamplitude = 1;
+    public $xAmplitude = 1;
 
     /** letter rotation clockwise */
     public $maxRotation = 8;
@@ -96,7 +96,7 @@ class Captcha
     public static function create()
     {
         $captcha = new Captcha();
-        $captcha->CreateImage();
+        $captcha->createImage();
     }
 
     /**
@@ -113,27 +113,27 @@ class Captcha
     /**
      * Creates the image
      */
-    public function CreateImage()
+    public function createImage()
     {
         $ini = microtime(true);
 
         /** Initialization */
-        $this->ImageAllocate();
+        $this->imageAllocate();
 
         /** Text insertion */
-        $text = $this->GetCaptchaText();
+        $text = $this->getCaptchaText();
 
         $fontcfg = $this->fonts[array_rand($this->fonts)];
-        $this->WriteText($text, $fontcfg);
+        $this->writeText($text, $fontcfg);
 
         $_SESSION[self::$session_var] = $text;
 
         /** Transformations */
-        $this->WaveImage();
+        $this->waveImage();
         if ($this->blur) {
             imagefilter($this->im, IMG_FILTER_GAUSSIAN_BLUR);
         }
-        $this->ReduceImage();
+        $this->reduceImage();
 
 
         if ($this->debug) {
@@ -142,14 +142,14 @@ class Captcha
         }
 
         /** Output */
-        $this->WriteImage();
-        $this->Cleanup();
+        $this->writeImage();
+        $this->cleanUp();
     }
 
     /**
      * Creates the image resources
      */
-    protected function ImageAllocate()
+    protected function imageAllocate()
     {
         // Cleanup
         if (!empty($this->im)) {
@@ -179,7 +179,7 @@ class Captcha
      *
      * @return string Text
      */
-    protected function GetCaptchaText($length = null)
+    protected function getCaptchaText($length = null)
     {
         if (empty($length)) {
             $length = rand($this->minWordLength, $this->maxWordLength);
@@ -204,7 +204,7 @@ class Captcha
     /**
      * Text insertion
      */
-    protected function WriteText($text, $fontcfg = array())
+    protected function writeText($text, $fontcfg = array())
     {
         if (empty($fontcfg)) {
             // Select the font configuration
@@ -239,27 +239,27 @@ class Captcha
     /**
      * Wave filter
      */
-    protected function WaveImage()
+    protected function waveImage()
     {
         // X-axis wave generation
-        $xp = $this->scale * $this->Xperiod * rand(1, 3);
+        $xp = $this->scale * $this->xPeriod * rand(1, 3);
         $k = rand(0, 100);
         for ($i = 0; $i < ($this->width * $this->scale); $i++) {
-            imagecopy($this->im, $this->im, $i - 1, sin($k + $i / $xp) * ($this->scale * $this->Xamplitude), $i, 0, 1, $this->height * $this->scale);
+            imagecopy($this->im, $this->im, $i - 1, sin($k + $i / $xp) * ($this->scale * $this->xAmplitude), $i, 0, 1, $this->height * $this->scale);
         }
 
         // Y-axis wave generation
         $k = rand(0, 100);
-        $yp = $this->scale * $this->Yperiod * rand(1, 2);
+        $yp = $this->scale * $this->yPeriod * rand(1, 2);
         for ($i = 0; $i < ($this->height * $this->scale); $i++) {
-            imagecopy($this->im, $this->im, sin($k + $i / $yp) * ($this->scale * $this->Yamplitude), $i - 1, 0, $i, $this->width * $this->scale, 1);
+            imagecopy($this->im, $this->im, sin($k + $i / $yp) * ($this->scale * $this->yAmplitude), $i - 1, 0, $i, $this->width * $this->scale, 1);
         }
     }
 
     /**
      * Reduce the image to the final size
      */
-    protected function ReduceImage()
+    protected function reduceImage()
     {
         // Reduzco el tama�o de la imagen
         $imResampled = imagecreatetruecolor($this->width, $this->height);
@@ -273,7 +273,7 @@ class Captcha
     /**
      * File generation
      */
-    protected function WriteImage()
+    protected function writeImage()
     {
         if ($this->imageFormat == 'png') {
             header("Content-type: image/png");
@@ -289,7 +289,7 @@ class Captcha
     /**
      * Cleanup
      */
-    protected function Cleanup()
+    protected function cleanUp()
     {
         imagedestroy($this->im);
     }

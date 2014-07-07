@@ -25,8 +25,8 @@ class Sendmail
         
         $mime = new \Mail_Mime($build_params);
         
-        $mime->setSubject(self::header_encode($subject));
-        $mime->setFrom(!empty($name) ? '"' . self::header_encode($name) . '" <' . $from . '>' : '<' . $from . '>');
+        $mime->setSubject(self::headerEncode($subject));
+        $mime->setFrom(!empty($name) ? '"' . self::headerEncode($name) . '" <' . $from . '>' : '<' . $from . '>');
         
         $mime->setHTMLBody($message);
         $mime->setTXTBody(strip_tags($message));
@@ -52,7 +52,7 @@ class Sendmail
         return array($headers, $body);
     }
     
-    public static function header_encode($text)
+    public static function headerEncode($text)
     {
         return '=?UTF-8?B?' . base64_encode($text) . '?=';
     }

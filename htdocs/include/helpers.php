@@ -135,7 +135,7 @@ function is_empty($var)
     }
 }
 
-function declOfNum($number, $titles, $view_number = true)
+function decl_of_num($number, $titles, $view_number = true)
 {
     $cases = array(2, 0, 1, 1, 1, 2);
     $value = abs($number);
@@ -223,4 +223,22 @@ function to_translit($string)
         "ї" => "yi", "Ї" => "yi", "є" => "e", "Є" => "e", "ё" => "e", "Ё" => "e"
     );
     return $str = iconv("UTF-8", "UTF-8//IGNORE", strtr($string, $replace));
+}
+
+function to_class_name($string)
+{
+    return preg_replace_callback(
+        '/_([a-z])/', function ($matches) {
+            return strtoupper($matches[1]);
+        }, ucfirst(strtolower($string))
+    );
+}
+
+function to_field_name($string)
+{
+    return preg_replace_callback(
+        '/[A-Z]/', function ($matches) {
+            return '_' . strtolower($matches[0]);
+        }, lcfirst($string)
+    );
 }

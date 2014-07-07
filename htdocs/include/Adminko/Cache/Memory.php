@@ -8,7 +8,7 @@ class Memory
     
     private static $cache_obj = null;
     
-    private function get_connect()
+    private function getConnect()
     {
         if (!is_null(self::$cache_obj))
             return self::$cache_obj;

@@ -5,7 +5,7 @@ abstract class Cache
 {
     private static $cache_driver = null;
     
-    private static function get_driver()
+    private static function getDriver()
     {
         if (self::$cache_driver == null)
             self::$cache_driver = self::factory();
@@ -20,7 +20,7 @@ abstract class Cache
         return new $driver_name($cache_type);
     }
     
-    private static function get_key_name($key)
+    private static function getKeyName($key)
     {
         return CACHE_DIR . md5($key);
     }
@@ -29,16 +29,16 @@ abstract class Cache
     
     public static function get($key, $expire = CACHE_TIME)
     {
-        return self::get_driver()->get(self::get_key_name($key), $expire);
+        return self::getDriver()->get(self::getKeyName($key), $expire);
     }
     
     public static function set($key, $var, $expire = CACHE_TIME)
     {
-        return self::get_driver()->set(self::get_key_name($key), $var, $expire);
+        return self::getDriver()->set(self::getKeyName($key), $var, $expire);
     }
     
     public static function clear()
     {
-        return self::get_driver()->clear();
+        return self::getDriver()->clear();
     }
 }

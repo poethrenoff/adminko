@@ -7,12 +7,12 @@ use Adminko\Field\Field;
 
 class BlockTable extends BuilderTable
 {
-    protected function action_add_save($redirect = true)
+    protected function actionAddSave($redirect = true)
     {
-        $primary_field = parent::action_add_save(false);
+        $primary_field = parent::actionAddAave(false);
         
         if ($redirect)
-            $this->apply_default_params($primary_field);
+            $this->applyDefaultParams($primary_field);
         
         if ($redirect)
             System::build();
@@ -23,11 +23,11 @@ class BlockTable extends BuilderTable
         return $primary_field;
     }
     
-    protected function action_copy_save($redirect = true)
+    protected function actionCopySave($redirect = true)
     {
-        $primary_field = parent::action_copy_save(false);
+        $primary_field = parent::actionCopySave(false);
         
-        $this->copy_block_params(System::id(), $primary_field);
+        $this->copyBlockParams(System::id(), $primary_field);
         
         System::build();
         
@@ -37,15 +37,15 @@ class BlockTable extends BuilderTable
         return $primary_field;
     }
     
-    protected function action_edit_save($redirect = true)
+    protected function actionEditSave($redirect = true)
     {
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
-        parent::action_edit_save(false);
+        parent::actionEditAave(false);
         
         if ($record['block_module'] != init_string('block_module'))
-            $this->apply_default_params($primary_field);
+            $this->applyDefaultParams($primary_field);
         
         System::build();
         
@@ -53,10 +53,10 @@ class BlockTable extends BuilderTable
             $this->redirect();
     }
     
-    protected function action_param()
+    protected function actionParam()
     {
-        $record = $this->get_record();
-        $params = $this->get_params($record[$this->primary_field]);
+        $record = $this->getRecord();
+        $params = $this->getParams($record[$this->primary_field]);
         
         $form_fields = array();
         foreach($params as $param_index => $param_value)
@@ -88,7 +88,7 @@ class BlockTable extends BuilderTable
             if ($param_value['param_type'] == 'table')
             {
                 $form_fields['param[' . $param_value['param_id'] . ']']['values'] =
-                    $this->get_table_records($param_value['param_table']);
+                    $this->getTableRecords($param_value['param_table']);
             }
         }
         
@@ -102,17 +102,17 @@ class BlockTable extends BuilderTable
         $form_url = System::urlFor(array('object' => $this->object, 'action' => 'param_save', 'id' => $record[$this->primary_field]));
         $this->view->assign('form_url', $form_url);
         
-        $prev_url = $this->restore_state();
+        $prev_url = $this->restoreState();
         $this->view->assign('back_url', System::urlFor($prev_url));
         
         $this->content = $this->view->fetch('/admin/form');
         $this->output['meta_title'] .= ' :: ' . $record_title . ' :: ' . $action_title;
     }
     
-    protected function action_param_save($redirect = true)
+    protected function actionParamSave($redirect = true)
     {
-        $record = $this->get_record();
-        $params = $this->get_params($record[$this->primary_field]);
+        $record = $this->getRecord();
+        $params = $this->getParams($record[$this->primary_field]);
         
         $param_values = init_array('param');
         
@@ -143,9 +143,9 @@ class BlockTable extends BuilderTable
             $this->redirect();
     }
     
-    protected function action_multiply($redirect = true)
+    protected function actionMultiply($redirect = true)
     {
-        $record = $this->get_record();
+        $record = $this->getRecord();
         
         $page_list = Db::selectAll('
             select * from page, layout_area
@@ -186,7 +186,7 @@ class BlockTable extends BuilderTable
             $this->redirect();
     }
     
-    protected function get_params($block_id)
+    protected function getParams($block_id)
     {
         return Db::selectAll('
                 select module_param.*, block_param.value
@@ -199,9 +199,9 @@ class BlockTable extends BuilderTable
             array('block_id' => $block_id));
     }
     
-    protected function apply_default_params($block_id)
+    protected function applyDefaultParams($block_id)
     {
-        $params = $this->get_params($block_id);
+        $params = $this->getParams($block_id);
         
         $params_in = array_make_in($params, 'param_id');
         $param_values = Db::selectAll('select * from param_value where value_param in (' . $params_in . ') order by value_default');
@@ -227,9 +227,9 @@ class BlockTable extends BuilderTable
                 'block' => $block_id, 'param' => $param_id, 'value' => $param_value));
     }
     
-    protected function get_record_actions($record)
+    protected function getRecordActions($record)
     {
-        $actions = parent::get_record_actions($record);
+        $actions = parent::getRecordActions($record);
         
         $actions['property'] = array('title' => 'Параметры', 'url' =>
             System::urlFor(array('object' => $this->object, 'action' => 'param', 'id' => $record[$this->primary_field])));
@@ -240,9 +240,9 @@ class BlockTable extends BuilderTable
         return $actions;
     }
     
-    protected function get_card_scripts($action = 'edit', $record = null)
+    protected function getCardScripts($action = 'edit', $record = null)
     {
-        $scripts = parent::get_card_scripts($action, $record);
+        $scripts = parent::getCardScripts($action, $record);
         
         $page_list = Db::selectAll('select page_id, page_layout from page, layout where page_layout = layout_id');
         $area_list = Db::selectAll('select area_id, area_title, area_layout from layout_area, layout where area_layout = layout_id order by area_title');

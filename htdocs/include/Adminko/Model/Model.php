@@ -53,15 +53,17 @@ class Model
 
     // Диспетчер неявных аксессоров
     public function __call($method, $vars) {
-        if (!preg_match("/^(get|set)_(\w+)/", $method, $matches)) {
+        if (!preg_match("/^(get|set)(\w+)/", $method, $matches)) {
             throw new \AlarmException("Ошибка. Метод " . get_called_class() . "::{$method}() не найден.");
         }
-        if (!(isset($this->fields_desc[$matches[2]]) && is_array($this->fields_desc[$matches[2]]))) {
-            throw new \AlarmException("Ошибка. Поле {$this->object}->{$matches[2]} не описано в метаданных.");
+        $accessor = $matches[1];
+        $field_name = to_field_name($matches[2]);
+        if (!(isset($this->fields_desc[$field_name]) && is_array($this->fields_desc[$field_name]))) {
+            throw new \AlarmException("Ошибка. Поле {$this->object}->{$field_name} не описано в метаданных.");
         }
         
-        $field = $this->fields[$matches[2]];
-        switch ($matches[1]) {
+        $field = $this->fields[$field_name];
+        switch ($accessor) {
             case 'get':
                 return $field->get();
             case 'set':
@@ -75,16 +77,17 @@ class Model
     // Создание объекта модели
     public static final function factory($object)
     {
+        $class_namespace = 'Model';
+        
         if (isset(Metadata::$objects[$object]['model'])) {
             $class_name = metadata::$objects[$object]['model'];
         } else {
-            $class_name = ucfirst($object);
+            $class_name = to_class_name($object);
         }
         
-        $class_name = __NAMESPACE__ . '\\' . $class_name . 'Model';
-        
+        $class_name = __NAMESPACE__ . '\\' . $class_name . $class_namespace;
         if (!class_exists($class_name)) {
-            $class_name = __NAMESPACE__ . '\\' . 'Model';
+            $class_name = __NAMESPACE__ . '\\' . $class_namespace;
         }
         
         return new $class_name($object);
@@ -112,7 +115,7 @@ class Model
     }
 
     // Получение списка объектов
-    public function get_batch(&$records = array()) {
+    public function getBatch(&$records = array()) {
         $objects = array();
         foreach ($records as $record) {
             $objects[$record[$this->primary_field]] = model::factory($this->object)->get($record[$this->primary_field], $record);
@@ -121,7 +124,7 @@ class Model
     }
 
     // Получение условия фильтрации записей
-    public function get_filter_condition($where = array()) {
+    public function getFilterCondition($where = array()) {
         $filter_conds = $filter_binds = array();
         foreach ($where as $name => $value) {
             $filter_conds[] = "{$name} = :{$name}";
@@ -132,7 +135,7 @@ class Model
     }
     
     // Получение условия сортировки записей
-    protected function get_order_clause($order = array()) {
+    protected function getOrderClause($order = array()) {
         $order_conds = array();
         foreach ($order as $field => $dir) {
             $order_conds[] = "{$field} {$dir}";
@@ -141,7 +144,7 @@ class Model
     }
     
     // Получение условия ограничения количества записей
-    protected function get_limit_clause($limit = null, $offset = null) {
+    protected function getLimitClause($limit = null, $offset = null) {
         $limit_clause = '';
         if (isset($limit)) {
             $limit_clause .= 'limit ' . $limit;
@@ -153,20 +156,20 @@ class Model
     }
 
     // Получение количества объектов
-    public function get_count($where = array()) {
-        list($filter_clause, $filter_binds) = $this->get_filter_condition($where);
+    public function getCount($where = array()) {
+        list($filter_clause, $filter_binds) = $this->getFilterCondition($where);
         return Db::selectCell("select count(*) from {$this->object} {$filter_clause}", $filter_binds);
     }
 
     // Получение списка объектов
-    public function get_list($where = array(), $order = array(), $limit = null, $offset = null) {
-        list($filter_clause, $filter_binds) = $this->get_filter_condition($where);
-        $order_clause = $this->get_order_clause($order);
-        $limit_clause = $this->get_limit_clause($limit, $offset);
+    public function getList($where = array(), $order = array(), $limit = null, $offset = null) {
+        list($filter_clause, $filter_binds) = $this->getFilterCondition($where);
+        $order_clause = $this->getOrderClause($order);
+        $limit_clause = $this->getLimitClause($limit, $offset);
         
         $records = Db::selectAll("select * from {$this->object} {$filter_clause} {$order_clause} {$limit_clause}", $filter_binds);
         
-        return $this->get_batch($records);
+        return $this->getBatch($records);
     }
 
     // Сохранение объекта в БД
@@ -190,7 +193,7 @@ class Model
         if ($this->is_new) {
             Db::insert($this->object, $record); $this->get(Db::lastInsertId());
         } else {
-            Db::update($this->object, $record, array($this->primary_field => $this->get_id()));
+            Db::update($this->object, $record, array($this->primary_field => $this->getId()));
         }
         return $this;
     }
@@ -200,12 +203,12 @@ class Model
         if($this->is_new){
             throw new \AlarmException("Ошибка. Запись не можеть быть удалена из БД, так как не имеет идентификатора.");
         }
-        Db::delete($this->object, array($this->primary_field => $this->get_id()));
+        Db::delete($this->object, array($this->primary_field => $this->getId()));
         self::purge($this->object, $this->primary_field);
     }
 
     // Получение идентификатора объекта
-    public function get_id() {
+    public function getId() {
         if($this->is_new){
             throw new \AlarmException("Ошибка. Запись не была сохранена в БД, поэтому не имеет идентификатора.");
         }
@@ -213,7 +216,7 @@ class Model
     }
 
     // Получение поля с идентификатором первичного ключа
-    public function get_primary_field() {
+    public function getPrimaryField() {
         return $this->primary_field;
     }
 

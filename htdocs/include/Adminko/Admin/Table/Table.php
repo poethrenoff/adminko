@@ -6,7 +6,6 @@ use Adminko\Metadata;
 use Adminko\Paginator;
 use Adminko\View;
 use Adminko\Upload;
-use Adminko\Url;
 use Adminko\Admin\Admin;
 use Adminko\Field\Field;
 use Adminko\Db\Db;
@@ -73,23 +72,23 @@ class Table extends Admin
     
     //////////////////////////////////////////////////////////////////////////
     
-    protected function action_index()
+    protected function actionIndex()
     {
-        $records_header = $this->get_table_headers();
+        $records_header = $this->getTableHeaders();
         
         if (!$this->parent_field)
-            $this->set_filter_condition();
+            $this->setFilterCondition();
         
-        $records_count = $this->get_records_count();
+        $records_count = $this->getRecordsCount();
         
-        $pages = Paginator::construct($records_count, array('by_page' => $this->records_per_page));
+        $pages = Paginator::create($records_count, array('by_page' => $this->records_per_page));
         if (!$this->parent_field)
-            $this->set_limit_condition($pages['by_page'], $pages['offset']);
+            $this->setLimitCondition($pages['by_page'], $pages['offset']);
         
-        $records = $this->get_records();
+        $records = $this->getRecords();
         
         if ($this->parent_field)
-            $records = $this->get_tree($records);
+            $records = $this->getTree($records);
         
         foreach ($records as $record_id => $record)
         {
@@ -97,17 +96,17 @@ class Table extends Admin
                 $records[$record_id][$show_field] = Field::factory($this->fields[$show_field]['type'])
                     ->set($records[$record_id][$show_field])->view();
             
-            $records[$record_id] += $this->get_record_links($record);
-            $records[$record_id] += $this->get_record_relations($record);
+            $records[$record_id] += $this->getRecordLinks($record);
+            $records[$record_id] += $this->getRecordRelations($record);
             
-            $records[$record_id]['_action'] = $this->get_record_actions($record);
+            $records[$record_id]['_action'] = $this->getRecordActions($record);
             
             $records[$record_id]['_hidden'] = $this->active_field && !$records[$record_id][$this->active_field];
         }
         
         if (!$this->parent_field)
-            $this->view->assign('filter', $this->get_filter());
-        $this->view->assign('actions', $this->get_table_actions());
+            $this->view->assign('filter', $this->getFilter());
+        $this->view->assign('actions', $this->getTableActions());
         
         $this->view->assign('title', $this->object_desc['title']);
         $this->view->assign('records', $records);
@@ -119,33 +118,33 @@ class Table extends Admin
         
         $this->content = $this->view->fetch('admin/table');
         
-        $this->store_state();
+        $this->storeState();
     }
     
-    protected function action_add()
+    protected function actionAdd()
     {
-        $this->is_action_allow('add', true);
+        $this->isActionAllow('add', true);
         
-        $this->record_card('add');
+        $this->recordCard('add');
     }
     
-    protected function action_copy()
+    protected function actionCopy()
     {
-        $this->is_action_allow('add', true);
+        $this->isActionAllow('add', true);
         
-        $this->record_card('copy');
+        $this->recordCard('copy');
     }
     
-    protected function action_edit()
+    protected function actionEdit()
     {
-        $this->is_action_allow('edit', true);
+        $this->isActionAllow('edit', true);
         
-        $this->record_card('edit');
+        $this->recordCard('edit');
     }
     
-    protected function action_relation()
+    protected function actionRelation()
     {
-        $primary_record = $this->get_record();
+        $primary_record = $this->getRecord();
         
         $relation_name = init_string('relation');
         if (!isset($this->relations[$relation_name]))
@@ -168,7 +167,7 @@ class Table extends Admin
             $records_header[$show_field] = $secondary_object->fields[$show_field];
             $field_sort_order = $show_field == $secondary_object->sort_field && $secondary_object->sort_order == 'asc' ? 'desc' : 'asc';
             $records_header[$show_field]['sort_url'] =
-                Url::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
+                System::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
             if ($show_field == $secondary_object->sort_field)
                 $records_header[$show_field]['sort_sign'] = $field_sort_order == 'asc' ? 'desc' : 'asc';
         }
@@ -192,18 +191,18 @@ class Table extends Admin
                 $checked_filter_binds['checked_' . $this->primary_field] = $primary_record[$this->primary_field];
             }
             
-            $secondary_object->set_filter_condition($checked_filter_fields, $checked_filter_binds);
+            $secondary_object->setFilterCondition($checked_filter_fields, $checked_filter_binds);
         }
         
-        $records_count = $secondary_object->get_records_count();
+        $records_count = $secondary_object->getRecordsCount();
         
-        $pages = Paginator::construct($records_count, array('by_page' => $secondary_object->records_per_page));
+        $pages = Paginator::create($records_count, array('by_page' => $secondary_object->records_per_page));
         if (!$secondary_object->parent_field)
-            $secondary_object->set_limit_condition($pages['by_page'], $pages['offset']);
+            $secondary_object->setLimitCondition($pages['by_page'], $pages['offset']);
         
-        $records = $secondary_object->get_records();
+        $records = $secondary_object->getRecords();
         if ($secondary_object->parent_field)
-            $records = $secondary_object->get_tree($records);
+            $records = $secondary_object->getTree($records);
         
         $secondary_list = array();
         foreach ($records as $record_id => $record)
@@ -232,7 +231,7 @@ class Table extends Admin
             $secondary_object->filter_fields[] = '_checked';
             $secondary_object->fields['_checked'] = array('title' => 'Показать', 'type' => 'boolean', 'filter' => 1);
             
-            $this->view->assign('filter', $secondary_object->get_filter());
+            $this->view->assign('filter', $secondary_object->getFilter());
         }
         
         $title = Field::factory($this->fields[$this->main_field]['type'])
@@ -245,7 +244,7 @@ class Table extends Admin
         
         $this->view->assign('mode', 'form');
         
-        $this->view->assign('back_url', System::urlFor($this->restore_state()));
+        $this->view->assign('back_url', System::urlFor($this->restoreState()));
         
         $form_url = System::urlFor(array('object' => $this->object, 'action' => 'relation_save',
             'relation' => $relation_name, 'id' => $primary_record[$this->primary_field]));
@@ -257,14 +256,14 @@ class Table extends Admin
         $this->content = $this->view->fetch('admin/table');
         $this->output['meta_title'] .= ' :: ' . $title;
         
-        $this->store_state('prev_relation_url');
+        $this->storeState('prev_relation_url');
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    protected function action_add_save($redirect = true)
+    protected function actionAddSave($redirect = true)
     {
-        $this->is_action_allow('add', true);
+        $this->isActionAllow('add', true);
         
         $insert_fields = array(); $translate_values = array();
         foreach ($this->fields as $field_name => $field_desc)
@@ -290,7 +289,7 @@ class Table extends Admin
                 {
                     $field = Field::factory($field_desc['type']);
                     $value = ($field_desc['type'] == 'image' || $field_desc['type'] == 'file') ?
-                        $this->upload_file($field_name, $field_desc) : init_string($field_name);
+                        $this->uploadFile($field_name, $field_desc) : init_string($field_name);
                     if (!($field->parse($value))) {
                         throw new \AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
                     }
@@ -305,21 +304,21 @@ class Table extends Admin
         if ($this->order_field)
         {
             list($group_conds, $group_binds) =
-                $this->get_group_conds($insert_fields, $this->order_field);
+                $this->getGroupConds($insert_fields, $this->order_field);
             $field = Field::factory($this->fields[$this->order_field]['type'])
-                ->set($this->get_edge_order(true, $group_conds, $group_binds));
+                ->set($this->getEdgeOrder(true, $group_conds, $group_binds));
             $insert_fields[$this->order_field] = $field->get();
         }
         
-        $this->check_group_unique($insert_fields);
+        $this->checkGroupUnique($insert_fields);
         
-        $this->clear_default_fields($insert_fields);
+        $this->clearDefaultFields($insert_fields);
         
         Db::insert($this->object, $insert_fields);
         
         $primary_field = Db::lastInsertId();
         
-        $this->change_translate_record($this->object, $primary_field, $translate_values);
+        $this->changeTranslateRecord($this->object, $primary_field, $translate_values);
         
         if ($redirect)
             $this->redirect();
@@ -327,9 +326,9 @@ class Table extends Admin
         return $primary_field;
     }
     
-    protected function action_copy_save($redirect = true)
+    protected function actionCopySave($redirect = true)
     {
-        $primary_field = $this->action_add_save(false);
+        $primary_field = $this->actionAddSave(false);
         
         if ($redirect)
             $this->redirect();
@@ -337,11 +336,11 @@ class Table extends Admin
         return $primary_field;
     }
     
-    protected function action_edit_save($redirect = true)
+    protected function actionEditSave($redirect = true)
     {
-        $this->is_action_allow('edit', true);
+        $this->isActionAllow('edit', true);
         
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
         $update_fields = array(); $translate_values = array();
@@ -368,7 +367,7 @@ class Table extends Admin
                 {
                     $field = Field::factory($field_desc['type']);
                     $value = ($field_desc['type'] == 'image' || $field_desc['type'] == 'file') ?
-                        $this->upload_file($field_name, $field_desc) : init_string($field_name);
+                        $this->uploadFile($field_name, $field_desc) : init_string($field_name);
                     if (!($field->parse($value))) {
                         throw new \AlarmException('Ошибочное значение поля "' . $field_desc['title'] . '".');
                     }
@@ -383,9 +382,9 @@ class Table extends Admin
         if ($this->order_field)
         {
             list($group_conds, $group_binds) =
-                $this->get_group_conds($update_fields, $this->order_field);
+                $this->getGroupConds($update_fields, $this->order_field);
             
-            $record = $this->get_record();
+            $record = $this->getRecord();
             
             $group_permanent = true;
             foreach ($group_binds as $field_name => $field_value)
@@ -393,40 +392,40 @@ class Table extends Admin
             
             if (!$group_permanent) {
                 $field = Field::factory($this->fields[$this->order_field]['type'])
-                    ->set($this->get_edge_order(true, $group_conds, $group_binds));
+                    ->set($this->getEdgeOrder(true, $group_conds, $group_binds));
                 $update_fields[$this->order_field] = $field->get();
             }
         }
         
-        $this->check_group_unique($update_fields, $primary_field);
+        $this->checkGroupUnique($update_fields, $primary_field);
         
-        $this->clear_default_fields($update_fields);
+        $this->clearDefaultFields($update_fields);
         
         Db::update($this->object, $update_fields, array($this->primary_field => $primary_field));
         
-        $this->change_translate_record($this->object, $primary_field, $translate_values);
+        $this->changeTranslateRecord($this->object, $primary_field, $translate_values);
         
         if ($redirect)
             $this->redirect();
     }
     
-    protected function action_move($redirect = true)
+    protected function actionMove($redirect = true)
     {
-        $this->is_action_allow('edit', true);
+        $this->isActionAllow('edit', true);
         
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
         if ($this->order_field)
         {
-            $record = $this->get_record();
+            $record = $this->getRecord();
             
             list($order_conds, $order_binds) =
-                $this->get_group_conds($record, $this->order_field);
+                $this->getGroupConds($record, $this->order_field);
             
             $direction = (boolean) init_string('dir');
             
-            if ($sibling_record = $this->get_sibling_record($direction, $order_conds, $order_binds, $record))
+            if ($sibling_record = $this->getSiblingRecord($direction, $order_conds, $order_binds, $record))
             {
                 $field = Field::factory($this->fields[$this->order_field]['type'])
                     ->set($sibling_record[$this->order_field]);
@@ -441,7 +440,7 @@ class Table extends Admin
             else
             {
                 $field = Field::factory($this->fields[$this->order_field]['type'])
-                    ->set($this->get_edge_order(!$direction, $order_conds, $order_binds));
+                    ->set($this->getEdgeOrder(!$direction, $order_conds, $order_binds));
                 Db::update($this->object, array($this->order_field => $field->get()),
                     array($this->primary_field => $record[$this->primary_field]));
             }
@@ -451,11 +450,11 @@ class Table extends Admin
             $this->redirect();
     }
     
-    protected function action_show($redirect = true)
+    protected function actionShow($redirect = true)
     {
-        $this->is_action_allow('edit', true);
+        $this->isActionAllow('edit', true);
         
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
         if ($this->active_field)
@@ -466,11 +465,11 @@ class Table extends Admin
             $this->redirect();
     }
     
-    protected function action_hide($redirect = true)
+    protected function actionHide($redirect = true)
     {
-        $this->is_action_allow('edit', true);
+        $this->isActionAllow('edit', true);
         
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
         if ($this->active_field)
@@ -481,11 +480,11 @@ class Table extends Admin
             $this->redirect();
     }
     
-    protected function action_delete($redirect = true)
+    protected function actionDelete($redirect = true)
     {
-        $this->is_action_allow('delete', true);
+        $this->isActionAllow('delete', true);
         
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
         if ($this->parent_field)
@@ -515,7 +514,7 @@ class Table extends Admin
                         $link_records = Db::selectAll($link_query, array('primary_field' => $primary_field));
                         
                         foreach ($link_records as $link_record)
-                            $this->delete_translate_record($link_desc['table'], $link_record[$link_table_desc['primary_field']]);
+                            $this->deleteTranslateRecord($link_desc['table'], $link_record[$link_table_desc['primary_field']]);
                     }
                     
                     if ($ondelete_action == 'cascade')
@@ -541,7 +540,7 @@ class Table extends Admin
             foreach ($this->relations as $relation_name => $relation_desc)
                 Db::delete($relation_desc['relation_table'], array($relation_desc['primary_field'] => $primary_field));
         
-        $this->delete_translate_record($this->object, $primary_field);
+        $this->deleteTranslateRecord($this->object, $primary_field);
         
         Db::delete($this->object, array($this->primary_field => $primary_field));
         
@@ -549,9 +548,9 @@ class Table extends Admin
             $this->redirect();
     }
     
-    protected function action_relation_save($redirect = true)
+    protected function actionRelationSave($redirect = true)
     {
-        $primary_record = $this->get_record();
+        $primary_record = $this->getRecord();
         
         $relation_name = init_string('relation');
         if (!isset($this->relations[$relation_name]))
@@ -576,12 +575,12 @@ class Table extends Admin
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    protected function set_limit_condition($limit = 0, $offset = 0)
+    protected function setLimitCondition($limit = 0, $offset = 0)
     {
         $this->limit_clause = 'limit ' . $limit . ($offset ? ' offset ' . $offset : '');
     }
     
-    protected function set_filter_condition($filter_fields = array(), $filter_binds = array())
+    protected function setFilterCondition($filter_fields = array(), $filter_binds = array())
     {
         foreach ($this->filter_fields as $filter_field)
         {
@@ -632,7 +631,7 @@ class Table extends Admin
         }
     }
     
-    protected function get_records()
+    protected function getRecords()
     {
         $select_fields = $this->show_fields;
         $select_fields[] = $this->primary_field;
@@ -687,17 +686,17 @@ class Table extends Admin
         return Db::selectAll($query, $this->filter_binds + $query_binds);
     }
     
-    public function get_table_records($table, $except = array())
+    public function getTableRecords($table, $except = array())
     {
         $table_object = admin::factory($table, false);
         
         $table_object->sort_field = $table_object->main_field;
         $table_object->sort_order = 'asc';
         
-        $table_records = $table_object->get_records();
+        $table_records = $table_object->getRecords();
         
         if ($table_object->parent_field)
-            $table_records = $table_object->get_tree($table_records, 0, $except);
+            $table_records = $table_object->getTree($table_records, 0, $except);
         
         $result_records = array();
         foreach ($table_records as $table_record)
@@ -710,7 +709,7 @@ class Table extends Admin
         return $result_records;
     }
     
-    protected function get_records_count()
+    protected function getRecordsCount()
     {
         $query = 'select count(*) as _count from ' . $this->object . ' ' . $this->filter_clause;
         $records_count = Db::selectRow($query, $this->filter_binds);
@@ -718,18 +717,18 @@ class Table extends Admin
         return $records_count['_count'];
     }
     
-    protected function get_table_actions()
+    protected function getTableActions()
     {
         $actions = array();
         
-        if ($this->is_action_allow('add'))
+        if ($this->isActionAllow('add'))
             $actions['add'] = array('title' => 'Добавить', 'url' =>
                 System::urlFor(array('object' => $this->object, 'action' => 'add')));
         
         return $actions;
     }
     
-    protected function get_table_headers()
+    protected function getTableHeaders()
     {
         $sort_field = init_string('sort_field');
         $sort_order = init_string('sort_order');
@@ -743,7 +742,7 @@ class Table extends Admin
             $records_header[$show_field] = $this->fields[$show_field];
             $field_sort_order = $show_field == $this->sort_field && $this->sort_order == 'asc' ? 'desc' : 'asc';
             $records_header[$show_field]['sort_url'] =
-                Url::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
+                System::requestUrl(array('sort_field' => $show_field, 'sort_order' => $field_sort_order), array('page'));
             if ($show_field == $this->sort_field)
                 $records_header[$show_field]['sort_sign'] = $field_sort_order == 'asc' ? 'desc' : 'asc';
         }
@@ -766,23 +765,23 @@ class Table extends Admin
         return $records_header;
     }
     
-    protected function get_record_actions($record)
+    protected function getRecordActions($record)
     {
         $actions = array();
         
-        if ($this->parent_field && $this->is_action_allow('add'))
+        if ($this->parent_field && $this->isActionAllow('add'))
             $actions['add'] = array('title' => 'Добавить', 'url' =>
                 System::urlFor(array('object' => $this->object, 'action' => 'add',
                     'id' => $record[$this->primary_field])));
-        if ($this->is_action_allow('edit'))
+        if ($this->isActionAllow('edit'))
             $actions['edit'] = array('title' => 'Редактировать', 'url' =>
                 System::urlFor(array('object' => $this->object, 'action' => 'edit',
                     'id' => $record[$this->primary_field])));
-        if ($this->is_action_allow('add'))
+        if ($this->isActionAllow('add'))
             $actions['copy'] = array('title' => 'Копировать', 'url' =>
                 System::urlFor(array('object' => $this->object, 'action' => 'copy',
                     'id' => $record[$this->primary_field])));
-        if ($this->order_field && $this->is_action_allow('edit'))
+        if ($this->order_field && $this->isActionAllow('edit'))
         {
             $actions['move_down'] = array('title' => 'Опустить вниз', 'url' =>
                 System::urlFor(array('object' => $this->object, 'action' => 'move', 'dir' => 1, 
@@ -791,7 +790,7 @@ class Table extends Admin
                 System::urlFor(array('object' => $this->object, 'action' => 'move', 'dir' => 0,
                     'id' => $record[$this->primary_field])));
         }
-        if ($this->active_field && $this->is_action_allow('edit'))
+        if ($this->active_field && $this->isActionAllow('edit'))
         {
             if (!$record[$this->active_field])
                 $actions['show'] = array('title' => 'Показать', 'url' =>
@@ -802,7 +801,7 @@ class Table extends Admin
                     System::urlFor(array('object' => $this->object, 'action' => 'hide',
                         'id' => $record[$this->primary_field])));
         }
-        if ($this->is_action_allow('delete'))
+        if ($this->isActionAllow('delete'))
             $actions['delete'] = array('title' => 'Удалить', 'url' =>
                 System::urlFor(array('object' => $this->object, 'action' => 'delete',
                     'id' => $record[$this->primary_field])),
@@ -813,7 +812,7 @@ class Table extends Admin
         return $actions;
     }
     
-    protected function get_record_links($record)
+    protected function getRecordLinks($record)
     {
         if (!count($this->links))
             return array();
@@ -845,7 +844,7 @@ class Table extends Admin
         return $links;
     }
     
-    protected function get_record_relations($record)
+    protected function getRecordRelations($record)
     {
         if (!count($this->relations))
             return array();
@@ -859,7 +858,7 @@ class Table extends Admin
         return $relations;
     }
     
-    protected function get_filter()
+    protected function getFilter()
     {
         if (!count($this->filter_fields))
             return '';
@@ -878,21 +877,21 @@ class Table extends Admin
             if ($this->fields[$field_name]['type'] == 'select')
                 $search_fields[$field_name]['values'] = $this->fields[$field_name]['values'];
             if ($this->fields[$field_name]['type'] == 'table' && $this->fields[$field_name]['search'] != 'text')
-                $search_fields[$field_name]['values'] = $this->get_table_records($this->fields[$field_name]['table']);
+                $search_fields[$field_name]['values'] = $this->getTableRecords($this->fields[$field_name]['table']);
         }
         
         $view = new View();
         
         $view->assign('fields', $search_fields);
-        $view->assign('form_url', Url::selfUrl());
+        $view->assign('form_url', System::selfUrl());
         
-        $hidden_fields = Url::prepareQuery($_GET, array_merge(array_keys($search_fields), array('page')));
+        $hidden_fields = System::prepareQuery($_GET, array_merge(array_keys($search_fields), array('page')));
         $view->assign('hidden', $hidden_fields);
         
         return $view->fetch('admin/filter');
     }
     
-    protected function get_group_conds($record, $field_name)
+    protected function getGroupConds($record, $field_name)
     {
         $group_conds = array(); $group_binds = array();
         
@@ -908,7 +907,7 @@ class Table extends Admin
         return array($group_conds, $group_binds);
     }
     
-    protected function check_group_unique($record, $primary_field = '')
+    protected function checkGroupUnique($record, $primary_field = '')
     {
         foreach ($this->fields as $field_name => $field_desc)
         {
@@ -917,7 +916,7 @@ class Table extends Admin
                 continue;
             
             list($group_conds, $group_binds) =
-                $this->get_group_conds($record, $field_name);
+                $this->getGroupConds($record, $field_name);
             
             $group_conds[] = $field_name . ' = :' . $field_name;
             $group_binds[$field_name] = $record[$field_name];
@@ -938,7 +937,7 @@ class Table extends Admin
         }
     }
     
-    protected function clear_default_fields($record)
+    protected function clearDefaultFields($record)
     {
         foreach ($this->fields as $field_name => $field_desc)
         {
@@ -954,7 +953,7 @@ class Table extends Admin
         }
     }
     
-    protected function get_edge_order($direction, $order_conds, $order_binds)
+    protected function getEdgeOrder($direction, $order_conds, $order_binds)
     {
         $order_clause = count($order_conds) ? 'where ' . join(' and ', $order_conds) : '';
         
@@ -967,7 +966,7 @@ class Table extends Admin
         return $direction ? ++$edge_order : --$edge_order;
     }
     
-    protected function get_sibling_record($direction, $order_conds, $order_binds, $record)
+    protected function getSiblingRecord($direction, $order_conds, $order_binds, $record)
     {
         $order_conds[] = $this->order_field . ' ' . ($direction ? '>' : '<') . ' :' . $this->order_field;
         $order_binds[$this->order_field] = $record[$this->order_field];
@@ -980,7 +979,7 @@ class Table extends Admin
         return Db::selectRow($query, $order_binds);
     }
     
-    protected function get_record($primary_field = '')
+    protected function getRecord($primary_field = '')
     {
         if ($primary_field === '') $primary_field = System::id();
         
@@ -992,17 +991,17 @@ class Table extends Admin
         
         foreach ($this->fields as $field_name => $field_desc)
             if (isset($field_desc['translate']) && $field_desc['translate'])
-                $record[$field_name] = $this->get_translate_values($this->object, $field_name, $primary_field);
+                $record[$field_name] = $this->getTranslateValues($this->object, $field_name, $primary_field);
         
         return $record;
     }
     
-    protected function record_card($action = 'edit')
+    protected function recordCard($action = 'edit')
     {
         if ($action == 'edit' || $action == 'copy')
-            $record = $this->get_record();
+            $record = $this->getRecord();
         
-        $prev_url = $this->restore_state();
+        $prev_url = $this->restoreState();
         
         $form_fields = array();
         
@@ -1048,11 +1047,11 @@ class Table extends Admin
             if ($field_desc['type'] == 'select')
                 $form_fields[$field_name]['values'] = $field_desc['values'];
             if ($field_desc['type'] == 'table')
-                $form_fields[$field_name]['values'] = $this->get_table_records($field_desc['table']);
+                $form_fields[$field_name]['values'] = $this->getTableRecords($field_desc['table']);
             if ($field_desc['type'] == 'parent')
             {
                 $except = $action == 'edit' ? array($record[$this->primary_field]) : array();
-                $form_fields[$field_name]['values'] = $this->get_table_records($this->object, $except);
+                $form_fields[$field_name]['values'] = $this->getTableRecords($this->object, $except);
             }
             
             if ($field_desc['type'] == 'parent' || $field_desc['type'] == 'table')
@@ -1102,7 +1101,7 @@ class Table extends Admin
             $action != 'add' ? array('id' => $record[$this->primary_field]) : array()));
         $this->view->assign('form_url', $form_url);
         
-        $this->view->assign('scripts', $this->get_card_scripts($action, $action == 'edit' ? $record : null));
+        $this->view->assign('scripts', $this->getCardScripts($action, $action == 'edit' ? $record : null));
         
         $this->view->assign('back_url', System::urlFor($prev_url));
         
@@ -1110,12 +1109,12 @@ class Table extends Admin
         $this->output['meta_title'] .= ($record_title ? ' :: ' . $record_title : '') . ' :: ' . $action_title;
     }
     
-    protected function get_card_scripts($action = 'edit', $record = null)
+    protected function getCardScripts($action = 'edit', $record = null)
     {
         return array();
     }
     
-    protected function upload_file($field_name, $field_desc)
+    protected function uploadFile($field_name, $field_desc)
     {
         if (isset($_FILES[$field_name . '_file']['name']) && $_FILES[$field_name . '_file']['name'])
         {
@@ -1132,7 +1131,7 @@ class Table extends Admin
         return init_string($field_name);
     }
     
-    protected function is_action_allow($action, $throw = false)
+    protected function isActionAllow($action, $throw = false)
     {
         $action_allow = !isset($this->object_desc['no_' . $action]) ||
             !$this->object_desc['no_' . $action];
@@ -1143,7 +1142,7 @@ class Table extends Admin
         return $action_allow;
     }
     
-    protected function get_translate_values($table_name, $field_name, $table_record)
+    protected function getTranslateValues($table_name, $field_name, $table_record)
     {
         $translate_values = Db::selectAll('
                 select lang.lang_id, translate.record_value
@@ -1159,7 +1158,7 @@ class Table extends Admin
         return $field_value;
     }
     
-    protected function change_translate_record($table_name, $table_record, $translate_values)
+    protected function changeTranslateRecord($table_name, $table_record, $translate_values)
     {
         foreach ($translate_values as $field_name => $field_values)
         {
@@ -1177,18 +1176,18 @@ class Table extends Admin
         }
     }
     
-    protected function delete_translate_record($table_name, $table_record)
+    protected function deleteTranslateRecord($table_name, $table_record)
     {
         $translate_values = array();
         foreach (Metadata::$objects[$table_name]['fields'] as $field_name => $field_desc)
             if (isset($field_desc['translate']) && $field_desc['translate'])
                 $translate_values[$field_name] = array();
         
-        $this->change_translate_record($table_name, $table_record, $translate_values);
+        $this->changeTranslateRecord($table_name, $table_record, $translate_values);
     }
     
     // Построение дерева записей
-    public function get_tree(&$records, $begin = 0, $except = array())
+    public function getTree(&$records, $begin = 0, $except = array())
     {
         $this->except = $except;
         $this->records_by_parent = array();
@@ -1197,13 +1196,13 @@ class Table extends Admin
         }
         
         $this->records_as_tree = array();
-        $this->build_tree($begin);
+        $this->buildTree($begin);
         
         return $this->records_as_tree;
     }
 
     // Рекурсивный метод постройки уровня дерева
-    private function build_tree($parent_field_id, $depth = 0)
+    private function buildTree($parent_field_id, $depth = 0)
     {
         if (isset($this->records_by_parent[$parent_field_id])) {
             foreach ($this->records_by_parent[$parent_field_id] as $record) {
@@ -1214,7 +1213,7 @@ class Table extends Admin
                         $record['_children_count'] = count($this->records_by_parent[$record[$this->primary_field]]);
                     
                     $this->records_as_tree[] = $record;
-                    $this->build_tree($record[$this->primary_field], $depth + 1);
+                    $this->buildTree($record[$this->primary_field], $depth + 1);
                 }
             }
         }

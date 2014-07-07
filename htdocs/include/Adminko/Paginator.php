@@ -3,7 +3,7 @@ namespace Adminko;
 
 class Paginator
 {
-    public static function construct($count, $pages = array())
+    public static function create($count, $pages = array())
     {
         if (!isset($pages['by_page'])) {
             $pages['by_page'] = 10;
@@ -12,13 +12,13 @@ class Paginator
             $pages['varname'] = 'page';
         }
         if (!isset($pages['url'])) {
-            $pages['url'] = Url::selfUrl();
+            $pages['url'] = System::selfUrl();
         }
 
         $pages['count'] = max(1, intval($count));
         $pages['by_page'] = max(1, intval($pages['by_page']));
 
-        $query_string = http_build_query(Url::prepareQuery($_GET, array($pages['varname'])));
+        $query_string = http_build_query(System::prepareQuery($_GET, array($pages['varname'])));
         $page_url = $pages['url'] . '?' . ($query_string ? $query_string . '&' : '') . $pages['varname'] . '=';
 
         $first_page = 0;

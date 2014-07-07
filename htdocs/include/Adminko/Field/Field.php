@@ -3,7 +3,7 @@ namespace Adminko\Field;
 
 use Adminko\Valid\Valid;
 
-class Field
+abstract class Field
 {
     // Значение поля
     protected $value = null;
@@ -50,7 +50,13 @@ class Field
     // Создание объекта поля
     public static final function factory($type)
     {
-        $class_name = __NAMESPACE__ . '\\' . ucfirst($type) . 'Field';
+        $class_namespace = 'Field';
+        $class_name = __NAMESPACE__ . '\\' . to_class_name($type) . $class_namespace;
+        
+        if (!class_exists($class_name)) {
+            throw new \Exception('Ошибка. Класс "' . $class_name . '" не найден.');
+        }
+        
         return new $class_name();
     }
 }

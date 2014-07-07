@@ -4,7 +4,6 @@ namespace Adminko\Admin;
 use Adminko\System;
 use Adminko\Session;
 use Adminko\Metadata;
-use Adminko\Url;
 use Adminko\View;
 use Adminko\Db\Db;
 
@@ -30,11 +29,11 @@ abstract class Admin extends \Adminko\Object
             self::logout();
         }
 
-        if (!self::get_admin()) {
+        if (!self::getAdmin()) {
             self::login();
         }
 
-        $object_list = array_filter(self::get_object_list(), 'trim');
+        $object_list = array_filter(self::getObjectList(), 'trim');
         if (!count($object_list)) {
             self::unauthorized();
         }
@@ -50,7 +49,7 @@ abstract class Admin extends \Adminko\Object
         }
 
         if (!self::$metadata_prepared) {
-            self::prepare_metadata();
+            self::prepareMetadata();
         }
 
         if (!isset(Metadata::$objects[$object])) {
@@ -62,29 +61,24 @@ abstract class Admin extends \Adminko\Object
         if (isset($object_desc['internal']) && $object_desc['internal']) {
             throw new \Exception('Ошибка. Попытка обратиться к внутреннему объекту "' . $object . '".');
         }
-
-        $class_name = __NAMESPACE__ . '\\';
         
         if (isset($object_desc['fields']) && $object_desc['fields']) {
-            $class_name .= 'Table\\';
+            $class_namespace = 'Table';
         } else {
-            $class_name .= 'Tool\\';
+            $class_namespace = 'Tool';
         }
-
+                
         if (isset($object_desc['class']) && $object_desc['class']) {
-            $class_name .= $object_desc['class'];
-        }
-
-        if (isset($object_desc['fields']) && $object_desc['fields']) {
-            $class_name .= 'Table';
+            $class_name = $object_desc['class'];
         } else {
-            $class_name .= 'Tool';
+            $class_name = to_class_name($object);
         }
-
+        
+        $class_name = __NAMESPACE__ . '\\' . $class_namespace . '\\' . $class_name . $class_namespace;
         if (!class_exists($class_name)) {
-            throw new \Exception('Ошибка. Класс "' . $class_name . '" не найден.');
+            $class_name = __NAMESPACE__ . '\\' . $class_namespace . '\\' . $class_namespace;
         }
-
+        
         return new $class_name($object);
     }
     
@@ -92,7 +86,7 @@ abstract class Admin extends \Adminko\Object
     {
         $this->view = new View();
         
-        $action_name = 'action_' . $action;
+        $action_name = 'action' . to_class_name($action);
         
         if (method_exists($this, $action_name)) {
             $this->$action_name();
@@ -103,32 +97,32 @@ abstract class Admin extends \Adminko\Object
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    protected abstract function action_index();
+    protected abstract function actionIndex();
     
-    protected function action_menu()
+    protected function actionMenu()
     {
-        $this->view->assign('object_tree', self::get_object_tree($this->object));
+        $this->view->assign('object_tree', self::getObjectTree($this->object));
         
         $this->content = $this->view->fetch('admin/menu');
     }
     
-    protected function action_auth()
+    protected function actionAuth()
     {
-        $this->view->assign('admin', self::get_admin());
+        $this->view->assign('admin', self::getAdmin());
         
         $this->content = $this->view->fetch('admin/auth');
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    protected function store_state($obj_name = 'prev_url')
+    protected function storeState($obj_name = 'prev_url')
     {
         $_SESSION[$obj_name] = array_merge($_GET,
             array('object' => $this->object, 'action' => System::action()),
                 System::id() ? array('id' => System::id()) : array());
     }
     
-    protected function restore_state($obj_name = 'prev_url')
+    protected function restoreState($obj_name = 'prev_url')
     {
         return isset($_SESSION[$obj_name]) && is_array($_SESSION[$obj_name]) ? $_SESSION[$obj_name] :
             array('object' => System::object(), 'action' => 'index');
@@ -136,7 +130,7 @@ abstract class Admin extends \Adminko\Object
     
     protected function redirect($obj_name = 'prev_url')
     {
-        Url::redirectTo($this->restore_state($obj_name));
+        System::redirectTo($this->restoreState($obj_name));
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,13 +179,13 @@ abstract class Admin extends \Adminko\Object
         }
     }
     
-    public static function get_object_tree($current_object)
+    public static function getObjectTree($current_object)
     {
         $object_list = Db::selectAll('
             select * from object where object_active = 1 and
                 object_id in (' . array_make_in(array_keys(self::$object_list)) . ')
             order by object_order');
-        $object_tree = Admin::factory('object', false)->get_tree($object_list);
+        $object_tree = Admin::factory('object', false)->getTree($object_list);
         
         foreach ($object_tree as $object_index => $object_item)
         {
@@ -226,19 +220,19 @@ abstract class Admin extends \Adminko\Object
         die($error_content);
     }
     
-    public static function get_admin()
+    public static function getAdmin()
     {
         return self::$admin;
     }
     
-    public static function get_object_list()
+    public static function getObjectList()
     {
         return self::$object_list;
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    private static final function prepare_metadata()
+    private static final function prepareMetadata()
     {
         foreach (Metadata::$objects as $object_name => $object_desc)
         {

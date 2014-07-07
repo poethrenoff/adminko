@@ -6,11 +6,11 @@ use Adminko\Db\Db;
 
 class PageTable extends Table
 {
-    protected function action_add_save($redirect = true)
+    protected function actionAddSave($redirect = true)
     {
-        $this->check_page_parent();
+        $this->checkPageParent();
         
-        $primary_field = parent::action_add_save(false);
+        $primary_field = parent::actionAddSave(false);
         
         if ($redirect)
             System::build();
@@ -21,9 +21,9 @@ class PageTable extends Table
         return $primary_field;
     }
     
-    protected function action_copy_save($redirect = true)
+    protected function actionCopySave($redirect = true)
     {
-        $primary_field = parent::action_copy_save(false);
+        $primary_field = parent::actionCopySave(false);
         
         $this->copy_blocks(System::id(), $primary_field);
         
@@ -35,11 +35,11 @@ class PageTable extends Table
         return $primary_field;
     }
     
-    protected function action_edit_save($redirect = true)
+    protected function actionEditSave($redirect = true)
     {
-        $this->check_page_parent();
+        $this->checkPageParent();
         
-        parent::action_edit_save(false);
+        parent::actionEditSave(false);
         
         System::build();
         
@@ -47,13 +47,13 @@ class PageTable extends Table
             $this->redirect();
     }
     
-    protected function action_delete($redirect = true)
+    protected function actionDelete($redirect = true)
     {
         $blocks = Db::selectAll('
                 select * from block where block_page = :block_page',
             array('block_page' => System::id()));
         
-        parent::action_delete(false);
+        parent::actionDelete(false);
         
         foreach ($blocks as $block)
             Db::delete('block_param', array('block' => $block['block_id']));
@@ -64,7 +64,7 @@ class PageTable extends Table
             $this->redirect();
     }
     
-    protected function check_page_parent()
+    protected function checkPageParent()
     {
         if (init_string('page_parent'))
             $this->fields['page_name']['errors'][] = 'require';

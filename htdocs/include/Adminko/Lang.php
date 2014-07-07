@@ -1,6 +1,8 @@
 <?php
 namespace Adminko;
 
+use Adminko\Db\Db;
+
 class Lang
 {
     public static function getTranslateClause($table_name, $field_name, $table_record, $record_lang, $field_title = null)
@@ -25,7 +27,7 @@ class Lang
     
     public static function getTranslateValues($table_name, $field_name, $table_record, $record_lang = null)
     {
-        $translate_values = Adminko\Db\Db::selectAll('
+        $translate_values = Db::selectAll('
             select lang.lang_name, translate.record_value
             from translate left join lang on lang.lang_id = translate.record_lang
             where table_name = :table_name and field_name = :field_name and table_record = :table_record

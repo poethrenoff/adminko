@@ -8,7 +8,7 @@ use Adminko\Admin\Admin;
 
 class DeliveryTool extends Admin
 {
-    protected function action_index()
+    protected function actionIndex()
     {
         $mail_count = Db::selectCell('select count(*) from delivery_queue');
         
@@ -28,10 +28,10 @@ class DeliveryTool extends Admin
         
         $this->content = $this->view->fetch('admin/delivery/delivery');
         
-        $this->store_state();
+        $this->storeState();
     }
     
-    protected function action_send()
+    protected function actionSend()
     {
         $email = init_string('email');
         $name = init_string('name');
@@ -76,7 +76,7 @@ class DeliveryTool extends Admin
         $this->redirect();
     }
     
-    protected function action_clear()
+    protected function actionClear()
     {
         Db::delete('delivery_queue');
         

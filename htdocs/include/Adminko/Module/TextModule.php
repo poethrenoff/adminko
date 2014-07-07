@@ -6,10 +6,10 @@ use Adminko\Model\Model;
 
 class TextModule extends Module
 {
-    protected function action_index()
+    protected function actionIndex()
     {
         try {
-            $item = Model::factory('text')->get($this->get_param('id'));
+            $item = Model::factory('text')->get($this->getParam('id'));
         } catch (AlarmException $e) {
             System::notFound();
         }
@@ -19,8 +19,8 @@ class TextModule extends Module
     }
     
     // Получение текста по тегу
-    public static function get_by_tag($text_tag)
+    public static function getByTag($text_tag)
     {
-        return Model::factory('text')->get_by_tag($text_tag)->get_text_content();
+        return Model::factory('text')->getByTag($text_tag)->getTextContent();
     }
 }

@@ -12,7 +12,13 @@ abstract class Valid
     public static final function factory($type)
     {
         if (!isset(self::$object_cache[$type])) {
-            $class_name = __NAMESPACE__ . '\\' . ucfirst($type) . 'Valid';
+            $class_namespace = 'Valid';
+            $class_name = __NAMESPACE__ . '\\' . to_class_name($type) . $class_namespace;
+
+            if (!class_exists($class_name)) {
+                throw new \Exception('Ошибка. Класс "' . $class_name . '" не найден.');
+            }
+            
             self::$object_cache[$type] = new $class_name();
         }
         return self::$object_cache[$type];

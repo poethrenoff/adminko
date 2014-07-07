@@ -5,11 +5,11 @@ use Adminko\System;
 
 class ModuleParamTable extends BuilderTable
 {
-    protected function action_add_save( $redirect = true )
+    protected function actionAddSave( $redirect = true )
     {
-        $this -> check_param_default();
+        $this -> checkParamDefault();
         
-        $primary_field = parent::action_add_save( false );
+        $primary_field = parent::actionAddSave( false );
         
         if ( $redirect )
             $this -> redirect();
@@ -17,11 +17,11 @@ class ModuleParamTable extends BuilderTable
         return $primary_field;
     }
     
-    protected function action_copy_save( $redirect = true )
+    protected function actionCopySave( $redirect = true )
     {
-        $primary_field = parent::action_copy_save( false );
+        $primary_field = parent::actionCopySave( false );
         
-        $this -> copy_param_values( System::id(), $primary_field );
+        $this -> copyParamValues( System::id(), $primary_field );
         
         if ( $redirect )
             $this -> redirect();
@@ -29,11 +29,11 @@ class ModuleParamTable extends BuilderTable
         return $primary_field;
     }
     
-    protected function action_edit_save( $redirect = true )
+    protected function actionEditSave( $redirect = true )
     {
-        $this -> check_param_default();
+        $this -> checkParamDefault();
         
-        parent::action_edit_save( false );
+        parent::actionEditSave( false );
         
         System::build();
         
@@ -41,7 +41,7 @@ class ModuleParamTable extends BuilderTable
             $this -> redirect();
     }
     
-    protected function check_param_default()
+    protected function checkParamDefault()
     {
         if ( init_string( 'param_require' ) &&
                 !in_array( init_string( 'param_type' ), array( 'select', 'table', 'boolean' ) ) )
@@ -56,9 +56,9 @@ class ModuleParamTable extends BuilderTable
             throw new \AlarmException( 'Ошибочное значение поля "' . $this -> fields['param_table']['title'] . '".' );
     }
     
-    protected function get_card_scripts( $action = 'edit', $record = null )
+    protected function getCardScripts( $action = 'edit', $record = null )
     {
-        $scripts = parent::get_card_scripts( $action, $record );
+        $scripts = parent::getCardScripts( $action, $record );
         
         $scripts['module_param_card'] = '';
         

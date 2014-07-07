@@ -24,13 +24,13 @@ abstract class Object
     }
     
     // Возвращает результат работы объекта
-    public function get_content()
+    public function getContent()
     {
         return $this->content;
     }
     
     // Возвращает данные для передачи в шаблон
-    public function get_output()
+    public function getOutput()
     {
         return $this->output;
     }

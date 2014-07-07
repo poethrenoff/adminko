@@ -32,51 +32,51 @@ class Hierarchy extends Model
     }
 
     // Получение идентификатора родительской записи
-    public function get_parent_id()
+    public function getParentId()
     {
         return $this->fields[$this->parent_field];
     }
     
     // Получение поля с идентификатором родительской записи
-    public function get_parent_field()
+    public function getParentField()
     {
         return $this->parent_field;
     }
     
     // Получение объекта-родителя
-    public function get_parent()
+    public function getParent()
     {
         return $this->parent;
     }
     
     // Получение списка дочерних объектов
-    public function get_children()
+    public function getChildren()
     {
         return $this->children;
     }
     
     // Количество дочерних объектов
-    public function children_count()
+    public function getChildrenCount()
     {
         return count($this->children);
     }
     
     // Есть ли дочерние объекты
-    public function has_children()
+    public function hasChildren()
     {
-        return $this->children_count() > 0;
+        return $this->getChildrenCount() > 0;
     }
     
     // Построение дерева записей
-    public function get_tree(&$records, $root_field = 0, $except = array())
+    public function getTree(&$records, $root_field = 0, $except = array())
     {
         $root_parent = null;
         
-        $parent_method = 'get_' . $this->parent_field;
-        $primary_method = 'get_' . $this->primary_field;
+        $parent_method = 'get' . to_class_name($this->parent_field);
+        $primary_method = 'get' . to_class_name($this->primary_field);
         
         if (!$root_field) {
-            $records[] = model::factory($this->object); $except[] = 0;
+            $records[] = Model::factory($this->object); $except[] = 0;
         }
         
         foreach ($records as $parent_record) {

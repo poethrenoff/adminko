@@ -6,9 +6,9 @@ use Adminko\System;
 
 class BuilderTable extends Table
 {
-    protected function action_add_save($redirect = true)
+    protected function actionAddSave($redirect = true)
     {
-        $primary_field = parent::action_add_save(false);
+        $primary_field = parent::actionAddSave(false);
         
         if ($redirect)
             System::build();
@@ -19,9 +19,9 @@ class BuilderTable extends Table
         return $primary_field;
     }
     
-    protected function action_copy_save($redirect = true)
+    protected function actionCopySave($redirect = true)
     {
-        $primary_field = parent::action_copy_save(false);
+        $primary_field = parent::actionCopySave(false);
         
         if ($redirect)
             System::build();
@@ -32,9 +32,9 @@ class BuilderTable extends Table
         return $primary_field;
     }
     
-    protected function action_edit_save($redirect = true)
+    protected function actionEditSave($redirect = true)
     {
-        parent::action_edit_save(false);
+        parent::actionEditSave(false);
         
         if ($redirect)
             System::build();
@@ -43,9 +43,9 @@ class BuilderTable extends Table
             $this->redirect();
     }
     
-    protected function action_move($redirect = true)
+    protected function actionMove($redirect = true)
     {
-        parent::action_move(false);
+        parent::actionMove(false);
         
         if ($redirect)
             build();
@@ -54,9 +54,9 @@ class BuilderTable extends Table
             $this->redirect();
     }
     
-    protected function action_delete($redirect = true)
+    protected function actionDelete($redirect = true)
     {
-        parent::action_delete(false);
+        parent::actionDelete(false);
         
         if ($redirect)
             System::build();
@@ -65,9 +65,9 @@ class BuilderTable extends Table
             $this->redirect();
     }
     
-    protected function action_show($redirect = true)
+    protected function actionShow($redirect = true)
     {
-        parent::action_show(false);
+        parent::actionShow(false);
         
         if ($redirect)
             build();
@@ -76,9 +76,9 @@ class BuilderTable extends Table
             $this->redirect();
     }
     
-    protected function action_hide($redirect = true)
+    protected function actionHide($redirect = true)
     {
-        parent::action_hide(false);
+        parent::actionHide(false);
         
         if ($redirect)
             System::build();
@@ -89,7 +89,7 @@ class BuilderTable extends Table
     
     ////////////////////////////////////////////////////////////////////////////////////////////
     
-    protected function copy_blocks($from_id, $to_id)
+    protected function copyBlocks($from_id, $to_id)
     {
         $blocks = Db::selectAll('
                 select * from block where block_page = :block_page',
@@ -104,11 +104,11 @@ class BuilderTable extends Table
             
             Db::insert('block', $block);
             
-            $this->copy_block_params($block_id, Db::lastInsertId());
+            $this->copyBlockParams($block_id, Db::lastInsertId());
         }
     }
     
-    protected function copy_block_params($from_id, $to_id)
+    protected function copyBlockParams($from_id, $to_id)
     {
         $block_params = Db::selectAll('
                 select * from block_param where block = :block',
@@ -122,7 +122,7 @@ class BuilderTable extends Table
         }
     }
     
-    protected function copy_module_params($from_id, $to_id)
+    protected function copyModuleParams($from_id, $to_id)
     {
         $module_params = Db::selectAll('
                 select * from module_param where param_module = :param_module',
@@ -137,11 +137,11 @@ class BuilderTable extends Table
             
             Db::insert('module_param', $module_param);
             
-            $this->copy_param_values($module_param_id, Db::lastInsertId());
+            $this->copyParamValues($module_param_id, Db::lastInsertId());
         }
     }
     
-    protected function copy_param_values($from_id, $to_id)
+    protected function copyParamValues($from_id, $to_id)
     {
         $param_values = Db::selectAll('
                 select * from param_value where value_param = :value_param',
@@ -156,7 +156,7 @@ class BuilderTable extends Table
         }
     }
     
-    protected function copy_layout_areas($from_id, $to_id)
+    protected function copyLayoutAreas($from_id, $to_id)
     {
         $layout_areas = Db::selectAll('
                 select * from layout_area where area_layout = :area_layout',

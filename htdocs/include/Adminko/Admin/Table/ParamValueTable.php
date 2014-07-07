@@ -6,9 +6,9 @@ use Adminko\Db\Db;
 
 class ParamValueTable extends BuilderTable
 {
-    protected function action_add_save($redirect = true)
+    protected function actionAddSave($redirect = true)
     {
-        $primary_field = parent::action_add_save(false);
+        $primary_field = parent::actionAddSave(false);
         
         if ($redirect)
             $this->redirect();
@@ -16,9 +16,9 @@ class ParamValueTable extends BuilderTable
         return $primary_field;
     }
     
-    protected function action_copy_save($redirect = true)
+    protected function actionCopySave($redirect = true)
     {
-        $primary_field = parent::action_copy_save(false);
+        $primary_field = parent::actionCopySave(false);
         
         if ($redirect)
             $this->redirect();
@@ -26,12 +26,12 @@ class ParamValueTable extends BuilderTable
         return $primary_field;
     }
     
-    protected function action_delete($redirect = true)
+    protected function actionDelete($redirect = true)
     {
-        $record = $this->get_record();
+        $record = $this->getRecord();
         $primary_field = $record[$this->primary_field];
         
-        parent::action_delete(false);
+        parent::actionDelete(false);
         
         $default_value = Db::selectCell('select value_id from param_value
                 where value_param = :value_param and value_default = 1',

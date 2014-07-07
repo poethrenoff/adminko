@@ -1,5 +1,6 @@
 <?php
 use Adminko\System;
+use Adminko\Image;
 
 include_once dirname(dirname(__FILE__)) . '/config/config.php';
 
@@ -19,7 +20,7 @@ try {
     $dest_image = $path_parts['dirname'] . '/' . $path_parts['filename'] . '_' . $thumb_marker . '.' . $path_parts['extension'];
 
     if (!file_exists($dest_image)) {
-        image::process(($method == 'c') ? 'crop' : 'resize', array(
+        Image::process(($method == 'c') ? 'crop' : 'resize', array(
             'source_image' => $source_image, 'dest_image' => $dest_image, 'width' => $width, 'height' => $height
         ));
     }
