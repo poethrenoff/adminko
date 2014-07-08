@@ -154,11 +154,7 @@ class FmTool extends Admin
         $field_name = 'file';
 
         if (isset($_FILES[$field_name . '_file']['name']) && $_FILES[$field_name . '_file']['name']) {
-            $upload = Upload::fetch($field_name . '_file', array('upload_path' => ''));
-
-            if ($upload->is_error()) {
-                throw new \AlarmException('Ошибка. ' . $upload->get_error() . '.');
-            }
+            $upload = Upload::process($field_name . '_file');
         } else {
             throw new \AlarmException('Ошибка. Отсутствует файл для закачки.');
         }
@@ -171,10 +167,10 @@ class FmTool extends Admin
         $CKEditorFuncNum = intval(init_string('CKEditorFuncNum'));
 
         if (isset($_FILES['upload']['name']) && $_FILES['upload']['name']) {
-            $upload = upload::fetch('upload', array('upload_path' => ''));
-
-            if ($upload->is_error()) {
-                die('<script type="text/javascript">alert( "Ошибка! ' . $upload->get_error() . '." ); window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "", "");</script>');
+            try {
+                $upload = Upload::process('upload');
+            } catch (\AlarmException $e) {
+                die('<script type="text/javascript">alert( "Ошибка! ' . $e->getMessage() . '." ); window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "", "");</script>');
             }
         } else {
             die('<script type="text/javascript">alert( "Ошибка! Отсутствует файл для закачки." ); window.parent.CKEDITOR.tools.callFunction(' . $CKEditorFuncNum . ', "", "");</script>');

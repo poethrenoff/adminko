@@ -1,5 +1,4 @@
 <?php
-
 namespace Adminko;
 
 /**
@@ -36,27 +35,9 @@ class Image
     private $size_str = '';
 
     /**
-     * Единый метод для вызова функций класса
-     *
-     * @param     string
-     * @param     array
-     * @return    object
-     */
-    public static function process($action = 'resize', $params = array())
-    {
-        $obj = new Image($params);
-
-        if (in_array($action, array('resize', 'crop', 'cut'))) {
-            $obj->$action();
-        }
-
-        return $obj;
-    }
-
-    /**
      * Конструктор
      *
-     * @param   array
+     * $params   array
      * @return  void
      */
     private function __construct($params = array())
@@ -109,14 +90,27 @@ class Image
             }
 
             $path_parts = pathinfo($this->source_image);
-            $this->dest_image = $path_parts['dirname'] . '/' . $path_parts['filename'] . $this->thumb_marker . '.' . $path_parts['extension'];
+            $this->dest_image = $path_parts['dirname'] . DIRECTORY_SEPARATOR .
+                $path_parts['filename'] . $this->thumb_marker . '.' . $path_parts['extension'];
         }
     }
 
     /**
-     * Загрузка исходного изображения
-     *
-     * @return  object
+     * Единый метод для вызова функций класса
+     */
+    public static function process($action = 'resize', $params = array())
+    {
+        $obj = new Image($params);
+
+        if (in_array($action, array('resize', 'crop', 'cut'))) {
+            $obj->$action();
+        }
+
+        return $obj;
+    }
+
+    /**
+     * Создание исходного изображения
      */
     private function create()
     {
@@ -143,9 +137,6 @@ class Image
 
     /**
      * Сохранение полученного изображения
-     *
-     * @param   object
-     * @return  bool
      */
     private function save($destination_resource)
     {
@@ -172,8 +163,6 @@ class Image
 
     /**
      * Ресайз изображения
-     * 
-     * @return  void
      */
     private function resize()
     {
@@ -228,8 +217,6 @@ class Image
 
     /**
      * Кроп изображения
-     * 
-     * @return  void
      */
     private function crop()
     {
@@ -305,8 +292,6 @@ class Image
 
     /**
      * Кат изображения
-     * 
-     * @return  void
      */
     private function cut()
     {
@@ -323,8 +308,6 @@ class Image
 
     /**
      * Абсолютный путь к преобразованному файлу
-     *
-     * @return  string
      */
     public function getFilePath()
     {
@@ -333,11 +316,10 @@ class Image
 
     /**
      * Относительный путь к преобразованному файлу
-     *
-     * @return  string
      */
-    public function getFileLink()
+    public function getFileLink($absolute_url = false)
     {
-        return str_replace(normalize_path(UPLOAD_DIR), UPLOAD_ALIAS, $this->getFilePath());
+        return ($absolute_url ? ('http://' . filter_input(INPUT_SERVER, 'HTTP_HOST')) : '') .
+            str_replace(normalize_path(UPLOAD_DIR), UPLOAD_ALIAS, $this->getFilePath());
     }
 }

@@ -208,10 +208,8 @@ function strip_tags_attributes($string, $allowtags = null, $allowattributes = nu
 
 function to_translit($string)
 {
-    $string = mb_strtolower($string, "UTF-8");
     $replace = array(
-        "," => "", "/" => "_", "(" => "", ")" => "", "\"" => "", "-" => "_", ":" => "", ";" => "",
-        "'" => "", " " => "_", "`" => "", "а" => "a", "А" => "a", "б" => "b", "Б" => "b", "в" => "v", "В" => "v",
+        "а" => "a", "А" => "a", "б" => "b", "Б" => "b", "в" => "v", "В" => "v",
         "г" => "g", "Г" => "g", "д" => "d", "Д" => "d", "е" => "e", "Е" => "e", "ж" => "zh", "Ж" => "zh",
         "з" => "z", "З" => "z", "и" => "i", "И" => "i", "й" => "y", "Й" => "y", "к" => "k", "К" => "k",
         "л" => "l", "Л" => "l", "м" => "m", "М" => "m", "н" => "n", "Н" => "n", "о" => "o", "О" => "o",
@@ -222,7 +220,7 @@ function to_translit($string)
         "ю" => "yu", "Ю" => "yu", "я" => "ya", "Я" => "ya", "і" => "i", "І" => "i",
         "ї" => "yi", "Ї" => "yi", "є" => "e", "Є" => "e", "ё" => "e", "Ё" => "e"
     );
-    return $str = iconv("UTF-8", "UTF-8//IGNORE", strtr($string, $replace));
+    return iconv("UTF-8", "UTF-8//IGNORE", strtr($string, $replace));
 }
 
 function to_class_name($string)

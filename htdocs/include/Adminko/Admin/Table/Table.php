@@ -1160,7 +1160,7 @@ class Table extends Admin
                 throw new \AlarmException('Ошибка. Поле "' . $field_desc['title'] . '": ' . $upload->get_error() . '.');
             }
 
-            return $upload->get_file_link();
+            return $upload->getFileLink();
         }
 
         return init_string($field_name);
