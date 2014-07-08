@@ -8,10 +8,10 @@ class View
 {
     // Каталог с шаблонами
     protected $template_dir = VIEW_DIR;
-    
+
     // Объект, переданный в шаблон
     protected $object = null;
-    
+
     /**
      * Передача переменной в шаблон
      *
@@ -23,12 +23,12 @@ class View
         // Если переменая - объект
         if (is_object($name)) {
             $this->object = $name;
-        // Если переменая - массив
+            // Если переменая - массив
         } elseif (is_array($name)) {
             foreach ($name as $key => $val) {
                 $this->$key = $val;
             }
-        // Если переменая - строка
+            // Если переменая - строка
         } elseif (is_string($name)) {
             $this->$name = $data;
         } else {
@@ -47,7 +47,7 @@ class View
     {
         return call_user_func_array(array($this->object, $method), $vars);
     }
-    
+
     /**
      * Получение контента
      *
@@ -57,26 +57,27 @@ class View
     public function fetch($template)
     {
         $template_file = $this->template_dir . '/' . $template . '.phtml';
-        
-        if (!file_exists($template_file))
+
+        if (!file_exists($template_file)) {
             throw new \AlarmException('Файл "' . normalize_path($template_file) . '" не найден');
-        
+        }
+
         $old_error_level = error_reporting();
-        error_reporting(error_reporting() & ~(E_NOTICE|E_WARNING));
-        
+        error_reporting(error_reporting() & ~(E_NOTICE | E_WARNING));
+
         ob_start();
-        
+
         include($this->template_dir . '/' . $template . '.phtml');
-        
+
         $result = ob_get_contents();
-        
+
         ob_end_clean();
-        
+
         error_reporting($old_error_level);
-        
+
         return $result;
     }
-    
+
     /**
      * Печать контента
      *
@@ -86,7 +87,7 @@ class View
     {
         print $this->fetch($template);
     }
-    
+
     /**
      * Алиас для htmlspecialchars + возможность обработки массивов
      *
@@ -103,7 +104,7 @@ class View
         }
         return $var;
     }
-    
+
     /**
      * Проверка присутствия данных в запросе
      *
@@ -119,10 +120,10 @@ class View
     public function inRequest($name, $data = null)
     {
         $isset = !is_null($value = $this->fromRequest($name));
-        
+
         return (is_null($data) || !$isset) ? $isset : ($value == $data);
     }
-    
+
     /**
      * Извлечение данных из запроса
      *
@@ -139,23 +140,25 @@ class View
     {
         $path = array();
         if (preg_match('/^(.+)\[(.+)\]$/U', $name, $match)) {
-            $name = $match[1]; $path = explode('][', $match[2]);
+            $name = $match[1];
+            $path = explode('][', $match[2]);
         }
-        
+
         if ($isset = isset($_REQUEST[$name])) {
-            $value = $_REQUEST[$name]; 
-            foreach ($path as $piece) { 
+            $value = $_REQUEST[$name];
+            foreach ($path as $piece) {
                 if (isset($value[$piece])) {
                     $value = $value[$piece];
                 } else {
-                    $isset = false; break;
+                    $isset = false;
+                    break;
                 }
             }
         }
-        
+
         return $isset ? $value : $data;
     }
-    
+
     /**
      * Получение статического блока
      *
@@ -166,10 +169,11 @@ class View
     public static function block($template, $params = array())
     {
         $view = new View();
-        
-        foreach ($params as $key => $value)
+
+        foreach ($params as $key => $value) {
             $view->assign($key, $value);
-        
+        }
+
         return $view->fetch($template);
     }
 }

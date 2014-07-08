@@ -88,7 +88,7 @@ class Captcha
     public $im;
 
     /** Sessionname to store the original text */
-    public static $session_var = '__captcha__';
+    public static $sessionVar = '__captcha__';
 
     /**
      * Draw captcha image
@@ -104,9 +104,9 @@ class Captcha
      */
     public static function check($captcha_value)
     {
-        $result = isset($_SESSION[self::$session_var]) &&
-                !strcasecmp($captcha_value, $_SESSION[self::$session_var]);
-        unset($_SESSION[self::$session_var]);
+        $result = isset($_SESSION[self::$sessionVar]) &&
+                !strcasecmp($captcha_value, $_SESSION[self::$sessionVar]);
+        unset($_SESSION[self::$sessionVar]);
         return $result;
     }
 
@@ -126,7 +126,7 @@ class Captcha
         $fontcfg = $this->fonts[array_rand($this->fonts)];
         $this->writeText($text, $fontcfg);
 
-        $_SESSION[self::$session_var] = $text;
+        $_SESSION[self::$sessionVar] = $text;
 
         /** Transformations */
         $this->waveImage();
@@ -137,8 +137,7 @@ class Captcha
 
 
         if ($this->debug) {
-            imagestring($this->im, 1, 1, $this->height - 8, "$text {$fontcfg['font']} " . round((microtime(true) - $ini) * 1000) . "ms", $this->GdFgColor
-            );
+            imagestring($this->im, 1, 1, $this->height - 8, "$text {$fontcfg['font']} " . round((microtime(true) - $ini) * 1000) . "ms", $this->gdFgColor);
         }
 
         /** Output */
@@ -159,18 +158,16 @@ class Captcha
         $this->im = imagecreatetruecolor($this->width * $this->scale, $this->height * $this->scale);
 
         // Background color
-        $this->GdBgColor = imagecolorallocate($this->im, $this->backgroundColor[0], $this->backgroundColor[1], $this->backgroundColor[2]
-        );
-        imagefilledrectangle($this->im, 0, 0, $this->width * $this->scale, $this->height * $this->scale, $this->GdBgColor);
+        $this->gdBgColor = imagecolorallocate($this->im, $this->backgroundColor[0], $this->backgroundColor[1], $this->backgroundColor[2]);
+        imagefilledrectangle($this->im, 0, 0, $this->width * $this->scale, $this->height * $this->scale, $this->gdBgColor);
 
         // Foreground color
         $color = $this->colors[mt_rand(0, sizeof($this->colors) - 1)];
-        $this->GdFgColor = imagecolorallocate($this->im, $color[0], $color[1], $color[2]);
+        $this->gdFgColor = imagecolorallocate($this->im, $color[0], $color[1], $color[2]);
 
         // Shadow color
         if (!empty($this->shadowColor)) {
-            $this->GdShadowColor = imagecolorallocate($this->im, $this->shadowColor[0], $this->shadowColor[1], $this->shadowColor[2]
-            );
+            $this->gdShadowColor = imagecolorallocate($this->im, $this->shadowColor[0], $this->shadowColor[1], $this->shadowColor[2]);
         }
     }
 
@@ -229,9 +226,9 @@ class Captcha
             $letter = substr($text, $i, 1);
 
             if ($this->shadowColor) {
-                $coords = imagettftext($this->im, $fontsize, $degree, $x + $this->scale, $y + $this->scale, $this->GdShadowColor, $fontfile, $letter);
+                $coords = imagettftext($this->im, $fontsize, $degree, $x + $this->scale, $y + $this->scale, $this->gdShadowColor, $fontfile, $letter);
             }
-            $coords = imagettftext($this->im, $fontsize, $degree, $x, $y, $this->GdFgColor, $fontfile, $letter);
+            $coords = imagettftext($this->im, $fontsize, $degree, $x, $y, $this->gdFgColor, $fontfile, $letter);
             $x += ($coords[2] - $x) + ($fontcfg['spacing'] * $this->scale);
         }
     }

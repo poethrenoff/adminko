@@ -20,7 +20,9 @@ class CSV
         if ($filename === null) {
             $filename = "data_" . date("d.m.Y_H_i_s") . ".csv";
         }
-        while (@ob_end_clean());
+        while (@ob_end_clean()) {
+            //
+        }
 
         header("Pragma: private");
         header("Content-Type: text/csv");

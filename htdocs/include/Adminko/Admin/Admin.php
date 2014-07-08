@@ -299,7 +299,7 @@ abstract class Admin extends \Adminko\Object
                     }
 
                     Metadata::$objects[$relation_desc['secondary_table']]['links'][$relation_desc['relation_table']] = array('table' => $relation_desc['relation_table'], 'field' => $relation_desc['secondary_field'],
-                                'hidden' => 1, 'ondelete' => 'cascade');
+                        'hidden' => 1, 'ondelete' => 'cascade');
                 }
             }
         }

@@ -12,8 +12,6 @@ class FmTool extends Admin
 
     protected $records_per_page = 20;
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
     public function getUploadPath()
     {
         return realpath(filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . $this->upload_path) . DIRECTORY_SEPARATOR;

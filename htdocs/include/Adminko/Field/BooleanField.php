@@ -1,27 +1,22 @@
 <?php
 namespace Adminko\Field;
 
-class BooleanField extends Field
+class BooleanField extends IntField
 {
-    public function set($content) {
-        $this->value = (string) $content !== '' ? (boolean) $content : null;
-        return $this;
-    }
-    
     public function get() {
-        return (boolean) $this->value;
+        return (int) $this->value;
     }
     
     public function form() {
-        return is_null($this->value) ? null : $this->get();
+        return is_null($this->value) ? null : (boolean) $this->value;
     }
     
     public function view() {
-        return $this->get() ? 'да' : 'нет';
+        return (boolean) $this->value ? 'да' : 'нет';
     }
     
     public function check($errors = array()) {
         return parent::check($errors) &&
-            (in_array('require', $errors) ? $this->get() : true);
+            (in_array('require', $errors) ? (boolean) $this->value : true);
     }
 }

@@ -408,4 +408,4 @@ class Metadata
    );
 }
 
-//Adminko\Db\Db::create();
+//\Adminko\Db\Db::create();
