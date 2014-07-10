@@ -68,7 +68,6 @@ class Metadata
          */
         'page' => array(
             'title' => 'Разделы',
-            'class' => 'Page',
             'fields' => array(
                 'page_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'page_parent' => array('title' => 'Родительский раздел', 'type' => 'parent'),
@@ -92,7 +91,6 @@ class Metadata
          */
         'block' => array(
             'title' => 'Блоки',
-            'class' => 'Block',
             'fields' => array(
                 'block_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'block_page' => array('title' => 'Раздел', 'type' => 'table', 'table' => 'page', 'errors' => array('require')),
@@ -110,7 +108,6 @@ class Metadata
          */
         'layout' => array(
             'title' => 'Шаблоны',
-            'class' => 'Layout',
             'fields' => array(
                 'layout_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'layout_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
@@ -146,7 +143,6 @@ class Metadata
          */
         'module' => array(
             'title' => 'Модули',
-            'class' => 'Module',
             'fields' => array(
                 'module_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'module_title' => array('title' => 'Название', 'type' => 'string', 'main' => 1, 'errors' => array('require')),
@@ -163,7 +159,6 @@ class Metadata
          */
         'module_param' => array(
             'title' => 'Параметры модулей',
-            'class' => 'ModuleParam',
             'fields' => array(
                 'param_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'param_module' => array('title' => 'Модуль', 'type' => 'table', 'table' => 'module', 'errors' => array('require')),
@@ -192,7 +187,6 @@ class Metadata
          */
         'param_value' => array(
             'title' => 'Значения параметров модулей',
-            'class' => 'ParamValue',
             'fields' => array(
                 'value_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
                 'value_param' => array('title' => 'Параметр', 'type' => 'table', 'table' => 'module_param', 'errors' => array('require')),

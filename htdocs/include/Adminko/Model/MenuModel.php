@@ -1,7 +1,8 @@
 <?php
 namespace Adminko\Model;
 
-class MenuModel extends Hierarchy
+class MenuModel extends HierarchyModel
 {
-    ///
+    // Пункт меню выделен
+    protected $selected = false;
 }

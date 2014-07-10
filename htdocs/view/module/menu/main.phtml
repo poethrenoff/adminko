@@ -1,3 +1,1 @@
-<? foreach ($this->getChildren() as $menu_item) { ?>
-	<a<? if ($menu_item->is_selected) { ?> style="font-weight: bold"<? } ?> href="<?= $menu_item->getMenuUrl() ?>"><?= $menu_item->getMenuTitle() ?></a><br/>
-<? } ?>
+<?= Adminko\View::block('module/menu/item', array('menu_tree' => $this->menu_tree, 'depth' => 0)) ?> 

@@ -23,13 +23,13 @@ class MenuModule extends Module
                 $menu_list[$menu_index]->setMenuUrl($menu_url);
             }
             if ($menu_list[$menu_index]->getMenuUrl() == $current_page['page_path']) {
-                $menu_list[$menu_index]->is_selected = true;
+                $menu_list[$menu_index]->setSelected(true);
             }
         }
         
         $menu_tree = Model::factory('menu')->getTree($menu_list, $menu_id);
         
-        $this->view->assign($menu_tree);
+        $this->view->assign('menu_tree', $menu_tree);
         $this->content = $this->view->fetch('module/menu/' . $menu_template);
     }
     

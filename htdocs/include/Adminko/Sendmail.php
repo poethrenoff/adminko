@@ -7,7 +7,7 @@ class Sendmail
     {
         list($headers, $body) = self::prepare($from, $name, $subject, $message, $files);
 
-        $result = Mail::factory('mail')->send($to, $headers, $body);
+        $result = \Mail::factory('mail')->send($to, $headers, $body);
 
         return !is_a($result, 'PEAR_Error');
     }
