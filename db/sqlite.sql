@@ -22,11 +22,10 @@ CREATE TABLE block (
   block_area integer NOT NULL default '0'
 );
 INSERT INTO "block" VALUES(1,1,1,'Текст на главной странице',1);
-INSERT INTO "block" VALUES(2,1,3,'Главное меню',4);
-INSERT INTO "block" VALUES(3,1,2,'Краткий список новостей',6);
-INSERT INTO "block" VALUES(4,3,2,'Полный список новостей',2);
-INSERT INTO "block" VALUES(5,3,3,'Главное меню',5);
-INSERT INTO "block" VALUES(6,2,1,'Сообщение об ошибке',3);
+INSERT INTO "block" VALUES(2,1,3,'Главное меню',3);
+INSERT INTO "block" VALUES(3,1,2,'Краткий список новостей',5);
+INSERT INTO "block" VALUES(4,2,2,'Полный список новостей',2);
+INSERT INTO "block" VALUES(5,2,3,'Главное меню',4);
 CREATE TABLE block_param (
   block integer NOT NULL default '0',
   param integer NOT NULL default '0',
@@ -38,7 +37,6 @@ INSERT INTO "block_param" VALUES(3,2,'2');
 INSERT INTO "block_param" VALUES(3,3,'3');
 INSERT INTO "block_param" VALUES(4,2,'1');
 INSERT INTO "block_param" VALUES(4,3,'10');
-INSERT INTO "block_param" VALUES(6,1,'2');
 INSERT INTO "block_param" VALUES(1,1,'1');
 INSERT INTO "block_param" VALUES(2,4,'1');
 INSERT INTO "block_param" VALUES(2,5,'3');
@@ -85,7 +83,6 @@ CREATE TABLE layout (
 );
 INSERT INTO "layout" VALUES(1,'Шаблон главной страницы','index');
 INSERT INTO "layout" VALUES(2,'Шаблон внутренних страниц','default');
-INSERT INTO "layout" VALUES(3,'Шаблон для страницы ошибок','simple');
 CREATE TABLE layout_area (
   area_id integer PRIMARY KEY autoincrement,
   area_layout integer NOT NULL default '0',
@@ -96,10 +93,9 @@ CREATE TABLE layout_area (
 );
 INSERT INTO "layout_area" VALUES(1,1,'Контентная область','content',1,1);
 INSERT INTO "layout_area" VALUES(2,2,'Контентная область','content',1,1);
-INSERT INTO "layout_area" VALUES(3,3,'Контентная область','content',1,1);
-INSERT INTO "layout_area" VALUES(4,1,'Главное меню','menu',0,2);
-INSERT INTO "layout_area" VALUES(5,2,'Главное меню','menu',0,2);
-INSERT INTO "layout_area" VALUES(6,1,'Новостной блок','news',0,3);
+INSERT INTO "layout_area" VALUES(3,1,'Главное меню','menu',0,2);
+INSERT INTO "layout_area" VALUES(4,2,'Главное меню','menu',0,2);
+INSERT INTO "layout_area" VALUES(5,1,'Новостной блок','news',0,3);
 CREATE TABLE menu (
   menu_id integer PRIMARY KEY autoincrement,
   menu_parent integer NOT NULL default '0',
@@ -111,7 +107,7 @@ CREATE TABLE menu (
 );
 INSERT INTO "menu" VALUES(1,0,'Главное меню',0,'',1,1);
 INSERT INTO "menu" VALUES(2,1,'Главная',1,'',1,1);
-INSERT INTO "menu" VALUES(3,1,'Новости',3,'',2,1);
+INSERT INTO "menu" VALUES(3,2,'Новости',2,'',1,1);
 INSERT INTO "menu" VALUES(4,1,'Ссылка',0,'http://adminko.testea.ru/',3,1);
 CREATE TABLE module (
   module_id integer PRIMARY KEY autoincrement,
@@ -216,8 +212,7 @@ CREATE TABLE page (
   page_active integer NOT NULL default '0'
 );
 INSERT INTO "page" VALUES(1,0,1,'Главная страница','',0,'Заголовок главной страницы','Ключевые слова главной страницы','Описание главной страницы',1,1);
-INSERT INTO "page" VALUES(2,1,3,'Ошибка 404','404',0,'Страница не найдена','Страница не найдена','Страница не найдена',2,1);
-INSERT INTO "page" VALUES(3,1,2,'Новости','news',0,'Заголовок внутренней страницы','Ключевые слова внутренней страницы','Описание внутренней страницы',1,1);
+INSERT INTO "page" VALUES(2,1,2,'Новости','news',0,'Заголовок внутренней страницы','Ключевые слова внутренней страницы','Описание внутренней страницы',1,1);
 CREATE TABLE param_value (
   value_id integer PRIMARY KEY autoincrement,
   value_param integer NOT NULL default '0',
@@ -254,11 +249,8 @@ INSERT INTO "text" VALUES(1,'index','Главная страница','<h3>До�
 <p>Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице.&nbsp;</p>
 <p>Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице.</p>
 <p>Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице. Текст на главной странице.</p>');
-INSERT INTO "text" VALUES(2,'404','Ошибка 404','<h1 style="text-align:center">&nbsp;</h1>
-<h1 style="text-align:center"><span style="font-size:48px">404</span></h1>
-<p style="text-align:center">Страница не найдена</p>');
-INSERT INTO "text" VALUES(3,'header','Шапка сайта','<p>Шапка сайта</p>');
-INSERT INTO "text" VALUES(4,'footer','Подвал сайта','<p>Подвал сайта</p>');
+INSERT INTO "text" VALUES(2,'header','Шапка сайта','<p>Шапка сайта</p>');
+INSERT INTO "text" VALUES(3,'footer','Подвал сайта','<p>Подвал сайта</p>');
 CREATE TABLE translate (
   table_name varchar NOT NULL default '',
   field_name varchar NOT NULL default '',
@@ -268,17 +260,17 @@ CREATE TABLE translate (
 );
 DELETE FROM sqlite_sequence;
 INSERT INTO "sqlite_sequence" VALUES('admin',1);
-INSERT INTO "sqlite_sequence" VALUES('block',6);
+INSERT INTO "sqlite_sequence" VALUES('block',5);
 INSERT INTO "sqlite_sequence" VALUES('lang',2);
-INSERT INTO "sqlite_sequence" VALUES('layout',3);
-INSERT INTO "sqlite_sequence" VALUES('layout_area',6);
+INSERT INTO "sqlite_sequence" VALUES('layout',2);
+INSERT INTO "sqlite_sequence" VALUES('layout_area',5);
 INSERT INTO "sqlite_sequence" VALUES('menu',4);
 INSERT INTO "sqlite_sequence" VALUES('module',3);
 INSERT INTO "sqlite_sequence" VALUES('module_param',5);
 INSERT INTO "sqlite_sequence" VALUES('news',3);
 INSERT INTO "sqlite_sequence" VALUES('object',23);
-INSERT INTO "sqlite_sequence" VALUES('page',3);
+INSERT INTO "sqlite_sequence" VALUES('page',2);
 INSERT INTO "sqlite_sequence" VALUES('param_value',3);
 INSERT INTO "sqlite_sequence" VALUES('role',1);
-INSERT INTO "sqlite_sequence" VALUES('text',4);
+INSERT INTO "sqlite_sequence" VALUES('text',3);
 COMMIT;
