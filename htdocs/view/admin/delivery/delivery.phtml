@@ -23,7 +23,7 @@
 				Тема рассылки <span class="require">*</span>:
 			</td>
 			<td class="field">
-				<input type="text" name="subject" value="<?= $this->escape($this -> prev_mail['body_subject']) ?>" class="text" errors="require"/>
+				<input type="text" name="subject" value="<?= $this->escape($this -> prev_mail['storage_subject']) ?>" class="text" errors="require"/>
 			</td>
 		</tr>
 		<tr>
@@ -31,7 +31,7 @@
 				От кого (email) <span class="require">*</span>:
 			</td>
 			<td class="field">
-				<input type="text" name="email" value="<?= $this->escape($this -> prev_mail['body_email']) ?>" class="text" errors="require|email"/>
+				<input type="text" name="email" value="<?= $this->escape($this -> prev_mail['storage_email']) ?>" class="text" errors="require|email"/>
 			</td>
 		</tr>
 		<tr>
@@ -39,7 +39,7 @@
 				От кого (имя):
 			</td>
 			<td class="field">
-				<input type="text" name="name" value="<?= $this->escape($this -> prev_mail['body_name']) ?>" class="text"/>
+				<input type="text" name="name" value="<?= $this->escape($this -> prev_mail['storage_name']) ?>" class="text"/>
 			</td>
 		</tr>
 		<tr>
@@ -47,7 +47,7 @@
 				Текст рассылки <span class="require">*</span>:
 			</td>
 			<td class="field">
-				<textarea name="message" cols="" rows="" errors="require" class="ckeditor"><?= $this->escape($this -> prev_mail['body_text']) ?></textarea>
+				<textarea name="body" cols="" rows="" errors="require" class="ckeditor"><?= $this->escape($this -> prev_mail['storage_body']) ?></textarea>
 			</td>
 		</tr>
 		<tr>

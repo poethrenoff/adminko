@@ -321,13 +321,12 @@ class Metadata
             ),
         ),
         
-        'delivery_body' => array(
+        'delivery_message' => array(
             'title' => 'Содержимое рассылки',
             'internal' => 'true',
             'fields' => array(
-                'body_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'body_headers' => array('title' => 'Заголовки письма', 'type' => 'text'),
-                'body_text' => array('title' => 'Текст письма', 'type' => 'text'),
+                'message_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
+                'message_content' => array('title' => 'Содержимое письма', 'type' => 'text'),
             ),
         ),
         
@@ -336,7 +335,7 @@ class Metadata
             'internal' => 'true',
             'fields' => array(
                 'queue_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'queue_body' => array('title' => 'Письмо', 'type' => 'table', 'table' => 'delivery_body', 'errors' => array('require')),
+                'queue_message' => array('title' => 'Письмо', 'type' => 'table', 'table' => 'delivery_message', 'errors' => array('require')),
                 'queue_person' => array('title' => 'Получатель', 'type' => 'table', 'table' => 'delivery_person', 'errors' => array('require')),
             ),
         ),
@@ -345,11 +344,11 @@ class Metadata
             'title' => 'Последнее письмо',
             'internal' => true,
             'fields' => array(
-                'body_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
-                'body_subject' => array('title' => 'Тема письма', 'type' => 'string'),
-                'body_email' => array('title' => 'От кого', 'type' => 'string'),
-                'body_name' => array('title' => 'От кого (имя)', 'type' => 'string'),
-                'body_text' => array('title' => 'Текст письма', 'type' => 'text'),
+                'storage_id' => array('title' => 'Идентификатор', 'type' => 'pk'),
+                'storage_subject' => array('title' => 'Тема письма', 'type' => 'string'),
+                'storage_email' => array('title' => 'От кого', 'type' => 'string'),
+                'storage_name' => array('title' => 'От кого (имя)', 'type' => 'string'),
+                'storage_body' => array('title' => 'Текст письма', 'type' => 'text'),
              ),
         ),
 /**

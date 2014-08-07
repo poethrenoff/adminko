@@ -61,13 +61,13 @@ DROP SEQUENCE public.lang_lang_id_seq;
 DROP TABLE public.dictionary;
 DROP SEQUENCE public.dictionary_word_id_seq;
 DROP TABLE public.delivery_storage;
-DROP SEQUENCE public.delivery_storage_body_id_seq;
+DROP SEQUENCE public.delivery_storage_delivery_id_seq;
 DROP TABLE public.delivery_queue;
 DROP SEQUENCE public.delivery_queue_queue_id_seq;
 DROP TABLE public.delivery_person;
 DROP SEQUENCE public.delivery_person_person_id_seq;
-DROP TABLE public.delivery_body;
-DROP SEQUENCE public.delivery_body_body_id_seq;
+DROP TABLE public.delivery_message;
+DROP SEQUENCE public.delivery_message_message_id_seq;
 DROP TABLE public.block_param;
 DROP TABLE public.block;
 DROP SEQUENCE public.block_block_id_seq;
@@ -168,10 +168,10 @@ CREATE TABLE block_param (
 
 
 --
--- Name: delivery_body_body_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: delivery_message_message_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE delivery_body_body_id_seq
+CREATE SEQUENCE delivery_message_message_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -180,13 +180,12 @@ CREATE SEQUENCE delivery_body_body_id_seq
 
 
 --
--- Name: delivery_body; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: delivery_message; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE delivery_body (
-    body_id integer DEFAULT nextval('delivery_body_body_id_seq'::regclass) NOT NULL,
-    body_headers pg_catalog.text,
-    body_text pg_catalog.text
+CREATE TABLE delivery_message (
+    message_id integer DEFAULT nextval('delivery_message_message_id_seq'::regclass) NOT NULL,
+    message_content pg_catalog.text
 );
 
 
@@ -231,16 +230,16 @@ CREATE SEQUENCE delivery_queue_queue_id_seq
 
 CREATE TABLE delivery_queue (
     queue_id integer DEFAULT nextval('delivery_queue_queue_id_seq'::regclass) NOT NULL,
-    queue_body integer,
+    queue_message integer,
     queue_person integer
 );
 
 
 --
--- Name: delivery_storage_body_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: delivery_storage_storage_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE delivery_storage_body_id_seq
+CREATE SEQUENCE delivery_storage_storage_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -253,11 +252,11 @@ CREATE SEQUENCE delivery_storage_body_id_seq
 --
 
 CREATE TABLE delivery_storage (
-    body_id integer DEFAULT nextval('delivery_storage_body_id_seq'::regclass) NOT NULL,
-    body_subject character varying,
-    body_email character varying,
-    body_name character varying,
-    body_text pg_catalog.text
+    storage_id integer DEFAULT nextval('delivery_storage_body_id_seq'::regclass) NOT NULL,
+    storage_subject character varying,
+    storage_email character varying,
+    storage_name character varying,
+    storage_body pg_catalog.text
 );
 
 
@@ -693,16 +692,16 @@ INSERT INTO block_param VALUES (2, 5, '3');
 
 
 --
--- Data for Name: delivery_body; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: delivery_message; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- Name: delivery_body_body_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: delivery_message_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('delivery_body_body_id_seq', 1, false);
+SELECT pg_catalog.setval('delivery_message_message_id_seq', 1, false);
 
 
 --
@@ -741,7 +740,7 @@ SELECT pg_catalog.setval('delivery_queue_queue_id_seq', 1, false);
 -- Name: delivery_storage_body_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('delivery_storage_body_id_seq', 1, false);
+SELECT pg_catalog.setval('delivery_storage_storage_id_seq', 1, false);
 
 
 --

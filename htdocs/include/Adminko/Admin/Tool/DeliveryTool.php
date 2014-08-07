@@ -2,7 +2,7 @@
 namespace Adminko\Admin\Tool;
 
 use Adminko\System;
-use Adminko\Sendmail;
+use Adminko\Mail;
 use Adminko\Db\Db;
 use Adminko\Admin\Admin;
 
@@ -13,7 +13,7 @@ class DeliveryTool extends Admin
         $mail_count = Db::selectCell('select count(*) from delivery_queue');
 
         if (!$mail_count) {
-            Db::delete('delivery_body');
+            Db::delete('delivery_message');
         }
 
         $prev_mail = Db::selectRow('select * from delivery_storage');
@@ -37,7 +37,7 @@ class DeliveryTool extends Admin
         $email = init_string('email');
         $name = init_string('name');
         $subject = init_string('subject');
-        $message = init_string('message');
+        $body = init_string('body');
         $type = init_string('type');
 
         if ($subject === '') {
@@ -46,7 +46,7 @@ class DeliveryTool extends Admin
         if ($email === '') {
             throw new \AlarmException('Ошибка. Не заполнено поле "От кого".');
         }
-        if ($message === '') {
+        if ($body === '') {
             throw new \AlarmException('Ошибка. Не заполнено поле "Текст рассылки".');
         }
         if ($type === '') {
@@ -54,8 +54,8 @@ class DeliveryTool extends Admin
         }
 
         Db::delete('delivery_storage');
-        Db::insert('delivery_storage', array('body_subject' => $subject, 'body_email' => $email,
-            'body_name' => $name, 'body_text' => $message));
+        Db::insert('delivery_storage', array('storage_subject' => $subject, 'storage_email' => $email,
+            'storage_name' => $name, 'storage_body' => $body));
 
         switch ($type) {
             case 'send_to_all':
@@ -68,13 +68,13 @@ class DeliveryTool extends Admin
         }
 
         if (count($person_list)) {
-            list($headers, $body) = Sendmail::prepare($email, $name, $subject, $message);
+            $message = Mail::prepareMessage($email, $name, $subject, $body);
 
-            Db::insert('delivery_body', array('body_headers' => serialize($headers), 'body_text' => $body));
-            $body_id = Db::lastInsertId();
+            Db::insert('delivery_message', array('message_content' => @base64_encode(gzcompress(serialize($message)))));
+            $message_id = Db::lastInsertId();
 
             foreach ($person_list as $person) {
-                Db::insert('delivery_queue', array('queue_body' => $body_id, 'queue_person' => $person['person_id']));
+                Db::insert('delivery_queue', array('queue_message' => $message_id, 'queue_person' => $person['person_id']));
             }
         }
 

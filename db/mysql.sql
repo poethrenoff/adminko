@@ -118,27 +118,26 @@ INSERT INTO `block_param` VALUES (5,4,'1'),(5,5,'3'),(3,2,'2'),(3,3,'3'),(4,2,'1
 UNLOCK TABLES;
 
 --
--- Table structure for table `delivery_body`
+-- Table structure for table `delivery_message`
 --
 
-DROP TABLE IF EXISTS `delivery_body`;
+DROP TABLE IF EXISTS `delivery_message`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `delivery_body` (
-  `body_id` int(11) NOT NULL AUTO_INCREMENT,
-  `body_headers` text,
-  `body_text` text,
+CREATE TABLE `delivery_message` (
+  `message_id` int(11) NOT NULL AUTO_INCREMENT,
+  `message_content` mediumtext,
   PRIMARY KEY (`body_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `delivery_body`
+-- Dumping data for table `delivery_message`
 --
 
-LOCK TABLES `delivery_body` WRITE;
-/*!40000 ALTER TABLE `delivery_body` DISABLE KEYS */;
-/*!40000 ALTER TABLE `delivery_body` ENABLE KEYS */;
+LOCK TABLES `delivery_message` WRITE;
+/*!40000 ALTER TABLE `delivery_message` DISABLE KEYS */;
+/*!40000 ALTER TABLE `delivery_message` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -174,7 +173,7 @@ DROP TABLE IF EXISTS `delivery_queue`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `delivery_queue` (
   `queue_id` int(11) NOT NULL AUTO_INCREMENT,
-  `queue_body` int(11) NOT NULL DEFAULT '0',
+  `queue_message` int(11) NOT NULL DEFAULT '0',
   `queue_person` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`queue_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -197,12 +196,12 @@ DROP TABLE IF EXISTS `delivery_storage`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `delivery_storage` (
-  `body_id` int(11) NOT NULL AUTO_INCREMENT,
-  `body_subject` varchar(255) NOT NULL DEFAULT '',
-  `body_email` varchar(255) NOT NULL DEFAULT '',
-  `body_name` varchar(255) NOT NULL DEFAULT '',
-  `body_text` text,
-  PRIMARY KEY (`body_id`)
+  `storage_id` int(11) NOT NULL AUTO_INCREMENT,
+  `storage_subject` varchar(255) NOT NULL DEFAULT '',
+  `storage_email` varchar(255) NOT NULL DEFAULT '',
+  `storage_name` varchar(255) NOT NULL DEFAULT '',
+  `storage_body` text,
+  PRIMARY KEY (`storage_body`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

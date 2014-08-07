@@ -1,0 +1,3 @@
+[submodule "htdocs/include/swiftmailer"]
+	path = htdocs/include/swiftmailer
+	url = http://github.com/swiftmailer/swiftmailer.git

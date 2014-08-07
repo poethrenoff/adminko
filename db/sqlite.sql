@@ -40,10 +40,9 @@ INSERT INTO "block_param" VALUES(4,3,'10');
 INSERT INTO "block_param" VALUES(1,1,'1');
 INSERT INTO "block_param" VALUES(2,4,'1');
 INSERT INTO "block_param" VALUES(2,5,'3');
-CREATE TABLE delivery_body (
-  body_id integer PRIMARY KEY autoincrement,
-  body_headers text,
-  body_text text
+CREATE TABLE delivery_message (
+  message_id integer PRIMARY KEY autoincrement,
+  message_content text
 );
 CREATE TABLE delivery_person (
   person_id integer PRIMARY KEY autoincrement,
@@ -52,15 +51,15 @@ CREATE TABLE delivery_person (
 );
 CREATE TABLE delivery_queue (
   queue_id integer PRIMARY KEY autoincrement,
-  queue_body integer NOT NULL default '0',
+  queue_message integer NOT NULL default '0',
   queue_person integer NOT NULL default '0'
 );
 CREATE TABLE delivery_storage (
-  body_id integer PRIMARY KEY autoincrement,
-  body_subject varchar NOT NULL default '',
-  body_email varchar NOT NULL default '',
-  body_name varchar NOT NULL default '',
-  body_text text
+  storage_id integer PRIMARY KEY autoincrement,
+  storage_subject varchar NOT NULL default '',
+  storage_email varchar NOT NULL default '',
+  storage_name varchar NOT NULL default '',
+  storage_body text
 );
 CREATE TABLE dictionary (
   word_id integer PRIMARY KEY autoincrement,
