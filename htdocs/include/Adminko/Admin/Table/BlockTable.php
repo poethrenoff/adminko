@@ -120,16 +120,19 @@ class BlockTable extends BuilderTable
 
         $insert_fields = array();
         foreach ($params as $param_index => $param_value) {
-            $errors = array();
+            $param_errors = array();
             if ($param_value['param_require']) {
-                $errors[] = 'require';
+                $param_errors[] = 'require';
+            }
+            if ($param_value['param_type'] == 'int') {
+                $param_errors[] = 'int';
             }
 
             $value_content = isset($param_values[$param_value['param_id']]) ?
-                    $param_values[$param_value['param_id']] : '';
+                $param_values[$param_value['param_id']] : '';
 
             $field = Field::factory($param_value['param_type'])->set($value_content);
-            if (!($field->check($errors))) {
+            if (!($field->check($param_errors))) {
                 throw new \AlarmException('Ошибочное значение поля "' . $param_value['param_title'] . '".');
             }
             $insert_fields[$param_value['param_id']] = $field->get();
