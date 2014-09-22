@@ -27,7 +27,7 @@ ALTER TABLE ONLY public.dictionary DROP CONSTRAINT dictionary_pkey;
 ALTER TABLE ONLY public.delivery_storage DROP CONSTRAINT delivery_storage_pkey;
 ALTER TABLE ONLY public.delivery_queue DROP CONSTRAINT delivery_queue_pkey;
 ALTER TABLE ONLY public.delivery_person DROP CONSTRAINT delivery_person_pkey;
-ALTER TABLE ONLY public.delivery_body DROP CONSTRAINT delivery_body_pkey;
+ALTER TABLE ONLY public.delivery_message DROP CONSTRAINT delivery_message_pkey;
 ALTER TABLE ONLY public.block DROP CONSTRAINT block_pkey;
 ALTER TABLE ONLY public.admin DROP CONSTRAINT admin_pkey;
 DROP TABLE public.translate;
@@ -252,7 +252,7 @@ CREATE SEQUENCE delivery_storage_storage_id_seq
 --
 
 CREATE TABLE delivery_storage (
-    storage_id integer DEFAULT nextval('delivery_storage_body_id_seq'::regclass) NOT NULL,
+    storage_id integer DEFAULT nextval('delivery_storage_storage_id_seq'::regclass) NOT NULL,
     storage_subject character varying,
     storage_email character varying,
     storage_name character varying,
@@ -737,7 +737,7 @@ SELECT pg_catalog.setval('delivery_queue_queue_id_seq', 1, false);
 
 
 --
--- Name: delivery_storage_body_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: delivery_storage_storage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('delivery_storage_storage_id_seq', 1, false);
@@ -1022,11 +1022,11 @@ ALTER TABLE ONLY block
 
 
 --
--- Name: delivery_body_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: delivery_message_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY delivery_body
-    ADD CONSTRAINT delivery_body_pkey PRIMARY KEY (body_id);
+ALTER TABLE ONLY delivery_message
+    ADD CONSTRAINT delivery_message_pkey PRIMARY KEY (message_id);
 
 
 --
@@ -1050,7 +1050,7 @@ ALTER TABLE ONLY delivery_queue
 --
 
 ALTER TABLE ONLY delivery_storage
-    ADD CONSTRAINT delivery_storage_pkey PRIMARY KEY (body_id);
+    ADD CONSTRAINT delivery_storage_pkey PRIMARY KEY (storage_id);
 
 
 --

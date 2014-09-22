@@ -127,7 +127,7 @@ DROP TABLE IF EXISTS `delivery_message`;
 CREATE TABLE `delivery_message` (
   `message_id` int(11) NOT NULL AUTO_INCREMENT,
   `message_content` mediumtext,
-  PRIMARY KEY (`body_id`)
+  PRIMARY KEY (`message_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -201,7 +201,7 @@ CREATE TABLE `delivery_storage` (
   `storage_email` varchar(255) NOT NULL DEFAULT '',
   `storage_name` varchar(255) NOT NULL DEFAULT '',
   `storage_body` text,
-  PRIMARY KEY (`storage_body`)
+  PRIMARY KEY (`storage_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
